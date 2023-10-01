@@ -2,9 +2,12 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from bs4 import BeautifulSoup
 import requests
+from flask_pymongo import PyMongo
 
 app = Flask(__name__)
 CORS(app)
+app.config["MONGO_URI"] = "mongodb://localhost:27017/costcomeat"
+mongo = PyMongo(app)
 
 BASE_URL = "https://www.costco.com/meat.html"
 HEADERS = {
@@ -23,21 +26,31 @@ def scrape_page(url):
 
 @app.route('/scrape')
 def index():
-    try :
+    try:
+        products_collection = mongo.db.products
         all_products = []
         page = 1
+
         while True:
             url = f"{BASE_URL}?currentPage={page}"
             product_names, product_prices, product_images = scrape_page(url)
+
             if not product_names:
                 break
-            all_products.extend(
-                [{"name": name, "price": price, "src": src} for name, price, src in zip(product_names, product_prices, product_images)]
-            )
+
+            for name, price, src in zip(product_names, product_prices, product_images):
+                criteria = {"name": name}
+
+                new_values = {"$set": {"name": name, "price": price, "src": src}}
+
+                products_collection.update_one(criteria, new_values, upsert=True)
+                all_products.append({"name": name, "price": price, "src": src})
+
             page += 1
+
         return jsonify(products=all_products)
     except requests.RequestException as e:
-            return jsonify(error=f"Request error: {str(e)}"), 500
+        return jsonify(error=f"Request error: {str(e)}"), 500
     except Exception as e:
         return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
 
