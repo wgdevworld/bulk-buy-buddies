@@ -1,0 +1,70 @@
+/* Messenger.css */
+
+.messenger {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 20%;
+  background-color: #f1f1f1;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  margin-bottom: 10px;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.sidebar li.selected {
+  background-color: #e6e6e6;
+}
+
+.main {
+  flex-grow: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+}
+
+.message {
+  display: inline-block;
+  max-width: 75%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.sent {
+  align-self: flex-end;
+  background-color: #dcf8c6;
+}
+
+.received {
+  align-self: flex-start;
+  background-color: #f1f0f0;
+}
+
+form {
+  display: flex;
+  margin-top: auto;
+}
+
+input[type="text"] {
+  flex-grow: 1;
+  padding: 10px;
+}
+
+button[type="submit"] {
+  padding: 10px;
+}

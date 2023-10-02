@@ -1,9 +1,19 @@
 from flask import Flask
-
-app = Flask(__name__)
-
+from Messaging import messaging_api
 import sys
-print(sys.path)
+from flask_cors import CORS
+from flask_pymongo import PyMongo
+
+# Flask Configurations
+app = Flask(__name__)
+CORS(app)
+
+# MongoDB Configuration
+app.config["MONGO_URI"] = "mongodb://localhost:27017/bbb"
+app.config["MONGO"] = PyMongo(app)
+
+# API Functionality
+app.register_blueprint(messaging_api)
 
 @app.route('/')
 def index():
