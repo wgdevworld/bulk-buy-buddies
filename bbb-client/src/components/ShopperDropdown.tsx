@@ -18,7 +18,7 @@ export default function Dropdown({ options, onSelect }: DropdownProps) {
 
   return (
     <div>
-      {/* <label>Category:</label> */}
+      <label>Category:</label>
       <select value={selectedOption} onChange={handleSelectChange}>
         <option value="">Choose product category</option>
         {options.map((option) => (

@@ -6,8 +6,13 @@ import ShopperForm from "@/components/ShopperForm";
 
 export default function Home() {
   return (
-    <div>
-      <Messenger />
-    </div>
+    <>
+      <div>
+        <Messenger />
+      </div>
+      <div>
+        <ShopperForm />
+      </div>
+    </>
   );
 }

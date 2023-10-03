@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import ShopperDropdown from "./ShopperDropdown";
-import DateTimePicker from "react-datetime-picker";
+import DatePicker from "react-datepicker";
+import "../components/ShopperForm.css";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface ShoppingForm {
   //   reqID: string;
@@ -16,6 +18,11 @@ interface ShoppingForm {
 const options = ["beef", "pork", "chicken"];
 
 function ShopperForm() {
+  const [category, setCategory] = useState<string>();
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [quantity, setQuantity] = useState<number>();
+  const [date1, setDate1] = useState(new Date());
   const [formData, setFormData] = useState<ShoppingForm>({
     // reqID: "",
     // userID: "",
@@ -57,7 +64,7 @@ function ShopperForm() {
     // update useState
   };
 
-  const handleStartTimeSelect = (selectedOption: Date) => {
+  const handleStartTimeSelect = (selectedOption: void) => {
     console.log(`Selected option: ${selectedOption}`);
     // update useState
   };
@@ -70,18 +77,28 @@ function ShopperForm() {
       </div>
       <form onSubmit={handleSubmit}>
         {/* Render form fields based on the ShoppingForm interface */}
-        <ShopperDropdown options={options} onSelect={handleCategorySelect} />
-        <DateTimePicker onChange={handleStartTimeSelect} />
-        <input type="number" placeholder="Enter quantity" />
-        {/* <input
-          type="text"
-          placeholder="Request ID"
-          value={formData.reqID}
-          onChange={(e) => setFormData({ ...formData, reqID: e.target.value })}
-        />
-        <input type="text" /> */}
-        {/* Other form fields go here */}
-        <button type="submit">Submit</button>
+        <div className="vertical-container">
+          <ShopperDropdown options={options} onSelect={handleCategorySelect} />
+          <input type="number" placeholder="Enter quantity" />
+          <div>
+            <DatePicker selected={date1} onChange={(date) => setDate1(date1)} />
+            <DatePicker
+              showTimeSelect
+              dateFormat="MM/dd/yyyy h:mm aa"
+              selected={startDate}
+              minDate={new Date()}
+              onChange={(date) => setStartDate(startDate)}
+            />
+            <DatePicker
+              showTimeSelect
+              dateFormat="MM/dd/yyyy h:mm aa"
+              selected={endDate}
+              minDate={new Date()}
+              onChange={(date) => setEndDate(endDate)}
+            />
+          </div>
+          <button type="submit">Submit</button>
+        </div>
       </form>
     </>
   );
