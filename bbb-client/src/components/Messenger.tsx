@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from "uuid";
 import "./Messenger.css";
 import { Chat, IMessage, fetchChats, sendMessage } from "./MessengerHelper";
 
+// const socket = io("http://localhost:5000");
+
 const Messenger = () => {
   const uid = "000";
 
@@ -17,7 +19,19 @@ const Messenger = () => {
       let fetchedChats = await fetchChats(uid);
       setChats(fetchedChats!);
     })();
+
+    // Websockets init
+    // socket.on("new_message", (messageData: IMessage) => {
+    //   setMessages((prevMessages) => [...prevMessages, messageData]);
+    // });
+
+    // return () => {
+    //   // Websockets disconnect
+    //   socket.disconnect();
+    // };
   }, [uid]);
+
+  useEffect(() => {}, []);
 
   // Send the currently typed message
   const sendCurrentBuffer = async (e: FormEvent) => {
@@ -36,6 +50,9 @@ const Messenger = () => {
     await sendMessage(messageData);
     setMessages([...messages, messageData]);
     setBuffer("");
+
+    // Send message thru socket
+    // socket.emit("new_message", messageData);
   };
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {

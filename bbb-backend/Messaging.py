@@ -17,8 +17,15 @@ It then unpacks the message data from the POST request body JSON.
 On success, a JSON response with a 'success' key is returned.
 On failure, a JSON response with an 'error' key containing the exception message is returned.
 """
-@messaging_api.route("/save_message", methods=['POST'])
+@messaging_api.route("/save_message", methods=['POST', 'OPTIONS'])
 def save_message():
+    if request.method == 'OPTIONS':
+        # Handle the OPTIONS method
+        response = current_app.make_default_options_response()
+        response.headers['Access-Control-Allow-Origin'] = '*'  # Set appropriate CORS headers
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        return response
+
     try:
         # set the messages database
         mongo = current_app.config['MONGO']
@@ -27,14 +34,15 @@ def save_message():
         # unpack the message data from the request
         message_data = request.get_json()
         message_dict = {
-            "id": message_data['id'],
+            "_id": message_data['id'],
             "text": message_data['text'],
             "fromUid": message_data['fromUid'],
             "toUid": message_data['toUid'],
-            "timestamp": message_data['text'],
+            "timestamp": message_data['timestamp'],
         }
         messages_collection.insert_one(message_dict)
-        return jsonify(success=true)
+        print(message_dict)
+        return jsonify(success=True)
 
     except exception as e:
         return jsonify(error=str(e)), 500
