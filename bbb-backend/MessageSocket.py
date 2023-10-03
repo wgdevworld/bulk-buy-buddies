@@ -1,4 +1,4 @@
-from flask import current_app
+from flask import current_app, Blueprint
 from flask_socketio import Namespace, emit
 
 class MessageSocket(Namespace):
