@@ -3,6 +3,8 @@ from flask_cors import CORS
 from bs4 import BeautifulSoup
 import requests
 from flask_pymongo import PyMongo
+import os
+from dotenv import dotenv_values
 
 app = Flask(__name__)
 CORS(app)
