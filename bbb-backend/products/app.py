@@ -6,7 +6,9 @@ from flask_pymongo import PyMongo
 
 app = Flask(__name__)
 CORS(app)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/products"
+secrets = dotenv_values(".env")
+app.config["MONGO_URI"] = f"mongodb+srv://{secrets['ATLAS_USR']}:{secrets['ATLAS_PWD']}@atlascluster.zojbxi7.mongodb.net/bbb?retryWrites=true&w=majority"
+
 mongo = PyMongo(app)
 
 BASE_URL = "https://www.costco.com/meat.html"
@@ -39,7 +41,7 @@ def extract_price(price_str):
 @app.route('/scrape')
 def index():
     try:
-        products_collection = mongo.db.all_products
+        products_collection = mongo.db.products
         all_products = []
         page = 1
 
@@ -87,7 +89,7 @@ def search():
             "type": category
         }
 
-        products = list(mongo.db.all_products.find(query))
+        products = list(mongo.db.products.find(query))
 
         results = []
         for product in products:
