@@ -1,0 +1,17 @@
+.product-list {
+    display: flex;
+    overflow-x: auto; 
+    gap: 16px;
+  }
+  
+  .product-card {
+    flex: 0 0 auto;
+    min-width: 200px;
+  }
+
+  .product-card-text {
+    max-width: 250px; 
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
