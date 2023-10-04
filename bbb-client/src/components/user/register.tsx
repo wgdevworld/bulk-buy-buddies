@@ -1,9 +1,5 @@
 import React, { FormEvent, useState } from "react";
-
-interface Values {
-    username: string;
-    password: string;
-}
+import Login from "@/components/user/login"
 
 function Register() {
     const [firstname, setFirstname] = useState("");
@@ -35,10 +31,12 @@ function Register() {
             //     setSuccess(true)
             // })
             console.log(response)
+            console.log(response.json())
             if (!response.ok) {
                 throw new Error("Failed to register user");
             }
             console.log("registered new user")
+            setSuccess(true)
         } catch (error) {
             console.error("Error creating user:", error);
         }
@@ -47,7 +45,10 @@ function Register() {
     return (
         <div>
             {success ?
-                <div> Form submitted </div>
+                <div> 
+                    Successfully registered! Log in to find your bbb!
+                    <Login />
+                </div>
                 :
                 <form onSubmit={registerUser}>
                     <div>
