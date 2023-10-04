@@ -1,0 +1,8 @@
+h1{
+    font-size: 100px;
+}
+
+body{
+    display: flex;
+    background-color: rgb(81, 81, 112);
+}
