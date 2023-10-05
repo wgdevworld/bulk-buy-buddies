@@ -1,11 +1,19 @@
 import { list } from "postcss";
 import React, { useState, useEffect, Fragment } from "react";
-
+import ProductCard from "./ProductList/ProductCard";
+ 
+export interface Product {
+    _id: string;
+    name: string;
+    price: number;
+    src: string;
+  }
+  
 const ProductRec = () => {
     const [userCategory, setUserCategory] = useState<String>('');
     const [userQuantity, setUserQuantity] = useState<String>('');
     const [buddyQuantity, setBuddyQuantity] = useState<String>('');
-    const [products, setProducts] = useState();
+    const [products, setProducts] = useState([]);
 
     const handleClick = async () => {
         try {
@@ -36,10 +44,10 @@ const ProductRec = () => {
         { view: "Pork", value: "pork" },
         { view: "Turkey", value: "turkey" },
         { view: "Beef", value: "beef" },
-        { view: "Coffee", value: "coffee" },
+        { view: "Coffee", value: "coffee-sweeteners" },
     ];
     return (
-        <div>
+        <div >
             <div>
                 <p>Choose users' product category</p>
                 {radioOptions.map(({view: title, value: option}: any) => {
@@ -52,11 +60,11 @@ const ProductRec = () => {
                                 checked = {option === userCategory}
                                 onChange={(e) => onRadioChange(e)}
                             />
-                            {title}
+                            {title}<br/>
                         </>
                     );
                 })}
-            </div>
+            </div><br/>
             <div>
                 <label>
                 User Quantity:
@@ -76,14 +84,18 @@ const ProductRec = () => {
                     onChange={(e) => onBuddyqChange(e)}
                 />
                 </label>
-            </div>
+            </div><br/>
             <button type="submit" onClick={handleClick}>Submit</button>
-            {products ? 
+            {products.length !== 0 ? 
                 (<>
+                    <br/>
                     <p>form submission complete, displaying product list below</p>
-                    
+                    <ul className="product-list">
+                        {products.map((product: Product) => (
+                            <ProductCard product={product} key={product._id} />
+                        ))}
+                    </ul>
                 </>
-                
                 )
                 : <></>
             }

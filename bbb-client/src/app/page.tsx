@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <div>
       {/* <Messenger /> */}
-      {/* <ProductList /> */}
+      {/* <ProductRec /> */}
     </div>
   );
 }
