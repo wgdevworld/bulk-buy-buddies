@@ -2,14 +2,14 @@
 
 import Messenger from "@/components/Messenger";
 import ProductList from "@/components/ProductList/ProductMain";
-import ShopperForm from "@/components/ShopperForm";
+import ShopperForm from "@/components//ShopperForm/ShopperForm";
 
 export default function Home() {
   return (
     <>
-      <div>
+      {/* <div>
         <Messenger />
-      </div>
+      </div> */}
       <div>
         <ShopperForm />
       </div>
