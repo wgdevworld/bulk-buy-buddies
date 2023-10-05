@@ -2,8 +2,9 @@
 
 import Messenger from "@/components/Messenger";
 import ProductList from "@/components/ProductList/ProductMain";
-import Register from "@/components/user/register"
-import Login from "@/components/user/login"
+import ShopperForm from "@/components//ShopperForm/ShopperForm";
+import Register from "@/components/user/register";
+import Login from "@/components/user/login";
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
       {/* <ProductList /> */}
       {/* <Register /> */}
       {/* <Login /> */}
+      {/* <ShopperForm /> */}
     </div>
   );
 }
