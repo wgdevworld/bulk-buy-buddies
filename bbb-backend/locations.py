@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv, find_dotenv
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins='http://127.0.0.1:5000')
 
 load_dotenv (find_dotenv())
 password = os.getenv("MONGODB_PWD")
@@ -24,6 +24,7 @@ def get_locations():
         for doc in locations_collection.find():
             location = {
                 "_id": str(doc["_id"]),
+                "name": doc["name"],
                 "address": doc["address"],
                 "coordinates": doc["location"]["coordinates"],
                 "openHours": doc["openHours"]
