@@ -27,9 +27,6 @@ function Register() {
                 },
                 body: JSON.stringify(user_info),
             })
-            // .then(() => {
-            //     setSuccess(true)
-            // })
             console.log(response)
             console.log(response.json())
             if (!response.ok) {

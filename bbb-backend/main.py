@@ -1,6 +1,6 @@
 from flask import Flask
 from Messaging import messaging_api
-from user_app import user
+from user.user_app import user
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 

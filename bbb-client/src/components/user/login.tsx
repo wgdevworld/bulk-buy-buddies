@@ -21,9 +21,6 @@ function Login() {
                 },
                 body: JSON.stringify(user_info),
             })
-            // .then(() => {
-            //     setSuccess(true)
-            // })
             console.log(response)
             if (!response.ok) {
                 throw new Error("Failed to login");

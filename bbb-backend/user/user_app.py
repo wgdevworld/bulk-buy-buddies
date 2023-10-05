@@ -1,14 +1,17 @@
 from flask import Flask, request, jsonify, Blueprint
-from user_model import User
+# from user_model import User
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 import certifi
+from dotenv import dotenv_values
 
 user = Blueprint('user', __name__)
 app = Flask(__name__)
+# secrets = dotenv_values('.env')  #ends up being empty?
 CORS(app)
+# app.config["MONGO_URI"] = f"mongodb+srv://{secrets['ATLAS_USR']}:{secrets['ATLAS_PWD']}@atlascluster.zojbxi7.mongodb.net/bbb"
 app.config["MONGO_URI"] = "mongodb+srv://czfrance:bbb2024DUKE@atlascluster.zojbxi7.mongodb.net/bbb"
 mongo = PyMongo(app,tlsCAFile=certifi.where())
 users = mongo.db.users
@@ -17,11 +20,10 @@ users = mongo.db.users
 def register():
     try:
         registration_info = request.get_json()
-        
         user = {
             "id": uuid.uuid4().hex,
             "firstname": registration_info['firstname'],
-            "firstname": registration_info['lastname'],
+            "lastname": registration_info['lastname'],
             "email": registration_info['email'],
             "password": generate_password_hash(registration_info['password'])
         }
