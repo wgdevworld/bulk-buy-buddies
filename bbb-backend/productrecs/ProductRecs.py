@@ -25,10 +25,8 @@ def fetchBestProduct():
         desired_quantity = user_quantity + buddy_quantity
         lower_bound = int(desired_quantity*0.8)
         upper_bound = int(desired_quantity*1.2)
-        print('ok!')
         products = list(mongo.db.product.find({'category':category_str,'quantity':{'$lte':upper_bound,'$gte':lower_bound}}))
         # products = list(mongo.db.product.find({"category":category_str,"quantity":{'$ne': None,'$lte':upper_bound,'gte':lower_bound}}))
-        print('0k')
         results = []
         for product in products:
             product['_id'] = str(product['_id'])
