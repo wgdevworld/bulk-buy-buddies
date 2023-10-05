@@ -9,7 +9,7 @@ const containerStyle = {
 
 function MapComponent({center, setCenter}: {center: {lat: number, lng: number}, setCenter:React.Dispatch<React.SetStateAction<{ lat: number; lng: number }>> }) {
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || "AIzaSyAc_M-Qxm_gfgUxldg45z9cDJ7uosPP9VA"
+    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || "" //string empty for now since using personal API key
   });
 
   if (loadError) {
