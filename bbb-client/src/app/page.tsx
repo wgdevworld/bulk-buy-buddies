@@ -1,13 +1,14 @@
 "use client";
 
 import Messenger from "@/components/Messenger";
-import ProductList from "@/components/ProductList";
 import ProductRec from "@/components/ProductRec";
+import ProductList from "@/components/ProductList/ProductMain";
 
 export default function Home() {
   return (
     <div>
-      <ProductRec />
+      {/* <Messenger /> */}
+      {/* <ProductList /> */}
     </div>
   );
 }
