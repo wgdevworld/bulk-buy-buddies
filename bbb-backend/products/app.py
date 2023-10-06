@@ -5,6 +5,7 @@ import requests
 from flask_pymongo import PyMongo
 import os
 from dotenv import dotenv_values
+import re
 
 app = Flask(__name__)
 CORS(app)
@@ -13,7 +14,9 @@ app.config["MONGO_URI"] = f"mongodb+srv://{secrets['ATLAS_USR']}:{secrets['ATLAS
 
 mongo = PyMongo(app)
 
-BASE_URL = "https://www.costco.com/meat.html"
+category = "turkey"
+
+BASE_URL = f"https://www.costco.com/{category}.html"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"
 }
@@ -29,15 +32,11 @@ def scrape_page(url):
     return product_names, product_prices, product_images
 
 def extract_price(price_str):
-    # Remove any dollar signs or commas
     cleaned_price_str = price_str.replace('$', '').replace(',', '')
     
-    # Check if the string contains "through"
     if 'through' in cleaned_price_str:
-        # Take the first value (the minimum) in the range
         cleaned_price_str = cleaned_price_str.split('through')[0].strip()
     
-    # Convert to float
     return float(cleaned_price_str)
 
 @app.route('/scrape')
@@ -55,14 +54,33 @@ def index():
                 break
 
             for name, price_str, src in zip(product_names, product_prices, product_images):
-                # Use the helper function to extract the price
                 price = extract_price(price_str)
 
+                match = re.search(r'(\d+(\.\d+)?)\s*lbs', name)
+                if match:
+                    quantity = float(match.group(1))
+                else:
+                    quantity = None
+
                 criteria = {"name": name}
-                new_values = {"$set": {"name": name, "price": price, "src": src, "type": "meat"}}
+                new_values = {
+                    "$set": {
+                        "name": name, 
+                        "price": price, 
+                        "src": src, 
+                        "category": category,
+                        "quantity": quantity 
+                    }
+                }
 
                 products_collection.update_one(criteria, new_values, upsert=True)
-                all_products.append({"name": name, "price": price, "src": src, "type": "meat"})
+                all_products.append({
+                    "name": name, 
+                    "price": price, 
+                    "src": src, 
+                    "category": category,
+                    "quantity": quantity 
+                })
 
             page += 1
 
@@ -81,15 +99,16 @@ def search():
 
         min_price_str = request.args.get('min_price')
         max_price_str = request.args.get('max_price')
-        category = request.args.get('category', 'meat')
+        category = request.args.get('category')
         min_price = float(min_price_str) if min_price_str != "" else 0
         max_price = float(max_price_str) if max_price_str != "" else float('inf')
 
         query = {
             "name": {"$regex": search_term, "$options": "i"},
             "price": {"$gte": min_price, "$lte": max_price},
-            "type": category
         }
+        if (category) :
+            query["category"] = category
 
         products = list(mongo.db.products.find(query))
 
