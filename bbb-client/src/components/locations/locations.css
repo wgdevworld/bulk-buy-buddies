@@ -1,0 +1,59 @@
+
+
+body{
+    background-color: rgb(255, 255, 255);
+}
+
+
+.locations{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.locations-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    border: 1px solid black;
+}
+
+
+.map-container {
+    padding:20px;
+    margin-bottom:40px;
+    width: 85%;
+    height: 100%;
+}
+
+
+.location-title {
+    font-size: 50px;
+    padding:40px;
+    border: 2px solid black;
+    border-radius: 20px;
+    background-color: rgb(196, 192, 186);
+    box-shadow: 1px 1px 1px  rgb(11, 11, 11);
+}
+
+.locations-list {
+    padding: 15px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid black;
+    border-radius: 30px;
+    background-color: rgb(206, 211, 222);
+}
+.locations-list:hover {
+    background-color: rgb(148, 145, 172);
+    box-shadow: 1px 1px 1px  rgb(11, 11, 11);
+}
+.locations-list:click {
+    background-color: rgb(148, 145, 172);
+    box-shadow: 1px 1px 1px  rgb(11, 11, 11);
+}
+
