@@ -14,18 +14,32 @@ app.config["MONGO_URI"] = f"mongodb+srv://{secrets['ATLAS_USR']}:{secrets['ATLAS
 
 mongo = PyMongo(app)
 
-category = "turkey"
 
-BASE_URL = f"https://www.costco.com/{category}.html"
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"
+# RALEIGH: 645
+# APEX: 1206
+# DURHAM: 249
+
+BASE_URL = f"https://www.costco.com/"
+
+headers = {
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "Referer": BASE_URL,
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    "Host": "www.costco.com"
 }
 
-def scrape_page(url):
+
+def scrape_page(session, url, page=1):
+    url = f"{url}?currentPage={page}"
     print('ℹ️ scraping page ' + url)
-    response = requests.get(url, headers=HEADERS)
-    response.raise_for_status()  
+    response = session.get(url)
+    response.raise_for_status()
     soup = BeautifulSoup(response.content, 'html.parser')
+    
     product_names = [link.text.strip() for link in soup.select('a[automation-id^="productDescriptionLink_"]')]
     product_prices = [tag.text.strip() for tag in soup.select('div[automation-id^="itemPriceOutput_"]')]
     product_images = [tag['src'] for tag in soup.select('img[automation-id^="productImageLink_"]') if tag.has_attr('src')]
@@ -33,62 +47,81 @@ def scrape_page(url):
 
 def extract_price(price_str):
     cleaned_price_str = price_str.replace('$', '').replace(',', '')
-    
     if 'through' in cleaned_price_str:
         cleaned_price_str = cleaned_price_str.split('through')[0].strip()
-    
     return float(cleaned_price_str)
 
-@app.route('/scrape')
-def index():
+@app.route('/scrape/<category>/<location>')
+def index(category, location):
+    print(f"Entered scrape route with category {category} and location {location}")
+    BASE_URL = f"https://www.costco.com/{category}.html"
     try:
-        products_collection = mongo.db.products
-        all_products = []
-        page = 1
+        with requests.Session() as session:
+            session.headers.update(headers)
 
-        while True:
-            url = f"{BASE_URL}?currentPage={page}"
-            product_names, product_prices, product_images = scrape_page(url)
+            warehouse_update_url = f"https://www.costco.com/AjaxWarehouseUpdateCmd?warehouseId={location}"
+            response = session.get(warehouse_update_url, timeout=10)
+            response.raise_for_status()
 
-            if not product_names:
-                break
+            products_collection = mongo.db.products
+            all_products = []
+            page = 1
+            scraped_products_names = set()
 
-            for name, price_str, src in zip(product_names, product_prices, product_images):
-                price = extract_price(price_str)
+            while True:
+                product_names, product_prices, product_images = scrape_page(session, BASE_URL, page)
 
-                match = re.search(r'(\d+(\.\d+)?)\s*lbs', name)
-                if match:
-                    quantity = float(match.group(1))
-                else:
-                    quantity = None
+                if not product_names:
+                    break
 
-                criteria = {"name": name}
-                new_values = {
-                    "$set": {
+                for name, price_str, src in zip(product_names, product_prices, product_images):
+                    price = extract_price(price_str)
+                    scraped_products_names.add(name)
+
+                    match = re.search(r'(?i)(\d+(\.\d+)?)\s*lb\.?', name)
+                    if match:
+                        quantity = float(match.group(1))
+                    else:
+                        quantity = None
+
+                    criteria = {"name": name}
+                    new_values = {
+                        "$set": {
+                            "name": name, 
+                            "price": price, 
+                            "src": src, 
+                            "category": category,
+                            "quantity": quantity 
+                        },
+                        "$addToSet": {
+                            "locations": location
+                        }
+                    }
+
+                    products_collection.update_one(criteria, new_values, upsert=True)
+                    all_products.append({
                         "name": name, 
                         "price": price, 
                         "src": src, 
                         "category": category,
-                        "quantity": quantity 
-                    }
-                }
+                        "quantity": quantity,
+                        "locations": [location]
+                    })
+                page += 1
 
-                products_collection.update_one(criteria, new_values, upsert=True)
-                all_products.append({
-                    "name": name, 
-                    "price": price, 
-                    "src": src, 
-                    "category": category,
-                    "quantity": quantity 
-                })
-
-            page += 1
+        all_products_in_db = products_collection.find({"locations": location}, {"name": 1})
+        for product in all_products_in_db:
+            if product["name"] not in scraped_products_names:
+                products_collection.update_one({"name": product["name"]}, {"$pull": {"locations": location}})
 
         return jsonify(products=all_products)
     except requests.RequestException as e:
         return jsonify(error=f"Request error: {str(e)}"), 500
+    except requests.Timeout:
+        return jsonify(error="Request timed out"), 500
     except Exception as e:
         return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
+
 
 
 
