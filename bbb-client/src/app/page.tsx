@@ -3,11 +3,11 @@
 import Messenger from "@/components/Messenger";
 import ProductRec from "@/components/ProductRec";
 import ProductList from "@/components/ProductList/ProductMain";
-import Register from "@/components/user/register"
-import Login from "@/components/user/login"
-import Locations from "@/components/locations/locations"
+import Register from "@/components/user/register";
+import Login from "@/components/user/login";
+import Locations from "@/components/locations/locations";
 import ShopperForm from "@/components//ShopperForm/ShopperForm";
-
+import ShopperMatch from "@/components/ShopperMatch/ShopperMatch";
 
 export default function Home() {
   return (
@@ -19,6 +19,7 @@ export default function Home() {
       {/* <Login /> */}
       {/* <Locations /> */}
       {/* <ShopperForm /> */}
+      <ShopperMatch />
     </div>
   );
 }
