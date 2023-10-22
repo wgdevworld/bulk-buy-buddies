@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import RequestCard from "./RequestCard";
 // import "./ShopperForm.css";
 
 interface RequestForm {
   //   reqID: string;
   //   userID: string;
   category: string | undefined;
+  prodID: string;
   quantity: number | undefined;
   location: string | undefined;
   timeStart: Date | null;
@@ -73,12 +75,11 @@ function MyRequests() {
       <div>Recommended Bulk Buy Buddies</div>
       <div>Shoppers we recommend you match with based on your preference.</div>
       <div>
-        {matches.map((item, index) => (
-          <ShopperCard
+        {requests.map((item, index) => (
+          <RequestCard
             key={index}
-            userID={item.userId}
             category={item.category}
-            prodID={item.prodId}
+            prodID={item.prodID}
             quantity={item.quantity}
             location={item.location}
           />
