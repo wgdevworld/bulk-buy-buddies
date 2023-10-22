@@ -22,7 +22,7 @@ function MyRequests() {
 
   const fetchMyRequests = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/get_locations");
+      const response = await fetch("http://127.0.0.1:5000/get_my_requests");
       const data = await response.json();
       console.log(data);
       setRequests(data);
