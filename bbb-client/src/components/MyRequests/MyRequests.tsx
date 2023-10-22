@@ -1,9 +1,7 @@
-import React, { useState } from "react";
-import { matches } from "./SampleShoppers";
-import ShopperCard from "./ShopperCard";
+import React, { useEffect, useState } from "react";
 // import "./ShopperForm.css";
 
-interface ShoppingForm {
+interface RequestForm {
   //   reqID: string;
   //   userID: string;
   category: string | undefined;
@@ -14,19 +12,22 @@ interface ShoppingForm {
   status: boolean;
 }
 
-const categories = ["beef", "pork", "chicken"];
-const locations = ["Durham", "Charlotte", "Raleigh"];
+function MyRequests() {
+  const [requests, setRequests] = useState<RequestForm[]>([]);
+  useEffect(() => {
+    fetchMyRequests();
+  }, []);
 
-function ShopperMatch() {
-  const shopperList = matches.map((request) => (
-    <li key={request.reqId}>
-      <div>UserID: {request.userId}</div>
-      <div>Category: {request.category}</div>
-      <div>ProductID: {request.prodId}</div>
-      <div>Quantity: {request.quantity}</div>
-      <div>Location: {request.location}</div>
-    </li>
-  ));
+  const fetchMyRequests = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/get_locations");
+      const data = await response.json();
+      console.log(data);
+      setRequests(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   //   const [category, setCategory] = useState<string | undefined>("");
   //   const [quantity, setQuantity] = useState<number | undefined>(0);
   //   const [location, setLocation] = useState<string | undefined>("");
@@ -83,23 +84,8 @@ function ShopperMatch() {
           />
         ))}
       </div>
-      {/* <form onSubmit={handleSubmit}>
-        <div className="vertical-container">
-          <input
-            type="number"
-            placeholder="Enter quantity"
-            value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
-          />
-
-          <button type="submit">Submit</button>
-        </div>
-      </form>
-      {responseContent !== null && (
-        <pre>{JSON.stringify(responseContent, null, 2)}</pre>
-      )} */}
     </>
   );
 }
 
-export default ShopperMatch;
+export default MyRequests;

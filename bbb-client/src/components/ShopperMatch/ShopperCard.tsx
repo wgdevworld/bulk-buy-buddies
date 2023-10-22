@@ -5,6 +5,7 @@ interface ShopperCardProps {
   //   reqID: string;
   userID: string;
   category: string | undefined;
+  prodID: string;
   quantity: number | undefined;
   location: string | undefined;
   //   timeStart: Date | null;
@@ -15,6 +16,7 @@ interface ShopperCardProps {
 export default function ShopperCard({
   userID,
   category,
+  prodID,
   quantity,
   location,
 }: ShopperCardProps) {
@@ -22,9 +24,16 @@ export default function ShopperCard({
     <div className="card">
       {/* userD corresponds to username */}
       <h2>UserID: {userID}</h2>
-      <p>Category: {category}</p>
+      <p>
+        Shopping for {category} {prodID} at {location}
+      </p>
+      {/* <p>Category: {category}</p> */}
       <p>Quantity: {quantity}</p>
-      <p>Location: {location}</p>
+      {/* <p>Location: {location}</p> */}
+      <div className="button-container">
+        <button className="button">Select Buddy</button>
+        <button className="button">Learn More</button>
+      </div>
     </div>
   );
 }
