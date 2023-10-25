@@ -124,3 +124,11 @@ def login():
         print(f'Exception: {e}')
         return jsonify(error=str(e)), 500
     
+    
+def refreshToken():
+    curr_user = session.get('user')
+    refresh_user = auth.refresh(user['refreshToken'])
+    curr_user['idToken'] = refresh_user['idToken']
+    curr_user['refreshToken'] = refresh_user['refreshToken']
+
+    session['user'] = curr_user
