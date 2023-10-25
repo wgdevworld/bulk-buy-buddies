@@ -124,6 +124,21 @@ def login():
         print(f'Exception: {e}')
         return jsonify(error=str(e)), 500
     
+
+@user.route("/logout", methods=['POST'])
+def logout():
+    try:
+        temp_user = session.get('user')
+        session.pop('user')
+        auth.current_user = None
+        
+        return jsonify(temp_user), 200
+
+    except Exception as e:
+        print("exception")
+        print(f'Exception: {e}')
+        return jsonify(error=str(e)), 500
+
     
 def refreshToken():
     curr_user = session.get('user')
