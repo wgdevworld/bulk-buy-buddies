@@ -1,15 +1,22 @@
-from flask import Flask
+from flask import Flask, session
+from flask_session import Session
 from Messaging import messaging_api
 import sys
 from user.user_app import user
 from flask_cors import CORS
 from flask_pymongo import PyMongo
-import uuid
+import secrets
 
 # Flask Configurations
 app = Flask(__name__)
-CORS(app)
-app.secret_key = uuid.uuid4().hex
+# app.secret_key = secrets.token_urlsafe(16)
+app.secret_key = 'super_secure_key_yay'
+# app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
+# app.config["SESSION_PERMANENT"] = False
+# app.config["SESSION_TYPE"] = "filesystem"
+# app.config.from_object(__name__)
+# Session(app)
+CORS(app, supports_credentials=True)
 
 # MongoDB Configuration
 app.config["MONGO_URI"] = "mongodb://localhost:27017/bbb"

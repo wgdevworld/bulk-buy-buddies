@@ -1,5 +1,5 @@
-import React, { FormEvent, useState } from "react";
-import Login from "@/components/user/login"
+import React, { FormEvent, useState, useEffect } from "react";
+import Login from "@/components/user/login";
 
 function Register() {
     const [firstname, setFirstname] = useState("");
@@ -20,6 +20,7 @@ function Register() {
             };
             console.log(user_info)
             const response = await fetch("http://127.0.0.1:5000/register", {
+                credentials: "include",
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -44,7 +45,7 @@ function Register() {
             {success ?
                 <div> 
                     Successfully registered! Log in to find your bbb!
-                    <Login />
+                    {/* <Login /> */}
                 </div>
                 :
                 <form onSubmit={registerUser}>
@@ -70,7 +71,7 @@ function Register() {
                         <label>Username</label>
                         <input 
                             type="text" 
-                            name="username" 
+                            name="email" 
                             value={username || ""} 
                             onChange={(e) => setUsername(e.target.value)}
                         />

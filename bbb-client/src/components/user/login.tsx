@@ -1,4 +1,5 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useState, useEffect } from "react";
+import Logout from "@/components/user/logout";
 
 function Login() {
     const [username, setUsername] = useState("");
@@ -15,6 +16,7 @@ function Login() {
             };
             console.log(user_info)
             const response = await fetch("http://127.0.0.1:5000/login", {
+                credentials: "include",
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -39,9 +41,9 @@ function Login() {
                 <div> 
                     <div> Successfully logged in! </div>
                     <div> 
-                        <h1> Welcome, firstname lastname</h1>
+                        <h1> Welcome, {username}</h1>
                     </div>
-
+                    {/* <Logout /> */}
                 </div>
                 :
                 <form onSubmit={loginUser}>
@@ -49,7 +51,7 @@ function Login() {
                         <label>Username/email</label>
                         <input 
                             type="text" 
-                            name="username" 
+                            name="email" 
                             value={username || ""} 
                             onChange={(e) => setUsername(e.target.value)}
                         />

@@ -1,18 +1,24 @@
-from flask import Flask, request, jsonify, Blueprint, session, redirect
+from flask import Flask, request, jsonify, Blueprint, session, make_response
+# from flask_session import Session
 # from user_model import User
 from flask_cors import CORS
 from flask_pymongo import PyMongo
-from werkzeug.security import generate_password_hash, check_password_hash
-import uuid
 import certifi
 from dotenv import dotenv_values
 import pyrebase
 from datetime import datetime
+import json
 
 user = Blueprint('user', __name__)
 app = Flask(__name__)
 # secrets = dotenv_values('.env')  #ends up being empty?
-CORS(app)
+# app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
+# app.config["SESSION_PERMANENT"] = False
+# app.config["SESSION_TYPE"] = "filesystem"
+# Session(app)
+app.secret_key = 'super_secure_key_yay'
+
+CORS(app, supports_credentials=True)
 # app.config["MONGO_URI"] = f"mongodb+srv://{secrets['ATLAS_USR']}:{secrets['ATLAS_PWD']}@atlascluster.zojbxi7.mongodb.net/bbb"
 app.config["MONGO_URI"] = "mongodb+srv://czfrance:bbb2024DUKE@atlascluster.zojbxi7.mongodb.net/bbb"
 mongo = PyMongo(app,tlsCAFile=certifi.where())
@@ -31,22 +37,32 @@ config = {
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 
+curr_user = None
+
+def get_user():
+    global curr_user
+    return curr_user
+
 @user.route("/register", methods=['POST'])
 def register():
+    print("\nREGISTER")
+    global curr_user
     try:
-        print("hiiii")
         registration_info = request.get_json()
+        result = users.find_one({"email": registration_info['email']})
 
-        if users.find_one({"email": registration_info['email']}):
+        if result is not None:
             print("Already a user with this email")
             return jsonify({"error": "Already a user with this email"}), 400
         
         try:
             firebase_user = auth.create_user_with_email_and_password(registration_info['email'], registration_info['password'])
 
-        except:
-            print("Already a user with this email")
-            return jsonify({"error": "Already a user with this email"}), 400
+        except Exception as e:
+            error_json = e.args[1]
+            error = json.loads(error_json)['error']['message']
+            print(error)
+            return jsonify({"error": error}), 400
 
         user = {
         "id": firebase_user.get('localId'),
@@ -54,23 +70,25 @@ def register():
         "lastname": registration_info['lastname'],
         "email": registration_info['email'],
         "dateJoined": str(datetime.now()),
-        "location": None,
-        # "password": generate_password_hash(registration_info['password'])
+        "location": None
         }
 
         try:
-            user_info = user
-            user_info['idToken'] = firebase_user['idToken']
-            user_info['refreshToken'] = firebase_user['refreshToken']
-            session['user'] = user_info
+            curr_user = dict(user)
+            curr_user['idToken'] = firebase_user['idToken']
+            curr_user['refreshToken'] = firebase_user['refreshToken']
+            # session['user'] = curr_user
 
         except Exception as e:
-            print("error adding user to session")
-            auth.delete_user_account(user_info['idToken'])
+            # print("error adding user to session")
+            auth.delete_user_account(curr_user['idToken'])
             return jsonify(error=str(e)), 500
 
         if users.insert_one(user):
             del user['_id']
+            # resp = make_response(user)
+            # resp.set_cookie('uid', value=user['id'], domain='127.0.0.1:3000')
+            # return resp, 200
             return jsonify(user), 200
         
         auth.delete_user_account(user_info['idToken'])
@@ -96,7 +114,13 @@ def register():
 
 @user.route("/login", methods=['POST'])
 def login():
+    print("\nLOGIN")
+    global curr_user
     try:
+        print('curr_user')
+        print(curr_user)
+        # print(session)
+        # print(session.get('user'))
         login_info = request.get_json()
         user = users.find_one({"email": login_info['email']})
         if not user:
@@ -104,10 +128,21 @@ def login():
             return jsonify({"error": "Incorrect email"}), 400
 
         try:
-            auth.sign_in_with_email_and_password(user['email'], login_info['password'])
+            firebase_user = auth.sign_in_with_email_and_password(user['email'], login_info['password'])
             del user['_id']
+
+            curr_user = dict(user)
+            curr_user['idToken'] = firebase_user['idToken']
+            curr_user['refreshToken'] = firebase_user['refreshToken']
+            # session['user'] = curr_user
+            # print(session.get('user'))
+
+            # resp = make_response(user)
+            # resp.set_cookie('uid', value=user['id'], domain='127.0.0.1:3000')
+            # return resp, 200
             return jsonify(user), 200
-        except:
+        except Exception as e:
+            print(e)
             print("incorrect password")
             return jsonify({"error": "Incorrect password"}), 400
         # elif not check_password_hash(user['password'], login_info['password']):
@@ -127,11 +162,21 @@ def login():
 
 @user.route("/logout", methods=['POST'])
 def logout():
+    global curr_user
     try:
-        temp_user = session.get('user')
-        session.pop('user')
+        print("\nLOGOUT")
+        # print(session)
+        # print(session.get('user'))
+        print('curr_user')
+        print(curr_user)
+        print("here")
+        temp_user = dict(curr_user)
+        # print(temp_user)
+        # session.pop('user')
+        # print("sucessfully popped")
         auth.current_user = None
-        
+        curr_user = None
+        print('successfully logged out')
         return jsonify(temp_user), 200
 
     except Exception as e:
@@ -141,8 +186,9 @@ def logout():
 
     
 def refreshToken():
-    curr_user = session.get('user')
-    refresh_user = auth.refresh(user['refreshToken'])
+    global curr_user
+    # curr_user = session.get('user')
+    refresh_user = auth.refresh(curr_user['refreshToken'])
     curr_user['idToken'] = refresh_user['idToken']
     curr_user['refreshToken'] = refresh_user['refreshToken']
 
