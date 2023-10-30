@@ -1,5 +1,6 @@
 import React, { FormEvent, useState, useEffect } from "react";
 import Logout from "@/components/user/logout";
+import StandardButton from './button';
 
 function Login() {
     const [username, setUsername] = useState("");
@@ -35,6 +36,22 @@ function Login() {
         }
     }
 
+    const navigateRegistration = async () => {
+        try {
+            console.log("go to registration page")
+        } catch (error) {
+            console.error("Error going to registration page:", error);
+        }
+    }
+
+    const resetPassword = async () => {
+        try {
+            console.log("go to reset password")
+        } catch (error) {
+            console.error("Error going to reset password page:", error);
+        }
+    }
+
     return (
         <div>
             {success ?
@@ -43,12 +60,12 @@ function Login() {
                     <div> 
                         <h1> Welcome, {username}</h1>
                     </div>
-                    {/* <Logout /> */}
+                    <Logout />
                 </div>
                 :
                 <form onSubmit={loginUser}>
                     <div>
-                        <label>Username/email</label>
+                        <label>Email</label>
                         <input 
                             type="text" 
                             name="email" 
@@ -66,6 +83,8 @@ function Login() {
                         />
                     </div>
                     <button type="submit"> Login </button>
+                    <StandardButton onClick={navigateRegistration} label="Create an Account" />
+                    <StandardButton onClick={resetPassword} label="Forgot Password?" />
                 </form>
             }
         </div>
