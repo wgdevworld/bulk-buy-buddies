@@ -16,9 +16,9 @@ export default function Home() {
       {/* <Messenger /> */}
       {/* <ProductRec /> */}
       {/* <ProductList /> */}
-      {/* <Register /> */}
+      <Register />
       {/* <Logout/> */}
-      <Login />
+      {/* <Login /> */}
       {/* <Locations /> */}
       {/* <ShopperForm /> */}
     </div>

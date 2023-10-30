@@ -4,23 +4,18 @@ from flask import Flask, request, jsonify, Blueprint, session, make_response
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 import certifi
-from dotenv import dotenv_values
+from dotenv import dotenv_values, load_dotenv, find_dotenv
 import pyrebase
 from datetime import datetime
 import json
+import os
 
 user = Blueprint('user', __name__)
 app = Flask(__name__)
-# secrets = dotenv_values('.env')  #ends up being empty?
-# app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
-# app.config["SESSION_PERMANENT"] = False
-# app.config["SESSION_TYPE"] = "filesystem"
-# Session(app)
-app.secret_key = 'super_secure_key_yay'
+load_dotenv(find_dotenv())
 
 CORS(app, supports_credentials=True)
-# app.config["MONGO_URI"] = f"mongodb+srv://{secrets['ATLAS_USR']}:{secrets['ATLAS_PWD']}@atlascluster.zojbxi7.mongodb.net/bbb"
-app.config["MONGO_URI"] = "mongodb+srv://czfrance:bbb2024DUKE@atlascluster.zojbxi7.mongodb.net/bbb"
+app.config["MONGO_URI"] = f"mongodb+srv://{os.getenv('ATLAS_USR')}:{os.getenv('ATLAS_PWD')}@atlascluster.zojbxi7.mongodb.net/bbb"
 mongo = PyMongo(app,tlsCAFile=certifi.where())
 users = mongo.db.users
 config = {
@@ -42,6 +37,25 @@ curr_user = None
 def get_user():
     global curr_user
     return curr_user
+
+@user.route('/retrieve_locations_temp', methods=['GET'])
+def get_locations():
+    print("here")
+    try: 
+        locations_collection = mongo.db.locations
+        locations_list = []
+        for doc in locations_collection.find():
+            location = {
+                "_id": str(doc["_id"]),
+                "name": doc["name"],
+                "address": doc["address"],
+                "coordinates": doc["location"]["coordinates"],
+                "openHours": doc["openHours"]
+            }
+            locations_list.append(location)
+        return jsonify(locations_list)
+    except Exception as e:
+        return jsonify(error={"message": str(e)})
 
 @user.route("/register", methods=['POST'])
 def register():
@@ -65,12 +79,12 @@ def register():
             return jsonify({"error": error}), 400
 
         user = {
-        "id": firebase_user.get('localId'),
+        "uid": firebase_user.get('localId'),
         "firstname": registration_info['firstname'],
         "lastname": registration_info['lastname'],
         "email": registration_info['email'],
         "dateJoined": str(datetime.now()),
-        "location": None
+        "location": registration_info.get('location', None)
         }
 
         try:
@@ -91,7 +105,7 @@ def register():
             # return resp, 200
             return jsonify(user), 200
         
-        auth.delete_user_account(user_info['idToken'])
+        auth.delete_user_account(curr_user['idToken'])
         return jsonify({"error": "Failed to sign up"}), 400
     
         # result = User.email_exists(registration_info['email'])
@@ -107,7 +121,6 @@ def register():
     except ValueError as e:
         return jsonify(error="Invalid value provided"), 400
     except Exception as e:
-        print("exception")
         print(f'Exception: {e}')
         return jsonify(error=str(e)), 500
 
@@ -117,8 +130,6 @@ def login():
     print("\nLOGIN")
     global curr_user
     try:
-        print('curr_user')
-        print(curr_user)
         # print(session)
         # print(session.get('user'))
         login_info = request.get_json()
@@ -155,7 +166,6 @@ def login():
     except ValueError as e:
         return jsonify(error="Invalid value provided"), 400
     except Exception as e:
-        print("exception")
         print(f'Exception: {e}')
         return jsonify(error=str(e)), 500
     
@@ -167,9 +177,6 @@ def logout():
         print("\nLOGOUT")
         # print(session)
         # print(session.get('user'))
-        print('curr_user')
-        print(curr_user)
-        print("here")
         temp_user = dict(curr_user)
         # print(temp_user)
         # session.pop('user')
@@ -183,7 +190,34 @@ def logout():
         print("exception")
         print(f'Exception: {e}')
         return jsonify(error=str(e)), 500
+    
+@user.route("/reset_password", methods=['POST'])
+def reset_password():
+    print("\nRESET PASSWORD")
+    global curr_user
+    try:
+        user_info = request.get_json()
+        result = users.find_one({"email": user_info['email']})
 
+        if result is None:
+            print("No account associated with this email")
+            return jsonify({"error": "No account associated with this email"}), 400
+        
+        try:
+            auth.send_password_reset_email(user_info['email'])
+            return jsonify(user_info), 200
+
+        except Exception as e:
+            error_json = e.args[1]
+            error = json.loads(error_json)['error']['message']
+            print(error)
+            return jsonify({"error": error}), 400
+
+    except ValueError as e:
+        return jsonify(error="Invalid value provided"), 400
+    except Exception as e:
+        print(f'Exception: {e}')
+        return jsonify(error=str(e)), 500
     
 def refreshToken():
     global curr_user
