@@ -1,5 +1,7 @@
 import React, { FormEvent, useState, useEffect } from "react";
 import Login from "@/components/user/login";
+import ShopperDropdown from "../ShopperForm/ShopperDropdown";
+import { Location } from "../locations/locations";
 
 function Register() {
     const [firstname, setFirstname] = useState("");
@@ -7,6 +9,33 @@ function Register() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [success, setSuccess] = useState(false);
+    const [location, setLocation] = useState("");
+    const [locations, setLocations] = useState<string[]>([]);
+
+    useEffect(() => {
+        getLocations();
+    }, []);
+
+    const getLocations = async () => {
+        try {
+          const response = await fetch("http://127.0.0.1:5000/retrieve_locations_temp", {
+            credentials: "include",
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+          })
+          const data: Location[] = await response.json();
+          var locs: string[]
+          locs = []
+          data.forEach(loc => {
+            locs.push(loc.name)
+          });
+          setLocations(locs)
+        } catch (error) {
+          console.error(error);
+        }
+    }
 
     const registerUser = async (e: FormEvent) => {
         e.preventDefault()
@@ -16,7 +45,8 @@ function Register() {
                 'firstname': firstname,
                 'lastname': lastname,
                 'email': username,
-                'password': password 
+                'password': password,
+                'location': location
             };
             console.log(user_info)
             const response = await fetch("http://127.0.0.1:5000/register", {
@@ -24,12 +54,12 @@ function Register() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-
                 },
                 body: JSON.stringify(user_info),
             })
             console.log(response)
             console.log(response.json())
+
             if (!response.ok) {
                 throw new Error("Failed to register user");
             }
@@ -45,7 +75,7 @@ function Register() {
             {success ?
                 <div> 
                     Successfully registered! Log in to find your bbb!
-                    {/* <Login /> */}
+                    <Login />
                 </div>
                 :
                 <form onSubmit={registerUser}>
@@ -68,7 +98,7 @@ function Register() {
                         />
                     </div>
                     <div>
-                        <label>Username</label>
+                        <label>Email</label>
                         <input 
                             type="text" 
                             name="email" 
@@ -85,6 +115,12 @@ function Register() {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
+                    <ShopperDropdown
+                        name="Location"
+                        options={locations}
+                        value={location}
+                        onSelect={(selectedLocation) => setLocation(selectedLocation)}
+                    />
                     <button type="submit"> Register </button>
                 </form>
             }
