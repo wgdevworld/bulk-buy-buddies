@@ -40,7 +40,6 @@ def get_user():
 
 @user.route('/retrieve_locations_temp', methods=['GET'])
 def get_locations():
-    print("here")
     try: 
         locations_collection = mongo.db.locations
         locations_list = []
@@ -219,6 +218,38 @@ def reset_password():
         print(f'Exception: {e}')
         return jsonify(error=str(e)), 500
     
+@user.route("/get_acct_info", methods=['GET'])
+def get_acct_info():
+    print("\nACCOUNT INFO")
+    global curr_user
+    try:
+        return jsonify(get_user()), 200
+    
+    except Exception as e:
+        print(f'Exception: {e}')
+        return jsonify(error=str(e)), 500
+    
+
+@user.route("/get_transactions", methods=['GET'])
+def get_transactions():
+    print("\nTRANSACTIONS")
+    global curr_user
+
+    try: 
+        requests_collection = mongo.db.requests
+        transactions = []
+        results = requests_collection.find({"uid": curr_user['uid']})
+        print(results)
+        for transaction in requests_collection.find({"uid": curr_user['uid']}):
+            transaction["_id"] = str(transaction["_id"])
+            transactions.append(transaction)
+
+        return jsonify(transactions)
+    except Exception as e:
+        print(str(e))
+        return jsonify(error={"message": str(e)})
+    
+
 def refreshToken():
     global curr_user
     # curr_user = session.get('user')
