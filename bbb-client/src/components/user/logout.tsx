@@ -1,3 +1,5 @@
+"use client";
+
 import React, { MouseEvent, useState, useEffect } from "react";
 import StandardButton from './button';
 

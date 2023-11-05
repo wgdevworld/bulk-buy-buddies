@@ -1,7 +1,11 @@
+"use client";
+
 import React, { FormEvent, useState, useEffect } from "react";
-import Login from "@/components/user/login";
+import Logout from "@/components/user/logout";
 import ShopperDropdown from "../ShopperForm/ShopperDropdown";
+import StandardButton from './button';
 import { Location } from "../locations/locations";
+import { useRouter } from 'next/navigation';
 
 function Register() {
     const [firstname, setFirstname] = useState("");
@@ -11,6 +15,7 @@ function Register() {
     const [success, setSuccess] = useState(false);
     const [location, setLocation] = useState("");
     const [locations, setLocations] = useState<string[]>([]);
+    const router = useRouter()
 
     useEffect(() => {
         getLocations();
@@ -70,12 +75,25 @@ function Register() {
         }
     }
 
+    const navigateAccount = async () => {
+        try {
+            console.log("go to account page")
+            router.push('/user/account')
+        } catch (error) {
+            console.error("Error going to account page:", error);
+        }
+    }
+
     return (
         <div>
             {success ?
                 <div> 
-                    Successfully registered! Log in to find your bbb!
-                    <Login />
+                    <div> Successfully logged in! </div>
+                    <div> 
+                        <h1> Welcome, {username}</h1>
+                        <StandardButton onClick={navigateAccount} label="View Account" />
+                    </div>
+                    <Logout />
                 </div>
                 :
                 <form onSubmit={registerUser}>

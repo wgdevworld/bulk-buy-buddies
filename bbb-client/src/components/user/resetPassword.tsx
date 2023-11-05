@@ -1,10 +1,22 @@
-import React, { FormEvent, useState, useEffect } from "react";
-import Logout from "@/components/user/logout";
+"use client";
+
+import React, { FormEvent, useState } from "react";
 import StandardButton from './button';
+import { useRouter } from 'next/navigation';
 
 function ResetPassword() {
     const [email, setEmail] = useState("");
     const [success, setSuccess] = useState(false);
+    const router = useRouter();
+
+    const navigateLogin = async () => {
+        try {
+            console.log("go to login page")
+            router.push('/user/login')
+        } catch (error) {
+            console.error("Error going to login page:", error);
+        }
+    }
 
     const resetPassword = async (e: FormEvent) => {
         e.preventDefault()
@@ -39,6 +51,7 @@ function ResetPassword() {
             {success ?
                 <div> 
                     <div> Password reset! Check your email for instructions </div>
+                    <StandardButton onClick={navigateLogin} label="Back to Login" />
                 </div>
                 :
                 <form onSubmit={resetPassword}>
@@ -57,3 +70,5 @@ function ResetPassword() {
         </div>
     )
 }
+
+export default ResetPassword;
