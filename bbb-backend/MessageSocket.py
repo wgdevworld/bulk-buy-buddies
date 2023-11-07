@@ -1,26 +1,17 @@
-from flask import current_app, Blueprint
-from flask_socketio import Namespace, emit
+# MessageSocket.py
 
-class MessageSocket(Namespace):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+def register_socket_events(socketio):
+    @socketio.on('connect')
+    def connect():
+        print("Client connected")
 
-    def emit_new_messages(self):
-        # while loop to continuously listen for new messages
+    @socketio.on('disconnect')
+    def disconnect():
+        print("Client disconnected")
 
-        # Send new message to all connected clients
-        emit('new_message', cursor.next(), broadcast=True)
-
-    def on_connect(self):
-        # Start a background task for listening new messages
-        current_app._get_current_object().socketio.start_background_task(self.emit_new_messages)
-
-        emit('connection_success')
-
-    def on_new_message(self, message_data):
-        # Save message to MongoDB
-
-        # Emit new message to connected clients
-        emit('new_message', message_data, broadcast=True)
-
-message_socket = MessageSocket('/message-socket')
+    @socketio.on('new_message')
+    def handle_new_message(messageData):
+        # Your logic to handle incoming messages and broadcasting them
+        # ...
+        print("new message received")
+        

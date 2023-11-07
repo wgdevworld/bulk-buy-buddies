@@ -2,8 +2,7 @@ import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { v4 as uuidv4 } from "uuid";
 import "./Messenger.css";
 import { Chat, IMessage, fetchChats, sendMessage } from "./MessengerHelper";
-
-// const socket = io("http://localhost:5000");
+import io from "socket.io-client";
 
 const Messenger = () => {
   const uid = "000";
@@ -13,6 +12,7 @@ const Messenger = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<string>("");
   const [newChatUid, setNewChatUid] = useState<string>("");
+  const socket = io("http://localhost:5000");
 
   useEffect(() => {
     // Get all the chats
@@ -22,14 +22,14 @@ const Messenger = () => {
     })();
 
     // Websockets init
-    // socket.on("new_message", (messageData: IMessage) => {
-    //   setMessages((prevMessages) => [...prevMessages, messageData]);
-    // });
+    socket.on("new_message", (messageData: IMessage) => {
+      setMessages((prevMessages) => [...prevMessages, messageData]);
+    });
 
-    // return () => {
-    //   // Websockets disconnect
-    //   socket.disconnect();
-    // };
+    return () => {
+      // Websockets disconnect
+      socket.disconnect();
+    };
   }, [uid]);
 
   useEffect(() => {}, []);
@@ -48,12 +48,12 @@ const Messenger = () => {
       toUid: selectedChat,
       timestamp: new Date().toISOString(),
     };
-    await sendMessage(messageData);
-    setMessages([...messages, messageData]);
+    // await sendMessage(messageData);
+    // setMessages([...messages, messageData]);
     setBuffer("");
 
     // Send message thru socket
-    // socket.emit("new_message", messageData);
+    socket.emit("new_message", messageData);
   };
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
