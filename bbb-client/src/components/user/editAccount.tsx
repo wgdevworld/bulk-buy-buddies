@@ -56,7 +56,8 @@ function EditAccount() {
           var locs: string[]
           locs = []
           data.forEach(loc => {
-            locs.push(loc.name)
+            const display = `${loc.name} (${loc.address})`
+            locs.push(display)
           });
           setLocations(locs)
         } catch (error) {

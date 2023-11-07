@@ -7,6 +7,7 @@ import StandardButton from './button';
 import { Location } from "../locations/locations";
 import { useRouter } from 'next/navigation';
 
+
 function Register() {
     const [firstname, setFirstname] = useState("");
     const [lastname, setLastname] = useState("");
@@ -34,7 +35,8 @@ function Register() {
           var locs: string[]
           locs = []
           data.forEach(loc => {
-            locs.push(loc.name)
+            const display = `${loc.name} (${loc.address})`
+            locs.push(display)
           });
           setLocations(locs)
         } catch (error) {
