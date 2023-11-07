@@ -12,6 +12,7 @@ const Messenger = () => {
   const [messageBuffer, setBuffer] = useState<string>("");
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<string>("");
+  const [newChatUid, setNewChatUid] = useState<string>("");
 
   useEffect(() => {
     // Get all the chats
@@ -63,12 +64,48 @@ const Messenger = () => {
     setSelectedChat(withUid);
   };
 
+  const handleNewChatSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (newChatUid.trim() === "") return;
+
+    // Check if chat with this UID already exists
+    const chatExists = chats.some((chat) => chat.withUid === newChatUid);
+    if (!chatExists) {
+      // If not, create a new chat object and add it to the state
+      const newChat: Chat = {
+        withUid: newChatUid,
+        messages: [],
+      };
+      setChats([...chats, newChat]);
+    }
+
+    // Select the new chat
+    setSelectedChat(newChatUid);
+    setNewChatUid(""); // Reset the input field
+  };
+
+  const handleNewChatUidChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNewChatUid(e.target.value);
+  };
+
   const selectedChatMessages =
     chats.find((chat) => chat.withUid === selectedChat)?.messages || [];
 
   return (
     <div className="messenger">
       <div className="sidebar">
+        <form onSubmit={handleNewChatSubmit} className="new-chat-form">
+          <input
+            type="text"
+            value={newChatUid}
+            onChange={handleNewChatUidChange}
+            className="new-chat-input"
+            placeholder="Enter new user's UID"
+          />
+          <button type="submit" className="new-chat-button">
+            +
+          </button>
+        </form>
         <h2>Chats</h2>
         <ul>
           {chats.map((chat) => (
