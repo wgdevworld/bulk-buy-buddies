@@ -75,7 +75,7 @@ function Account() {
     const navigateUpdateUser = async () => {
         try {
             console.log("go to udpate page")
-            // router.push('/user/update_info')
+            router.push('/user/editAccount')
         } catch (error) {
             console.error("Error going to udpate page:", error);
         }

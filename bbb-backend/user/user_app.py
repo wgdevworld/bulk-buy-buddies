@@ -78,12 +78,12 @@ def register():
             return jsonify({"error": error}), 400
 
         user = {
-        "uid": firebase_user.get('localId'),
-        "firstname": registration_info['firstname'],
-        "lastname": registration_info['lastname'],
-        "email": registration_info['email'],
-        "dateJoined": str(datetime.now()),
-        "location": registration_info.get('location', None)
+            "uid": firebase_user.get('localId'),
+            "firstname": registration_info['firstname'],
+            "lastname": registration_info['lastname'],
+            "email": registration_info['email'],
+            "dateJoined": str(datetime.now()),
+            "location": registration_info.get('location', None)
         }
 
         try:
@@ -248,6 +248,46 @@ def get_transactions():
     except Exception as e:
         print(str(e))
         return jsonify(error={"message": str(e)})
+    
+
+@user.route("/updateAccount", methods=['POST'])
+def updateAccount():
+    print("\nUPDATE ACCOUNT")
+    global curr_user
+    try:
+        new_info = request.get_json()
+        print(new_info['firstname'])
+        if new_info['firstname'] == "":
+            return jsonify(error="first name cannot be empty"), 500
+        elif new_info['lastname'] == "":
+            return jsonify(error="last name cannot be empty"), 500
+        elif new_info['location'] == "":
+            return jsonify(error="location cannot be empty"), 500
+        
+        try:
+            user = users.update_one({"uid": curr_user['uid']},
+                                    {
+                                        '$set': {
+                                            'firstname': new_info['firstname'],
+                                            'lastname': new_info['lastname'],
+                                            'location': new_info['location'],
+                                        }
+                                    })
+            
+            curr_user['firstname'] = new_info['firstname']
+            curr_user['lastname'] = new_info['lastname']
+            curr_user['location'] = new_info['location']
+
+            return jsonify({'result': "success"}), 200
+        except Exception as e:
+            print("error updating user info")
+            return jsonify(error=str(e)), 500
+
+    except ValueError as e:
+        return jsonify(error="Invalid value provided"), 400
+    except Exception as e:
+        print(f'Exception: {e}')
+        return jsonify(error=str(e)), 500
     
 
 def refreshToken():

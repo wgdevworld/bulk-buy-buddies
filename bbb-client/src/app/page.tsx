@@ -8,6 +8,9 @@ import Logout from "@/components/user/logout"
 import Login from "@/components/user/login"
 import Locations from "@/components/locations/locations"
 import ShopperForm from "@/components//ShopperForm/ShopperForm";
+import ResetPassword from "@/components/user/resetPassword";
+import Account from "@/components/user/account";
+
 
 
 export default function Home() {
@@ -16,11 +19,13 @@ export default function Home() {
       {/* <Messenger /> */}
       {/* <ProductRec /> */}
       {/* <ProductList /> */}
-      <Register />
+      {/* <Register /> */}
       {/* <Logout/> */}
-      {/* <Login /> */}
+      <Login />
       {/* <Locations /> */}
       {/* <ShopperForm /> */}
+      {/* <ResetPassword /> */}
+      {/* <Account /> */}
     </div>
   );
 }
