@@ -62,11 +62,11 @@ function ProductMain() {
         <option value="beef">Beef</option>
       </select>
       <button onClick={handleSearch}>Search</button>
-      <ul className="product-list">
-        {products.map((product: Product) => (
-          <ProductCard product={product} key={product._id} />
-        ))}
-      </ul>
+        <ul className="product-list">
+          {products.map((product: Product) => (
+            <ProductCard product={product} key={product._id} />
+          ))}
+        </ul>
     </div>
   );
 }
