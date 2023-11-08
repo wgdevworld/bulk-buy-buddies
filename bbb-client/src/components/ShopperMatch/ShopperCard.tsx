@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
 import React from "react";
 import "./ShopperCard.css";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface ShopperCardProps {
   //   reqID: string;
   userID: string;
-  category: string | undefined;
-  quantity: number | undefined;
-  location: string | undefined;
+  category: string;
+  quantity: number;
+  location: string;
   timeStart: Date;
   timeEnd: Date;
   //   status: boolean;
@@ -23,8 +24,20 @@ export default function ShopperCard({
   timeEnd,
 }: ShopperCardProps) {
   const router = useRouter();
-  const handleLearnMore = () => {
-    router.push("../ProductRec");
+  const query = {
+    userID: userID,
+    userCategory: category,
+    userQuantity: 3, // add current user's quantity later
+    buddyQuantity: quantity,
+    location: "Durham",
+  };
+
+  const createQueryString = (query: object) => {
+    const params = new URLSearchParams();
+    for (const [name, value] of Object.entries(query)) {
+      params.set(name, value);
+    }
+    return params.toString();
   };
 
   return (
@@ -40,7 +53,12 @@ export default function ShopperCard({
       <p>End time: {timeEnd.toLocaleString()}</p>
       {/* <p>Location: {location}</p> */}
       <div className="button-container">
-        <button className="button" onClick={handleLearnMore}>
+        <button
+          className="button"
+          onClick={() =>
+            router.push("productRec" + "?" + createQueryString(query))
+          }
+        >
           Select Buddy
         </button>
         <button className="button">Learn More</button>

@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Blueprint, Flask, request, jsonify
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from dotenv import dotenv_values
 
+request = Blueprint('request', __name__)
 app = Flask(__name__)
 CORS(app)
 secrets = dotenv_values(".env")
@@ -41,4 +42,4 @@ def get_my_requests():
         return jsonify(error={"message": str(e)})
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=5000)

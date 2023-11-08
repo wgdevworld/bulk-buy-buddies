@@ -1,10 +1,9 @@
-from flask import Flask, jsonify, request
+from flask import Blueprint, Flask, jsonify, request
 from flask_cors import CORS
-import requests
 from flask_pymongo import PyMongo
-import os
 from dotenv import dotenv_values
 
+productRec = Blueprint('productRec', __name__)
 app = Flask(__name__)
 CORS(app)
 secrets = dotenv_values(".env")
@@ -40,7 +39,7 @@ def fetchBestProduct():
         return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
 
 @app.route("/fetchBuddyInfo", methods=['GET'])
-def fetchBestProduct():
+def fetchBuddyInfo():
     try:
         buddyID = request.args.get('buddyID')
         buddyInfo = mongo.db.users.find_one({'uid':buddyID})
@@ -50,4 +49,4 @@ def fetchBestProduct():
 
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(port=6000)

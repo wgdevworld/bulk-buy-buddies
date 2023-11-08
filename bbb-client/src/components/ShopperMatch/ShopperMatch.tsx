@@ -7,16 +7,13 @@ import { useRouter } from "next/navigation";
 interface ShoppingForm {
   reqID: string;
   userID: string;
-  category: string | undefined;
-  quantity: number | undefined;
-  location: string | undefined;
+  category: string;
+  quantity: number;
+  location: string;
   timeStart: Date;
   timeEnd: Date;
   status: boolean;
 }
-
-const categories = ["beef", "pork", "chicken"];
-const locations = ["Durham", "Charlotte", "Raleigh"];
 
 function ShopperMatch() {
   const router = useRouter();
