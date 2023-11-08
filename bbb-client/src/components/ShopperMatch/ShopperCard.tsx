@@ -2,7 +2,7 @@
 "use client";
 import React from "react";
 import "./ShopperCard.css";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface ShopperCardProps {
   //   reqID: string;
@@ -29,7 +29,7 @@ export default function ShopperCard({
     userCategory: category,
     userQuantity: 3, // add current user's quantity later
     buddyQuantity: quantity,
-    location: "Durham",
+    location: 249,
   };
 
   const createQueryString = (query: object) => {
@@ -39,29 +39,25 @@ export default function ShopperCard({
     }
     return params.toString();
   };
-
   return (
     <div className="card">
-      {/* userD corresponds to username */}
       <h2>UserID: {userID}</h2>
       <p>
         Shopping for {category} at {location}
       </p>
-      {/* <p>Category: {category}</p> */}
       <p>Quantity: {quantity}</p>
-      <p>Start time: {timeStart.toLocaleString()}</p>
-      <p>End time: {timeEnd.toLocaleString()}</p>
-      {/* <p>Location: {location}</p> */}
+      <p>Start time: {new Date(timeStart).toLocaleString()}</p>
+      <p>End time: {new Date(timeEnd).toLocaleString()}</p>
       <div className="button-container">
+        <button className="button">Select Buddy</button>
         <button
           className="button"
           onClick={() =>
-            router.push("productRec" + "?" + createQueryString(query))
+            router.push("/productRec" + "?" + createQueryString(query))
           }
         >
-          Select Buddy
+          Learn More
         </button>
-        <button className="button">Learn More</button>
       </div>
     </div>
   );

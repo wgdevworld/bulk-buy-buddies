@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 
 interface DropdownProps {
-  options: string[];
+  options: string[] | number[];
   onSelect: (selectedOption: string) => void;
   value: string | number | undefined;
   name: string;

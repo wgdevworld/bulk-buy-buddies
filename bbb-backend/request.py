@@ -21,6 +21,7 @@ def submit_shopping_request():
     except Exception as e:
         return jsonify({'error': 'Failed to process the request'}), 500
 
+
 @app.route('/get-requests', methods=['GET'])
 def get_my_requests():
     try: 
@@ -29,6 +30,7 @@ def get_my_requests():
         for doc in request_collection.find():
             request = {
                 "_id": str(doc["_id"]),
+                "userID": doc["userID"],
                 "category": doc["category"],
                 "quantity": doc["quantity"],
                 "location": doc["location"],

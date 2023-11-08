@@ -12,7 +12,7 @@ interface ShoppingForm {
   location: string;
   timeStart: Date;
   timeEnd: Date;
-  status: boolean;
+  status: string;
 }
 
 function ShopperMatch() {
@@ -49,21 +49,6 @@ function ShopperMatch() {
           />
         ))}
       </div>
-      {/* <form onSubmit={handleSubmit}>
-        <div className="vertical-container">
-          <input
-            type="number"
-            placeholder="Enter quantity"
-            value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
-          />
-
-          <button type="submit">Submit</button>
-        </div>
-      </form>
-      {responseContent !== null && (
-        <pre>{JSON.stringify(responseContent, null, 2)}</pre>
-      )} */}
     </>
   );
 }
