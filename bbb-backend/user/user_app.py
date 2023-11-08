@@ -99,23 +99,10 @@ def register():
 
         if users.insert_one(user):
             del user['_id']
-            # resp = make_response(user)
-            # resp.set_cookie('uid', value=user['id'], domain='127.0.0.1:3000')
-            # return resp, 200
             return jsonify(user), 200
         
         auth.delete_user_account(curr_user['idToken'])
         return jsonify({"error": "Failed to sign up"}), 400
-    
-        # result = User.email_exists(registration_info['email'])
-        # if result:
-        #     return jsonify({"error": "email address is already in use"})
-
-        # else:
-        # user = User.register(registration_info['firstname'], registration_info['lastname'],
-        #                     registration_info['username'], registration_info['password'])
-        # print(user)
-        # return jsonify({"user": user})
 
     except ValueError as e:
         return jsonify(error="Invalid value provided"), 400

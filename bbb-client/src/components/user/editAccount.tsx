@@ -18,13 +18,10 @@ function EditAccount() {
     const [city, setCity] = useState("");
     const [state, setState] = useState("");
     const [zipcode, setZipcode] = useState("");
-    // const [location, setLocation] = useState("");
-    // const [locations, setLocations] = useState<string[]>([]);
     const router = useRouter()
  
 
     useEffect(() => {
-        // getLocations();
         getCurrUser();
     }, []);
 
@@ -45,49 +42,6 @@ function EditAccount() {
             console.error(error);
           }
     }
-    // const getLocations = async () => {
-    //     try {
-    //       const response = await fetch("http://127.0.0.1:5000/retrieve_locations_temp", {
-    //         credentials: "include",
-    //         method: "GET",
-    //         headers: {
-    //             "Content-Type": "application/json"
-    //         }
-    //       })
-    //       const data: Location[] = await response.json();
-    //       const locs: string[] = []
-    //     //   locs = []
-    //       data.forEach(loc => {
-    //         const display = `${loc.name} (${loc.address})`
-    //         locs.push(display)
-    //       });
-    //       setLocations(locs)
-    //     } catch (error) {
-    //       console.error(error);
-    //     }
-    // }
-
-    // const getLocations = async () => {
-    //     try {
-    //       const response = await fetch("http://127.0.0.1:5000/retrieve_locations_temp", {
-    //         credentials: "include",
-    //         method: "GET",
-    //         headers: {
-    //             "Content-Type": "application/json"
-    //         }
-    //       })
-    //       const data: Location[] = await response.json();
-    //       const locs: string[] = []
-    //     //   locs = []
-    //       data.forEach(loc => {
-    //         const display = `${loc.name} (${loc.address})`
-    //         locs.push(display)
-    //       });
-    //       setLocations(locs)
-    //     } catch (error) {
-    //       console.error(error);
-    //     }
-    // }
 
     const resetPassword = async () => {
         try {
