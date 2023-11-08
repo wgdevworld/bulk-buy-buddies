@@ -2,23 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import StandardButton from './button';
-// import RequestCard from "./requestCard";
-// import RequestDisplay from "./requestDisplay";
 import { useRouter } from 'next/navigation';
 import RequestDisplay from "./requestDisplay";
 
-export interface Transaction {
-    _id: string;
-    rid: string;
-    uid: string;
-    category: string;
-    pid: string;
-    quantity: number;
-    location: number[];
-    timeStart: string;
-    timeEnd: string;
-    status: string;
-}
 
 export interface Account {
     _id: string;

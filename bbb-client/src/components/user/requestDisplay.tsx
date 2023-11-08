@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Transaction } from "./account";
 import RequestCard from "./requestCard";
 
+export interface Transaction {
+    _id: string;
+    userID: string;
+    category: string;
+    quantity: number;
+    location: string;
+    timeStart: string;
+    timeEnd: string;
+    status: string;
+}
 
 function RequestDisplay() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);

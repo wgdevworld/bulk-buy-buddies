@@ -225,9 +225,7 @@ def get_transactions():
     try: 
         requests_collection = mongo.db.requests
         transactions = []
-        results = requests_collection.find({"uid": curr_user['uid']})
-        print(results)
-        for transaction in requests_collection.find({"uid": curr_user['uid']}):
+        for transaction in requests_collection.find({"userID": curr_user['uid']}):
             transaction["_id"] = str(transaction["_id"])
             transactions.append(transaction)
 
