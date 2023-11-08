@@ -68,3 +68,30 @@ input[type="text"] {
 button[type="submit"] {
   padding: 10px;
 }
+
+/* New Chat Form */
+
+.new-chat-form {
+  display: flex;
+  max-width: 100%;
+  margin-bottom: 15px;
+}
+
+.new-chat-input {
+  flex-grow: 1;
+  margin-right: 5px; /* Spacing between input and button */
+}
+
+.new-chat-button {
+  width: 40px; /* Fixed width for the button */
+  background-color: #4caf50; /* A green color for the button */
+  color: white; /* White text color */
+  border: none; /* Remove default border */
+  cursor: pointer; /* Cursor pointer to indicate it's clickable */
+  text-align: center; /* Center the plus sign */
+  font-size: 16px; /* Larger font size for visibility */
+}
+
+.new-chat-button:hover {
+  background-color: #45a049; /* Darker green on hover for feedback */
+}
