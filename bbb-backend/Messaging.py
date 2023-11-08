@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, Blueprint, current_app
+from MessagingDBInterface import save_message_to_db
 
 # Flask Blueprint configuration
 messaging_api = Blueprint('messaging_api', __name__)
@@ -17,27 +18,23 @@ It then unpacks the message data from the POST request body JSON.
 On success, a JSON response with a 'success' key is returned.
 On failure, a JSON response with an 'error' key containing the exception message is returned.
 """
-@messaging_api.route("/save_message", methods=['POST'])
+@messaging_api.route("/save_message", methods=['POST', 'OPTIONS'])
 def save_message():
-    try:
-        # set the messages database
-        mongo = current_app.config['MONGO']
-        messages_collection  = mongo.db.messages
+    print("Saving message API called...")
+    if request.method == 'OPTIONS':
+        # Handle the OPTIONS method
+        response = current_app.make_default_options_response()
+        response.headers['Access-Control-Allow-Origin'] = '*'  # Set appropriate CORS headers
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        return response
 
-        # unpack the message data from the request
-        message_data = request.get_json()
-        message_dict = {
-            "id": message_data['id'],
-            "text": message_data['text'],
-            "fromUid": message_data['fromUid'],
-            "toUid": message_data['toUid'],
-            "timestamp": message_data['text'],
-        }
-        messages_collection.insert_one(message_dict)
-        return jsonify(success=true)
-
-    except exception as e:
-        return jsonify(error=str(e)), 500
+    message_data = request.get_json()
+    # save the messages database
+    success = save_message_to_db(message_data)
+    if success:
+        return jsonify(success=True)
+    else:
+        return jsonify(error="failed to save message"), 500
 
 
 """Gets chat messages for a user.

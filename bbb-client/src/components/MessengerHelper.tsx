@@ -50,7 +50,7 @@ export async function fetchChats(uid: string): Promise<Chat[] | undefined> {
 
 export async function sendMessage(messageData: IMessage) {
   try {
-    const response = await fetch("http://localhost:5000/api/save_message", {
+    const response = await fetch("http://localhost:5000/save_message", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
