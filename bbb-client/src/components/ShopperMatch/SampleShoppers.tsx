@@ -6,8 +6,8 @@ export const matches = [
     prodId: "breast",
     quantity: 3,
     location: "Durham",
-    // timeStart: Date | null;
-    // timeEnd: Date | null;
+    timeStart: new Date("2023-10-05T23:30:00.000Z"),
+    timeEnd: new Date("2023-10-06T00:30:00.000Z"),
     // status: boolean;
   },
   {
@@ -17,8 +17,8 @@ export const matches = [
     prodId: "breast",
     quantity: 1,
     location: "Durham",
-    // timeStart: Date | null;
-    // timeEnd: Date | null;
+    timeStart: new Date("2023-10-05T23:30:00.000Z"),
+    timeEnd: new Date("2023-10-06T00:30:00.000Z"),
     // status: boolean;
   },
   {
@@ -28,8 +28,8 @@ export const matches = [
     prodId: "breast",
     quantity: 5,
     location: "Raleigh",
-    // timeStart: Date | null;
-    // timeEnd: Date | null;
+    timeStart: new Date("2023-10-05T23:30:00.000Z"),
+    timeEnd: new Date("2023-10-06T00:30:00.000Z"),
     // status: boolean;
   },
   {
@@ -39,8 +39,8 @@ export const matches = [
     prodId: "wings",
     quantity: 3,
     location: "Durham",
-    // timeStart: Date | null;
-    // timeEnd: Date | null;
+    timeStart: new Date("2023-10-05T23:30:00.000Z"),
+    timeEnd: new Date("2023-10-06T00:30:00.000Z"),
     // status: boolean;
   },
   {
@@ -50,8 +50,8 @@ export const matches = [
     prodId: "wings",
     quantity: 3,
     location: "Charlotte",
-    // timeStart: Date | null;
-    // timeEnd: Date | null;
+    timeStart: new Date("2023-10-05T23:30:00.000Z"),
+    timeEnd: new Date("2023-10-06T00:30:00.000Z"),
     // status: boolean;
   },
 ];

@@ -11,6 +11,7 @@ import Locations from "@/components/locations/locations";
 import ShopperForm from "@/components//ShopperForm/ShopperForm";
 import ResetPassword from "@/components/user/resetPassword";
 import Account from "@/components/user/account";
+import ShopperMatch from "@/components/ShopperMatch/ShopperMatch";
 
 export default function Home() {
   return (
@@ -20,12 +21,10 @@ export default function Home() {
       {/* <ProductList /> */}
       {/* <Register /> */}
       {/* <Logout/> */}
-      <Login />
+      {/* <Login /> */}
       {/* <Locations /> */}
       {/* <ShopperForm /> */}
-
-      {/* <ShopperMatch /> */}
-
+      <ShopperMatch />
       {/* <ResetPassword /> */}
       {/* <Account /> */}
     </div>

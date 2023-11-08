@@ -8,27 +8,30 @@ interface ShopperCardProps {
   prodID: string;
   quantity: number | undefined;
   location: string | undefined;
-  //   timeStart: Date | null;
-  //   timeEnd: Date | null;
+  timeStart: Date;
+  timeEnd: Date;
   //   status: boolean;
 }
 
 export default function ShopperCard({
   userID,
   category,
-  prodID,
   quantity,
   location,
+  timeStart,
+  timeEnd,
 }: ShopperCardProps) {
   return (
     <div className="card">
       {/* userD corresponds to username */}
       <h2>UserID: {userID}</h2>
       <p>
-        Shopping for {category} {prodID} at {location}
+        Shopping for {category} at {location}
       </p>
       {/* <p>Category: {category}</p> */}
       <p>Quantity: {quantity}</p>
+      <p>Start time: {timeStart.toLocaleString()}</p>
+      <p>End time: {timeEnd.toLocaleString()}</p>
       {/* <p>Location: {location}</p> */}
       <div className="button-container">
         <button className="button">Select Buddy</button>

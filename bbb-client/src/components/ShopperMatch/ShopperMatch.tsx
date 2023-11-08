@@ -9,8 +9,8 @@ interface ShoppingForm {
   category: string | undefined;
   quantity: number | undefined;
   location: string | undefined;
-  timeStart: Date | null;
-  timeEnd: Date | null;
+  timeStart: Date;
+  timeEnd: Date;
   status: boolean;
 }
 
@@ -18,15 +18,15 @@ const categories = ["beef", "pork", "chicken"];
 const locations = ["Durham", "Charlotte", "Raleigh"];
 
 function ShopperMatch() {
-  const shopperList = matches.map((request) => (
-    <li key={request.reqId}>
-      <div>UserID: {request.userId}</div>
-      <div>Category: {request.category}</div>
-      <div>ProductID: {request.prodId}</div>
-      <div>Quantity: {request.quantity}</div>
-      <div>Location: {request.location}</div>
-    </li>
-  ));
+  // const shopperList = matches.map((request) => (
+  //   <li key={request.reqId}>
+  //     <div>UserID: {request.userId}</div>
+  //     <div>Category: {request.category}</div>
+  //     <div>ProductID: {request.prodId}</div>
+  //     <div>Quantity: {request.quantity}</div>
+  //     <div>Location: {request.location}</div>
+  //   </li>
+  // ));
   //   const [category, setCategory] = useState<string | undefined>("");
   //   const [quantity, setQuantity] = useState<number | undefined>(0);
   //   const [location, setLocation] = useState<string | undefined>("");
@@ -80,6 +80,8 @@ function ShopperMatch() {
             prodID={item.prodId}
             quantity={item.quantity}
             location={item.location}
+            timeStart={item.timeStart}
+            timeEnd={item.timeEnd}
           />
         ))}
       </div>
