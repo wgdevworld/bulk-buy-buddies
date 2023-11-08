@@ -27,71 +27,32 @@ function Account() {
     const router = useRouter()
 
     useEffect(() => {
-        const getUserAcctInfo = async () => {
-            try {
-              const response = await fetch("http://127.0.0.1:5000/get_acct_info", {
-                credentials: "include",
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-              })
-              const user_acct = await response.json();
-    
-              if (user_acct == null) {
-                router.push('/user/login')
-              }
-              console.log(user_acct)
-              setUser(user_acct)
-              setDoneLoading(true)
-            } catch (error) {
-              console.error(error);
-            }
-        }
-
         getUserAcctInfo();
-        // getUserTransactions();
     }, []);
 
-    // const getUserAcctInfo = async () => {
-    //     try {
-    //       const response = await fetch("http://127.0.0.1:5000/get_acct_info", {
-    //         credentials: "include",
-    //         method: "GET",
-    //         headers: {
-    //             "Content-Type": "application/json"
-    //         }
-    //       })
-    //       const user_acct = await response.json();
+    const getUserAcctInfo = async () => {
+        try {
+          const response = await fetch("http://127.0.0.1:5000/get_acct_info", {
+            credentials: "include",
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+          })
+          const user_acct = await response.json();
 
-    //       if (user_acct == null) {
-    //         console.log("NOOO")
-    //         router.push('/user/login')
-    //       }
-    //       console.log(user_acct)
-    //       setUser(user_acct)
-    //     } catch (error) {
-    //       console.error(error);
-    //     }
-    // }
+          if (user_acct == null) {
+            console.log("NOOO")
+            router.push('/user/login')
+          }
+          console.log(user_acct)
+          setUser(user_acct)
+          setDoneLoading(true)
+        } catch (error) {
+          console.error(error);
+        }
+    }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    // const getUserTransactions= async () => {
-    //     try {
-    //       const response = await fetch("http://127.0.0.1:5000/get_transactions", {
-    //         credentials: "include",
-    //         method: "GET",
-    //         headers: {
-    //             "Content-Type": "application/json"
-    //         }
-    //       })
-    //       const requests = await response.json();
-    //       console.log(requests)
-    //       setTransactions(requests)
-    //     } catch (error) {
-    //       console.error(error);
-    //     }
-    // }
 
     const navigateUpdateUser = async () => {
         try {
@@ -105,7 +66,7 @@ function Account() {
     return (
         <div>
             <h1> Welcome, {user?.firstname} </h1>
-            <p> Account: {user?.uid} </p>
+            <p> Account #: {user?.uid} </p>
             <StandardButton onClick={navigateUpdateUser} label="Edit account information" />
 
             {doneLoading ?
@@ -113,13 +74,6 @@ function Account() {
                 :
                 <div/>
             }
-            
-            {/* <h1> History </h1>
-            <ul className="product-list">
-                {transactions.map((request: Transaction) => (
-                <RequestCard request={request} key={request._id} />
-                ))}
-            </ul> */}
         </div>
     )
 
