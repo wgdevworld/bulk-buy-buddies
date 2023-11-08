@@ -10,7 +10,6 @@ import secrets
 # Flask Configurations
 app = Flask(__name__)
 # app.secret_key = secrets.token_urlsafe(16)
-app.secret_key = 'super_secure_key_yay'
 # app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
 # app.config["SESSION_PERMANENT"] = False
 # app.config["SESSION_TYPE"] = "filesystem"
