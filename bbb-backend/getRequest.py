@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request, Blueprint
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 import os
-from dotenv import load_dotenv, find_dotenv
+from dotenv import dotenv_values
 
 app = Flask(__name__)
 CORS(app, origins='http://127.0.0.1:5000')
@@ -25,8 +25,3 @@ def get_my_requests():
 
 if __name__ == '__main__':
     app.run(port=5000)
-    
-
-
-
-

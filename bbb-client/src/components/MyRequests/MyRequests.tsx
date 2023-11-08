@@ -6,11 +6,10 @@ interface RequestForm {
   //   reqID: string;
   //   userID: string;
   category: string | undefined;
-  prodID: string;
   quantity: number | undefined;
   location: string | undefined;
-  timeStart: Date | null;
-  timeEnd: Date | null;
+  timeStart: Date;
+  timeEnd: Date;
   status: boolean;
 }
 
@@ -79,9 +78,10 @@ function MyRequests() {
           <RequestCard
             key={index}
             category={item.category}
-            prodID={item.prodID}
             quantity={item.quantity}
             location={item.location}
+            timeStart={item.timeStart}
+            timeEnd={item.timeEnd}
           />
         ))}
       </div>
