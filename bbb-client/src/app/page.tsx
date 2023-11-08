@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react/react-in-jsx-scope */
 "use client";
 
 import Messenger from "@/components/Messenger";

@@ -24,7 +24,7 @@ function ShopperForm() {
   const [location, setLocation] = useState<string | undefined>("");
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
-  const [responseContent, setResponseContent] = useState<any | null>(null);
+  const [responseContent, setResponseContent] = useState<unknown | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +48,7 @@ function ShopperForm() {
       });
 
       if (response.ok) {
-        const responseData = await response.text(); // Parse the response as text
+        const responseData = await response.text();
         const parsedResponse = JSON.parse(responseData);
         setResponseContent(parsedResponse);
       } else {

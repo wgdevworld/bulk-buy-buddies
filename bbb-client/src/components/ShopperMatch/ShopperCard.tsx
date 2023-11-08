@@ -5,7 +5,6 @@ interface ShopperCardProps {
   //   reqID: string;
   userID: string;
   category: string | undefined;
-  prodID: string;
   quantity: number | undefined;
   location: string | undefined;
   timeStart: Date;

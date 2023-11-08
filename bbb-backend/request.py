@@ -20,5 +20,25 @@ def submit_shopping_request():
     except Exception as e:
         return jsonify({'error': 'Failed to process the request'}), 500
 
+@app.route('/get-requests', methods=['GET'])
+def get_my_requests():
+    try: 
+        request_collection = mongo.db.requests
+        request_list = []
+        for doc in request_collection.find():
+            request = {
+                "_id": str(doc["_id"]),
+                "category": doc["category"],
+                "quantity": doc["quantity"],
+                "location": doc["location"],
+                "timeStart": doc["timeStart"],
+                "timeEnd": doc["timeEnd"],
+                "status": doc["status"]
+            }
+            request_list.append(request)
+        return jsonify(request_list)
+    except Exception as e:
+        return jsonify(error={"message": str(e)})
+
 if __name__ == '__main__':
     app.run()
