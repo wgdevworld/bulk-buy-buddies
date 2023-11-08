@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { matches } from "./SampleShoppers";
 import ShopperCard from "./ShopperCard";
+import { useRouter } from "next/navigation";
 
 interface ShoppingForm {
   reqID: string;
@@ -18,6 +19,7 @@ const categories = ["beef", "pork", "chicken"];
 const locations = ["Durham", "Charlotte", "Raleigh"];
 
 function ShopperMatch() {
+  const router = useRouter();
   const [requests, setRequests] = useState<ShoppingForm[]>([]);
   useEffect(() => {
     fetchMyRequests();

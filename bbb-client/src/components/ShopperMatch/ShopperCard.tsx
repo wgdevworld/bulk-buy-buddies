@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
 import "./ShopperCard.css";
+import { useRouter } from "next/navigation";
 
 interface ShopperCardProps {
   //   reqID: string;
@@ -20,6 +22,11 @@ export default function ShopperCard({
   timeStart,
   timeEnd,
 }: ShopperCardProps) {
+  const router = useRouter();
+  const handleLearnMore = () => {
+    router.push("../ProductRec");
+  };
+
   return (
     <div className="card">
       {/* userD corresponds to username */}
@@ -33,7 +40,9 @@ export default function ShopperCard({
       <p>End time: {timeEnd.toLocaleString()}</p>
       {/* <p>Location: {location}</p> */}
       <div className="button-container">
-        <button className="button">Select Buddy</button>
+        <button className="button" onClick={handleLearnMore}>
+          Select Buddy
+        </button>
         <button className="button">Learn More</button>
       </div>
     </div>
