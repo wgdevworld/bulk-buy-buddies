@@ -1,6 +1,6 @@
 "use client";
 
-import React, { MouseEvent, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import StandardButton from './button';
 import { useRouter } from 'next/navigation';
 
