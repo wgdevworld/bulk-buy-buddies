@@ -35,6 +35,10 @@ function EditAccount() {
             }
           })
           const user_acct = await response.json();
+          
+          if (user_acct == null) {
+            router.push('/user/login')
+          }
           console.log(user_acct)
           setUser(user_acct)
           return user_acct
@@ -177,12 +181,6 @@ function EditAccount() {
                                 onChange={(e) => setZipcode(e.target.value)}
                             />
                         </div>
-                        {/* <ShopperDropdown
-                            name="New Location"
-                            options={locations}
-                            value={location}
-                            onSelect={(selectedLocation) => setLocation(selectedLocation)}
-                        /> */}
                         <button type="submit"> Update Information </button>
                     </form>
                     <StandardButton onClick={resetPassword} label="Forgot Password?" />

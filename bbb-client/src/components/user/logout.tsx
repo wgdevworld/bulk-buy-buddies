@@ -2,9 +2,35 @@
 
 import React, { MouseEvent, useState, useEffect } from "react";
 import StandardButton from './button';
+import { useRouter } from 'next/navigation';
 
 function Logout() {
     const [success, setSuccess] = useState(false);
+    const router = useRouter()
+
+    useEffect(() => {
+        getCurrUser();
+    }, []);
+
+    const getCurrUser = async () => {
+        try {
+            const response = await fetch("http://127.0.0.1:5000/get_acct_info", {
+            credentials: "include",
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+          })
+          const user_acct = await response.json();
+          
+          if (user_acct == null) {
+            router.push('/user/login')
+          }
+          console.log(user_acct)
+          } catch (error) {
+            console.error(error);
+          }
+    }
 
     const logoutUser = async () => {
 

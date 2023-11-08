@@ -4,7 +4,6 @@ import React, { FormEvent, useState } from "react";
 import Logout from "@/components/user/logout";
 import ShopperDropdown from "../ShopperForm/ShopperDropdown";
 import StandardButton from './button';
-// import { Location } from "../locations/locations";
 import { useRouter } from 'next/navigation';
 
 export const states = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado",

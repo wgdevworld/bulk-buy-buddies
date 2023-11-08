@@ -40,7 +40,7 @@ function Account() {
 
     useEffect(() => {
         getUserAcctInfo();
-        getUserTransactions();
+        // getUserTransactions();
     }, []);
 
     const getUserAcctInfo = async () => {
@@ -53,6 +53,10 @@ function Account() {
             }
           })
           const user_acct = await response.json();
+          
+          if (user_acct == null) {
+            router.push('/user/login')
+          }
           console.log(user_acct)
           setUser(user_acct)
         } catch (error) {
@@ -60,6 +64,7 @@ function Account() {
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const getUserTransactions= async () => {
         try {
           const response = await fetch("http://127.0.0.1:5000/get_transactions", {
