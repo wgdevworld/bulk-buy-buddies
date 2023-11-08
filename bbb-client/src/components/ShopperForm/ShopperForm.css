@@ -1,0 +1,9 @@
+.vertical-container {
+  display: flex;
+  flex-direction: column; /* Align components vertically */
+  align-items: center; /* Center components horizontally */
+}
+
+.component {
+  margin: 10px; /* Add spacing between components */
+}

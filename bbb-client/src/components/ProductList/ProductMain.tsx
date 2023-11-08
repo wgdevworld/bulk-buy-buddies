@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Image from "next/image";
 import ProductCard from "./ProductCard";
 import "./products.css";
 
@@ -14,7 +13,7 @@ function ProductMain() {
   const [products, setProducts] = useState([]);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [category, setCategory] = useState("meat");
+  const [category, setCategory] = useState("");
 
   const handleSearch = async () => {
     console.log("searching for", searchTerm);
@@ -55,8 +54,12 @@ function ProductMain() {
         placeholder="Max price"
       />
       <select value={category} onChange={(e) => setCategory(e.target.value)}>
-        <option value="meat">Meat</option>
-        {/* Add more categories as they become available */}
+        <option value="">All</option>
+        <option value="pork">Pork</option>
+        <option value="chicken">Chicken</option>
+        <option value="turkey">Turkey</option>
+        <option value="coffee-sweeteners">Coffee-Sweeteners</option>
+        <option value="beef">Beef</option>
       </select>
       <button onClick={handleSearch}>Search</button>
       <ul className="product-list">

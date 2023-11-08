@@ -1,9 +1,14 @@
-from flask import Flask
-from Messaging import messaging_api
+from flask import Flask, session
+from flask_session import Session
+from flask_cors import CORS
 from flask_pymongo import PyMongo
 from flask_socketio import SocketIO
+from Messaging import messaging_api
 from dotenv import load_dotenv
+from user.user_app import user
 import os
+import sys
+import secrets
 
 # Flask Configurations
 app = Flask(__name__)
@@ -20,6 +25,7 @@ app.config["MONGO"]=PyMongo(app)
 # API Functionality
 socketio = SocketIO(app, cors_allowed_origins="*")
 app.register_blueprint(messaging_api)
+app.register_blueprint(user)
 
 # Optional: if you want to use a namespace
 # from MessageSocket import PlaySocket

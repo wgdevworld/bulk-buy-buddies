@@ -1,5 +1,9 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 venv/
-
+productrecs/.env
+__pycache__/
+user/__pycache__/
+user/.env
 products/.env
+locations/.env
