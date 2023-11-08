@@ -1,11 +1,19 @@
 "use client";
 
-import React, { FormEvent, useState, useEffect } from "react";
+import React, { FormEvent, useState } from "react";
 import Logout from "@/components/user/logout";
 import ShopperDropdown from "../ShopperForm/ShopperDropdown";
 import StandardButton from './button';
-import { Location } from "../locations/locations";
+// import { Location } from "../locations/locations";
 import { useRouter } from 'next/navigation';
+
+export const states = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado",
+"Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana",
+"Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan",
+"Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire",
+"New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma",
+"Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee",
+"Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"]
 
 
 function Register() {
@@ -14,35 +22,45 @@ function Register() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [success, setSuccess] = useState(false);
-    const [location, setLocation] = useState("");
-    const [locations, setLocations] = useState<string[]>([]);
+    const [address, setAddress] = useState("");
+    const [city, setCity] = useState("");
+    const [state, setState] = useState("");
+    const [zipcode, setZipcode] = useState("");
+    // const [locations, setLocations] = useState<string[]>([]);
     const router = useRouter()
+    // const states = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado",
+    // "Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana",
+    // "Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan",
+    // "Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire",
+    // "New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma",
+    // "Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee",
+    // "Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"]
 
-    useEffect(() => {
-        getLocations();
-    }, []);
+    // useEffect(() => {
+    //     getLocations();
+    // }, []);
 
-    const getLocations = async () => {
-        try {
-          const response = await fetch("http://127.0.0.1:5000/retrieve_locations_temp", {
-            credentials: "include",
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-          })
-          const data: Location[] = await response.json();
-          var locs: string[]
-          locs = []
-          data.forEach(loc => {
-            const display = `${loc.name} (${loc.address})`
-            locs.push(display)
-          });
-          setLocations(locs)
-        } catch (error) {
-          console.error(error);
-        }
-    }
+    // const getLocations = async () => {
+    //     try {
+    //       const response = await fetch("http://127.0.0.1:5000/retrieve_locations_temp", {
+    //         credentials: "include",
+    //         method: "GET",
+    //         headers: {
+    //             "Content-Type": "application/json"
+    //         }
+    //       })
+    //       const data: Location[] = await response.json();
+    //       const locs: string[] = []
+    //     //   locs = []
+    //       data.forEach(loc => {
+    //         const display = `${loc.name} (${loc.address})`
+    //         locs.push(display)
+    //       });
+    //       setLocations(locs)
+    //     } catch (error) {
+    //       console.error(error);
+    //     }
+    // }
 
     const registerUser = async (e: FormEvent) => {
         e.preventDefault()
@@ -53,7 +71,12 @@ function Register() {
                 'lastname': lastname,
                 'email': username,
                 'password': password,
-                'location': location
+                'address': {
+                    'address': address,
+                    'city': city,
+                    'state': state,
+                    'zipcode': zipcode
+                }
             };
             console.log(user_info)
             const response = await fetch("http://127.0.0.1:5000/register", {
@@ -135,12 +158,39 @@ function Register() {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
+                    <div>
+                        <label>Address</label>
+                        <input 
+                            type="text" 
+                            name="email" 
+                            value={address || ""} 
+                            onChange={(e) => setAddress(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <label>City / Town</label>
+                        <input 
+                            type="text" 
+                            name="email" 
+                            value={city || ""} 
+                            onChange={(e) => setCity(e.target.value)}
+                        />
+                    </div>
                     <ShopperDropdown
-                        name="Location"
-                        options={locations}
-                        value={location}
-                        onSelect={(selectedLocation) => setLocation(selectedLocation)}
+                        name="State"
+                        options={states}
+                        value={state}
+                        onSelect={(selectedLocation) => setState(selectedLocation)}
                     />
+                    <div>
+                        <label>Zip / Postal Code</label>
+                        <input 
+                            type="text" 
+                            name="email" 
+                            value={zipcode || ""} 
+                            onChange={(e) => setZipcode(e.target.value)}
+                        />
+                    </div>
                     <button type="submit"> Register </button>
                 </form>
             }

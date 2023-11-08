@@ -3,9 +3,9 @@
 import React, { FormEvent, useState, useEffect } from "react";
 import ShopperDropdown from "../ShopperForm/ShopperDropdown";
 import StandardButton from './button';
-import { Location } from "../locations/locations";
 import { Account } from "@/components/user/account"
 import { useRouter } from 'next/navigation';
+import { states } from "@/components/user/register"
 
 function EditAccount() {
     
@@ -14,13 +14,17 @@ function EditAccount() {
     const [lastname, setLastname] = useState("");
     const [editSuccess, setEditSuccess] = useState(false);
     const [passwordSuccess, setPasswordSuccess] = useState(false);
-    const [location, setLocation] = useState("");
-    const [locations, setLocations] = useState<string[]>([]);
+    const [address, setAddress] = useState("");
+    const [city, setCity] = useState("");
+    const [state, setState] = useState("");
+    const [zipcode, setZipcode] = useState("");
+    // const [location, setLocation] = useState("");
+    // const [locations, setLocations] = useState<string[]>([]);
     const router = useRouter()
  
 
     useEffect(() => {
-        getLocations();
+        // getLocations();
         getCurrUser();
     }, []);
 
@@ -35,35 +39,55 @@ function EditAccount() {
           })
           const user_acct = await response.json();
           console.log(user_acct)
-        //   setUser(user_acct)
+          setUser(user_acct)
           return user_acct
           } catch (error) {
             console.error(error);
           }
     }
+    // const getLocations = async () => {
+    //     try {
+    //       const response = await fetch("http://127.0.0.1:5000/retrieve_locations_temp", {
+    //         credentials: "include",
+    //         method: "GET",
+    //         headers: {
+    //             "Content-Type": "application/json"
+    //         }
+    //       })
+    //       const data: Location[] = await response.json();
+    //       const locs: string[] = []
+    //     //   locs = []
+    //       data.forEach(loc => {
+    //         const display = `${loc.name} (${loc.address})`
+    //         locs.push(display)
+    //       });
+    //       setLocations(locs)
+    //     } catch (error) {
+    //       console.error(error);
+    //     }
+    // }
 
-
-    const getLocations = async () => {
-        try {
-          const response = await fetch("http://127.0.0.1:5000/retrieve_locations_temp", {
-            credentials: "include",
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-          })
-          const data: Location[] = await response.json();
-          var locs: string[]
-          locs = []
-          data.forEach(loc => {
-            const display = `${loc.name} (${loc.address})`
-            locs.push(display)
-          });
-          setLocations(locs)
-        } catch (error) {
-          console.error(error);
-        }
-    }
+    // const getLocations = async () => {
+    //     try {
+    //       const response = await fetch("http://127.0.0.1:5000/retrieve_locations_temp", {
+    //         credentials: "include",
+    //         method: "GET",
+    //         headers: {
+    //             "Content-Type": "application/json"
+    //         }
+    //       })
+    //       const data: Location[] = await response.json();
+    //       const locs: string[] = []
+    //     //   locs = []
+    //       data.forEach(loc => {
+    //         const display = `${loc.name} (${loc.address})`
+    //         locs.push(display)
+    //       });
+    //       setLocations(locs)
+    //     } catch (error) {
+    //       console.error(error);
+    //     }
+    // }
 
     const resetPassword = async () => {
         try {
@@ -100,7 +124,12 @@ function EditAccount() {
             const user_info = {
                 'firstname': firstname == "" ? user?.firstname : firstname,
                 'lastname': lastname == "" ? user?.lastname : lastname,
-                'location': location == "" ? user?.location : location
+                'address': {
+                    'address': address == "" ? user?.address['address'] : address,
+                    'city': city == "" ? user?.address['city'] : city,
+                    'state': state == "" ? user?.address['state'] : state,
+                    'zipcode': zipcode == "" ? user?.address['zipcode'] : zipcode
+                }
             };
             console.log(user_info)
             const response = await fetch("http://127.0.0.1:5000/updateAccount", {
@@ -161,12 +190,45 @@ function EditAccount() {
                                 onChange={(e) => setLastname(e.target.value)}
                             />
                         </div>
+                        <div>
+                            <label>Address</label>
+                            <input 
+                                type="text" 
+                                name="email" 
+                                value={address || ""} 
+                                onChange={(e) => setAddress(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label>City / Town</label>
+                            <input 
+                                type="text" 
+                                name="email" 
+                                value={city || ""} 
+                                onChange={(e) => setCity(e.target.value)}
+                            />
+                        </div>
                         <ShopperDropdown
+                            name="State"
+                            options={states}
+                            value={state}
+                            onSelect={(selectedLocation) => setState(selectedLocation)}
+                        />
+                        <div>
+                            <label>Zip / Postal Code</label>
+                            <input 
+                                type="text" 
+                                name="email" 
+                                value={zipcode || ""} 
+                                onChange={(e) => setZipcode(e.target.value)}
+                            />
+                        </div>
+                        {/* <ShopperDropdown
                             name="New Location"
                             options={locations}
                             value={location}
                             onSelect={(selectedLocation) => setLocation(selectedLocation)}
-                        />
+                        /> */}
                         <button type="submit"> Update Information </button>
                     </form>
                     <StandardButton onClick={resetPassword} label="Forgot Password?" />

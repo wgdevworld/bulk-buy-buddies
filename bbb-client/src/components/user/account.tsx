@@ -24,7 +24,12 @@ export interface Account {
     firstname: string;
     lastname: string;
     email: string;
-    location: string;
+    address: {
+        address: string;
+        city: string;
+        state: string;
+        zipcode: string;
+    }
     dateJoined: string;
 }
 

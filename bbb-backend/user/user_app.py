@@ -83,7 +83,7 @@ def register():
             "lastname": registration_info['lastname'],
             "email": registration_info['email'],
             "dateJoined": str(datetime.now()),
-            "location": registration_info.get('location', None)
+            "address": registration_info.get('address', None)
         }
 
         try:
@@ -261,8 +261,8 @@ def updateAccount():
             return jsonify(error="first name cannot be empty"), 500
         elif new_info['lastname'] == "":
             return jsonify(error="last name cannot be empty"), 500
-        elif new_info['location'] == "":
-            return jsonify(error="location cannot be empty"), 500
+        elif new_info['address'] == "":
+            return jsonify(error="address cannot be empty"), 500
         
         try:
             user = users.update_one({"uid": curr_user['uid']},
@@ -270,13 +270,13 @@ def updateAccount():
                                         '$set': {
                                             'firstname': new_info['firstname'],
                                             'lastname': new_info['lastname'],
-                                            'location': new_info['location'],
+                                            'address': new_info['address'],
                                         }
                                     })
             
             curr_user['firstname'] = new_info['firstname']
             curr_user['lastname'] = new_info['lastname']
-            curr_user['location'] = new_info['location']
+            curr_user['address'] = new_info['address']
 
             return jsonify({'result': "success"}), 200
         except Exception as e:
