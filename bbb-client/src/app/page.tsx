@@ -16,7 +16,7 @@ export default function Home() {
       {/* <Register /> */}
       {/* <Login /> */}
       {/* <Locations /> */}
-      {/* <ShopperForm /> */}
+      <ShopperForm />
     </div>
   );
 }

@@ -5,3 +5,4 @@ __pycache__/
 user/__pycache__/
 user/.env
 products/.env
+locations/.env

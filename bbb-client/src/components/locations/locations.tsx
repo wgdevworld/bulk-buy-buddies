@@ -37,8 +37,6 @@ function Locations() {
 
   const [mapCenter, setMapCenter] = useState({lat: 36.028848, lng: -78.915528});
 
-  
-
   return (
     <div className="locations">
       <h1 className="location-title">Costco Locations</h1>
