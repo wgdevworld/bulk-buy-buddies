@@ -36,10 +36,18 @@ def fetchBestProduct():
             results.append(product)
 
         return jsonify(results=results)
-    except ValueError:
-        return jsonify(error="Invalid value provided for price"), 400
     except Exception as e:
         return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
+
+@app.route("/fetchBuddyInfo", methods=['GET'])
+def fetchBestProduct():
+    try:
+        buddyID = request.args.get('buddyID')
+        buddyInfo = mongo.db.users.find_one({'uid':buddyID})
+        return jsonify(results=buddyInfo)
+    except Exception as e:
+        return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
+
 
 if __name__ == '__main__':
     app.run(port=5000)

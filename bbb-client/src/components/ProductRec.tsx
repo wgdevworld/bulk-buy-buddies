@@ -17,6 +17,8 @@ const ProductRec = () => {
     // const [userQuantity, setUserQuantity] = useState<String>('');
     // const [buddyQuantity, setBuddyQuantity] = useState<String>('');
     const [products, setProducts] = useState([]);
+    const [name, setName] = useState('');
+    const [dateJoined, setJoined] = useState();
     const router = useRouter(); 
     const searchParams = useSearchParams();
     
@@ -26,12 +28,14 @@ const ProductRec = () => {
             // retrieve information about the buddy that was clicked
             // INCLUDES: uid of buddy, preferably also information about the active request clicked
             // via session storage? or whatever mechanism we find
+            const buddyID = searchParams.get('userID');
             const userCategory = searchParams.get('userCategory');
             const userQuantity = searchParams.get('userQuantity');
             const buddyQuantity = searchParams.get('buddyQuantity')!;
             const location = searchParams.get('location')!;
             // get user information about buddy
             // run request information through backend function to fetch product recommenations 
+            fetchBuddy(buddyID);
             fetchProducts(userCategory, userQuantity, buddyQuantity, location)
         })();
       }, []);
@@ -51,6 +55,25 @@ const ProductRec = () => {
             console.error('An error occurred while submitting the form:', error);
           }
     };
+    const fetchBuddy = async (buddyID: any ) => {
+        try {
+            const response = await fetch(
+                `http://127.0.0.1:5000/fetchBuddyInfo?buddyID=${buddyID}`
+            );
+            if (!response.ok) {
+              // Handle success, e.g., show a success message
+              console.error('Failed to submit form data');
+            } 
+            const data = await response.json();
+            const name = data.firstname + ' ' + data.lastname
+            setName(name);
+            const location = data.dateJoined;
+            setJoined(location);
+          } catch (error) {
+            console.error('An error occurred while submitting the form:', error);
+          }
+    };
+
     // const onRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     //     setUserCategory(e.currentTarget.value);
     // };
@@ -68,7 +91,7 @@ const ProductRec = () => {
     //     { view: "Coffee", value: "coffee-sweeteners" },
     // ];
     return (
-        <div >
+        <div style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
             {/* <div>
                 <p>Choose users' product category</p>
                 {radioOptions.map(({view: title, value: option}: any) => {
@@ -107,10 +130,17 @@ const ProductRec = () => {
                 </label>
             </div><br/> */}
             {/* <button type="submit" onClick={handleClick}>Submit</button> */}
+            {name !== '' ? 
+                (<>
+                    <h3>Buddy Name: ${name}</h3>
+                    <h6>Date Joined: ${dateJoined}</h6>
+                </>
+                ) : <></>
+            }
             {products.length !== 0 ? 
                 (<>
                     <br/>
-                    <p>Here are the recommended products you purchase!</p>
+                    <p>Here are products you recommend you purchase with ${name}!</p>
                     <ul className="product-list">
                         {products.map((product: Product) => (
                             <ProductCard product={product} key={product._id} />
@@ -125,4 +155,5 @@ const ProductRec = () => {
   };
   
   export default ProductRec;
+  
   
