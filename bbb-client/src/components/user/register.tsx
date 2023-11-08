@@ -1,5 +1,12 @@
-import React, { FormEvent, useState } from "react";
-import Login from "@/components/user/login"
+"use client";
+
+import React, { FormEvent, useState, useEffect } from "react";
+import Logout from "@/components/user/logout";
+import ShopperDropdown from "../ShopperForm/ShopperDropdown";
+import StandardButton from './button';
+import { Location } from "../locations/locations";
+import { useRouter } from 'next/navigation';
+
 
 function Register() {
     const [firstname, setFirstname] = useState("");
@@ -7,6 +14,35 @@ function Register() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [success, setSuccess] = useState(false);
+    const [location, setLocation] = useState("");
+    const [locations, setLocations] = useState<string[]>([]);
+    const router = useRouter()
+
+    useEffect(() => {
+        getLocations();
+    }, []);
+
+    const getLocations = async () => {
+        try {
+          const response = await fetch("http://127.0.0.1:5000/retrieve_locations_temp", {
+            credentials: "include",
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+          })
+          const data: Location[] = await response.json();
+          var locs: string[]
+          locs = []
+          data.forEach(loc => {
+            const display = `${loc.name} (${loc.address})`
+            locs.push(display)
+          });
+          setLocations(locs)
+        } catch (error) {
+          console.error(error);
+        }
+    }
 
     const registerUser = async (e: FormEvent) => {
         e.preventDefault()
@@ -16,19 +52,21 @@ function Register() {
                 'firstname': firstname,
                 'lastname': lastname,
                 'email': username,
-                'password': password 
+                'password': password,
+                'location': location
             };
             console.log(user_info)
             const response = await fetch("http://127.0.0.1:5000/register", {
+                credentials: "include",
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-
                 },
                 body: JSON.stringify(user_info),
             })
             console.log(response)
             console.log(response.json())
+
             if (!response.ok) {
                 throw new Error("Failed to register user");
             }
@@ -39,12 +77,25 @@ function Register() {
         }
     }
 
+    const navigateAccount = async () => {
+        try {
+            console.log("go to account page")
+            router.push('/user/account')
+        } catch (error) {
+            console.error("Error going to account page:", error);
+        }
+    }
+
     return (
         <div>
             {success ?
                 <div> 
-                    Successfully registered! Log in to find your bbb!
-                    <Login />
+                    <div> Successfully logged in! </div>
+                    <div> 
+                        <h1> Welcome, {username}</h1>
+                        <StandardButton onClick={navigateAccount} label="View Account" />
+                    </div>
+                    <Logout />
                 </div>
                 :
                 <form onSubmit={registerUser}>
@@ -67,10 +118,10 @@ function Register() {
                         />
                     </div>
                     <div>
-                        <label>Username</label>
+                        <label>Email</label>
                         <input 
                             type="text" 
-                            name="username" 
+                            name="email" 
                             value={username || ""} 
                             onChange={(e) => setUsername(e.target.value)}
                         />
@@ -84,6 +135,12 @@ function Register() {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
+                    <ShopperDropdown
+                        name="Location"
+                        options={locations}
+                        value={location}
+                        onSelect={(selectedLocation) => setLocation(selectedLocation)}
+                    />
                     <button type="submit"> Register </button>
                 </form>
             }
