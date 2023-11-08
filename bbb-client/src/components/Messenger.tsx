@@ -5,41 +5,49 @@ import { Chat, IMessage, fetchChats, sendMessage } from "./MessengerHelper";
 import io from "socket.io-client";
 
 const Messenger = () => {
-  const uid = "000";
-
+  const [uid, setUid] = useState("");
+  const [newUid, setNewUid] = useState("");
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [messageBuffer, setBuffer] = useState<string>("");
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<string>("");
   const [newChatUid, setNewChatUid] = useState<string>("");
-  const socket = io("http://localhost:5000");
+  const [socket, setSocket] = useState<any>(null);
 
   useEffect(() => {
-    // Get all the chats
-    (async () => {
-      let fetchedChats = await fetchChats(uid);
-      setChats(fetchedChats!);
-    })();
+    // Only initialize the socket if the uid is set
+    if (uid) {
+      // Get all the chats
+      (async () => {
+        let fetchedChats = await fetchChats(uid);
+        setChats(fetchedChats!);
+      })();
 
-    // Websockets init
-    socket.on("new_message", (messageData: IMessage) => {
-      setMessages((prevMessages) => [...prevMessages, messageData]);
-    });
+      // on socket connect, provide server with uid
+      const newSocket = io("http://localhost:5000", {
+        query: { uid },
+      });
 
-    return () => {
-      // Websockets disconnect
-      socket.disconnect();
-    };
-  }, [uid]);
+      // set the newly initialized socket
+      setSocket(newSocket);
 
-  useEffect(() => {}, []);
+      // when server emits new messages, add them to the state
+      newSocket.on("got_message", (messageData: IMessage) => {
+        setMessages((prevMessages) => [...prevMessages, messageData]);
+      });
+
+      return () => {
+        // Disconnect the socket when the component unmounts or the uid changes
+        newSocket.disconnect();
+      };
+    }
+  }, [uid, messages]);
 
   // Send the currently typed message
   const sendCurrentBuffer = async (e: FormEvent) => {
     e.preventDefault();
-
     const message = messageBuffer.trim();
-    if (message === "") return;
+    if (message === "" || socket === null) return;
 
     const messageData: IMessage = {
       id: uuidv4(),
@@ -48,12 +56,8 @@ const Messenger = () => {
       toUid: selectedChat,
       timestamp: new Date().toISOString(),
     };
-    // await sendMessage(messageData);
-    // setMessages([...messages, messageData]);
-    setBuffer("");
-
-    // Send message thru socket
     socket.emit("new_message", messageData);
+    setBuffer("");
   };
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -84,8 +88,18 @@ const Messenger = () => {
     setNewChatUid(""); // Reset the input field
   };
 
+  //
   const handleNewChatUidChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNewChatUid(e.target.value);
+  };
+
+  const handleUidChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNewUid(e.target.value);
+  };
+
+  const handleUidSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setUid(newUid);
   };
 
   const selectedChatMessages =
@@ -94,6 +108,15 @@ const Messenger = () => {
   return (
     <div className="messenger">
       <div className="sidebar">
+        <form onSubmit={handleUidSubmit}>
+          <input
+            type="text"
+            value={newUid}
+            onChange={handleUidChange}
+            placeholder="Enter your user ID"
+          />
+          <button type="submit">Set UID</button>
+        </form>
         <form onSubmit={handleNewChatSubmit} className="new-chat-form">
           <input
             type="text"
