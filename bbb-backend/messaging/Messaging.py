@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, Blueprint, current_app
-from MessagingDBInterface import save_message_to_db
+from messaging.MessagingDBInterface import save_message_to_db
 
 # Flask Blueprint configuration
 messaging_api = Blueprint('messaging_api', __name__)

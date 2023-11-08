@@ -3,7 +3,7 @@ from flask_session import Session
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from flask_socketio import SocketIO
-from Messaging import messaging_api
+from messaging.Messaging import messaging_api
 from dotenv import load_dotenv
 from user.user_app import user
 import os
@@ -36,7 +36,7 @@ def index():
     return "Hello from Flask!"
 
 # Make sure to call the function to register your socket events
-from MessageSocket import register_socket_events
+from messaging.MessageSocket import register_socket_events
 register_socket_events(socketio)
 
 if __name__ == '__main__':
