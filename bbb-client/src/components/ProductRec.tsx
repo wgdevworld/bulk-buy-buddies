@@ -3,8 +3,6 @@ import React, { useState, useEffect, Fragment } from "react";
 import ProductCard from "./ProductList/ProductCard";
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
-
-
 export interface Product {
     _id: string;
     name: string;
