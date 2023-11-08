@@ -19,7 +19,7 @@ app.config["MONGO_URI"] = f"mongodb+srv://{os.getenv('ATLAS_USR')}:{os.getenv('A
 mongo = PyMongo(app,tlsCAFile=certifi.where())
 users = mongo.db.users
 config = {
-    'apiKey': "AIzaSyCQUBL56XsmpCkkOcn0It4770zC47ADgRM",
+    'apiKey': os.getenv('PYREBASE_API_KEY'),
     'authDomain': "bbb-user-auth.firebaseapp.com",
     'projectId': "bbb-user-auth",
     'storageBucket': "bbb-user-auth.appspot.com",
