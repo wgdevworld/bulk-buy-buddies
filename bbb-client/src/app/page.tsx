@@ -22,7 +22,7 @@ export default function Home() {
       {/* <ProductList /> */}
       {/* <Register /> */}
       {/* <Logout/> */}
-      <Login />
+      {/* <Login /> */}
       {/* <Locations /> */}
       {/* <ShopperForm /> */}
       {/* <ShopperMatch /> */}
