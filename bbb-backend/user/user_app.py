@@ -12,7 +12,7 @@ import os
 user_blueprint = Blueprint('user_blueprint', __name__)
 
 # mongo = PyMongo(app,tlsCAFile=certifi.where())
-curr_user = None
+# curr_user = None
 
 '''
 Helper Functions
