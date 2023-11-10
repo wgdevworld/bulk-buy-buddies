@@ -17,7 +17,7 @@ interface MapComponentProps {
 function MapComponent({ center, setCenter, selectedLocation }: MapComponentProps) {
   console.log("MapComponent - selectedLocation:", selectedLocation);
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || "AIzaSyAc_M-Qxm_gfgUxldg45z9cDJ7uosPP9VA" //string empty for now since using personal API key
+    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || "" //string empty for now since using personal API key
   });
 
   if (loadError) {
