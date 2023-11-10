@@ -34,9 +34,9 @@ def save_message():
             "timestamp": message_data['text'],
         }
         messages_collection.insert_one(message_dict)
-        return jsonify(success=true)
+        return jsonify(success=True)
 
-    except exception as e:
+    except Exception as e:
         return jsonify(error=str(e)), 500
 
 

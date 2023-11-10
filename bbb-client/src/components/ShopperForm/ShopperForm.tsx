@@ -3,6 +3,8 @@ import ShopperDropdown from "./ShopperDropdown";
 import DatePicker from "react-datepicker";
 import "./ShopperForm.css";
 import "react-datepicker/dist/react-datepicker.css";
+import "../locations/locations.css";
+import Locations from "../locations/locations";
 
 interface ShoppingForm {
   //   reqID: string;
@@ -67,12 +69,13 @@ function ShopperForm() {
       </div>
       <form onSubmit={handleSubmit}>
         <div className="vertical-container">
-          <ShopperDropdown
+          {/* <ShopperDropdown
             name="Location"
             options={locations}
             value={location}
             onSelect={(selectedLocation) => setLocation(selectedLocation)}
-          />
+          /> */}
+          <Locations />
           <ShopperDropdown
             name="Category"
             options={categories}

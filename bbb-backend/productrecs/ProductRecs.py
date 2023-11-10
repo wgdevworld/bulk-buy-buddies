@@ -1,18 +1,14 @@
-from flask import Flask, jsonify, request
-from flask_cors import CORS
-import requests
-from flask_pymongo import PyMongo
-import os
+from flask import Flask, jsonify, request, current_app
+# from flask_cors import CORS
+# import requests
+# from flask_pymongo import PyMongo
+# import os
 from dotenv import dotenv_values
 
-app = Flask(__name__)
-CORS(app)
-secrets = dotenv_values(".env")
-app.config["MONGO_URI"] = f"mongodb+srv://{secrets['ATLAS_USR']}:{secrets['ATLAS_PWD']}@atlascluster.zojbxi7.mongodb.net/bbb"
+mongo = current_app.config['MONGO']
 
-mongo = PyMongo(app)
 
-@app.route("/fetchSimilarProducts", methods=['GET'])
+@current_app.route("/fetchSimilarProducts", methods=['GET'])
 def fetchBestProduct():
     try:
         category_str = request.args.get('userCategory')
@@ -38,5 +34,3 @@ def fetchBestProduct():
     except Exception as e:
         return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
 
-if __name__ == '__main__':
-    app.run(port=5000)
