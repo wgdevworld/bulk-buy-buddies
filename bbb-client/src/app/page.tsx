@@ -25,8 +25,8 @@ export default function Home() {
       {/* <Logout/> */}
       {/* <Login /> */}
       {/* <Locations /> */}
-      {/* <ShopperForm /> */}
-      <ShopperMatch />
+      <ShopperForm />
+      {/* <ShopperMatch /> */}
       {/* <ResetPassword /> */}
       {/* <Account /> */}
     </div>

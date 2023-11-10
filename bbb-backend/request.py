@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_pymongo import PyMongo
 from dotenv import dotenv_values
 
-request = Blueprint('request', __name__)
+# request = Blueprint('request', __name__)
 app = Flask(__name__)
 CORS(app)
 secrets = dotenv_values(".env")

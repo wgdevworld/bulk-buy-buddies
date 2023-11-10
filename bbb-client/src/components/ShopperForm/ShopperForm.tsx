@@ -1,9 +1,12 @@
+"use client";
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import ShopperDropdown from "./ShopperDropdown";
 import DatePicker from "react-datepicker";
 import "./ShopperForm.css";
 import "react-datepicker/dist/react-datepicker.css";
+import { useRouter } from "next/navigation";
 
 // TODO: FIX data type for location once we implement selection from google maps
 
@@ -22,13 +25,42 @@ const categories = ["beef", "pork", "chicken"];
 const locations = [249, 645, 359];
 
 function ShopperForm() {
-  const [userID, setUserID] = useState<string>("aaaa");
+  const [userID, setUserID] = useState<string>("abcd");
   const [category, setCategory] = useState<string>("");
   const [quantity, setQuantity] = useState<number | undefined>(0);
   const [location, setLocation] = useState<string | number | undefined>(0);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
-  const [responseContent, setResponseContent] = useState<unknown | null>(null);
+  const [responseContent, setResponseContent] = useState<ShoppingForm | null>(
+    null
+  );
+
+  const router = useRouter();
+
+  const navigateShopperMatch = async () => {
+    try {
+      const query = {
+        userID: userID,
+        category: category,
+        location: location,
+        timeStart: startDate,
+        timeEnd: endDate,
+        status: "Active",
+      };
+      console.log("To Shopper Match page");
+      router.push("/shopper/shopperMatch" + "?" + createQueryString(query));
+    } catch (error) {
+      console.error("Error going to ShopperMatch page", error);
+    }
+  };
+
+  const createQueryString = (query: object) => {
+    const params = new URLSearchParams();
+    for (const [name, value] of Object.entries(query)) {
+      params.set(name, value);
+    }
+    return params.toString();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,16 +151,18 @@ function ShopperForm() {
               showTimeSelect
               dateFormat="MM/dd/yyyy h:mm aa"
               selected={endDate}
-              minDate={new Date()}
+              minDate={startDate}
               onChange={(date) => setEndDate(date)}
             />
           </div>
-          <button type="submit">Submit</button>
+          <button type="submit" onClick={navigateShopperMatch}>
+            Submit
+          </button>
         </div>
       </form>
-      {responseContent !== null && (
+      {/* {responseContent !== null && (
         <pre>{JSON.stringify(responseContent, null, 2)}</pre>
-      )}
+      )} */}
     </>
   );
 }

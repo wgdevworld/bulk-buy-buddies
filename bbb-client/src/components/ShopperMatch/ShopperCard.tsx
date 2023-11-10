@@ -2,7 +2,7 @@
 "use client";
 import React from "react";
 import "./ShopperCard.css";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface ShopperCardProps {
   //   reqID: string;
@@ -24,6 +24,9 @@ export default function ShopperCard({
   timeEnd,
 }: ShopperCardProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentUserID = searchParams.get("userID");
+
   const query = {
     userID: userID,
     userCategory: category,
@@ -41,6 +44,7 @@ export default function ShopperCard({
   };
   return (
     <div className="card">
+      <h2>Current UserID: {currentUserID}</h2>
       <h2>UserID: {userID}</h2>
       <p>
         Shopping for {category} at {location}
