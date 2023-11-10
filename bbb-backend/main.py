@@ -64,6 +64,7 @@ app.register_blueprint(user_blueprint)
 app.register_blueprint(request_blueprint)
 app.register_blueprint(productRec_blueprint)
 app.register_blueprint(locations_blueprint)
+app.register_blueprint(products_blueprint)
 
 @app.route('/')
 def index():
