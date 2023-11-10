@@ -28,22 +28,6 @@ def save_message():
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
         return response
 
-<<<<<<< HEAD:bbb-backend/Messaging.py
-        # unpack the message data from the request
-        message_data = request.get_json()
-        message_dict = {
-            "id": message_data['id'],
-            "text": message_data['text'],
-            "fromUid": message_data['fromUid'],
-            "toUid": message_data['toUid'],
-            "timestamp": message_data['text'],
-        }
-        messages_collection.insert_one(message_dict)
-        return jsonify(success=True)
-
-    except Exception as e:
-        return jsonify(error=str(e)), 500
-=======
     message_data = request.get_json()
     # save the messages database
     success = save_message_to_db(message_data)
@@ -51,7 +35,6 @@ def save_message():
         return jsonify(success=True)
     else:
         return jsonify(error="failed to save message"), 500
->>>>>>> main:bbb-backend/messaging/Messaging.py
 
 
 """Gets chat messages for a user.

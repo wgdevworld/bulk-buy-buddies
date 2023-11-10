@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, Blueprint, current_app
 import requests
 from flask_cors import CORS
 from flask_pymongo import PyMongo
@@ -7,18 +7,16 @@ from bson import ObjectId
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
-username = os.getenv("MONGODB_USER")
-password = os.getenv("MONGODB_PWD")
+
 google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
-app = Flask(__name__)
-CORS(app)
-app.config["MONGO_URI"] = f"mongodb+srv://{username}:{password}@atlascluster.zojbxi7.mongodb.net/bbb"
 
-mongo = PyMongo(app)
+locations_blueprint = Blueprint('locations_blueprint', __name__)
 
-@app.route('/get_locations', methods=['GET'])
+
+@locations_blueprint.route('/get_locations', methods=['GET'])
 def get_locations():
     try:
+        mongo = current_app.config['MONGO']
         locations_collection = mongo.db.locations
         locations_list = []
         for doc in locations_collection.find():
@@ -35,9 +33,10 @@ def get_locations():
         return jsonify(error={"message": str(e)})
 
 
-@app.route('/get_user_address/<user_id>', methods=['GET'])
+@locations_blueprint.route('/get_user_address/<user_id>', methods=['GET'])
 def get_user_address(user_id):
     try:
+        mongo = current_app.config['MONGO']
         users_collection = mongo.db.users
         user = users_collection.find_one({"uid": user_id})
         if user and 'address' in user:
@@ -48,9 +47,10 @@ def get_user_address(user_id):
         return jsonify(error={"message": str(e)})
 
 
-@app.route('/get_user_location/<user_id>', methods=['GET'])
+@locations_blueprint.route('/get_user_location/<user_id>', methods=['GET'])
 def get_user_location(user_id):
     try:
+        mongo = current_app.config['MONGO']
         users_collection = mongo.db.users
         user = users_collection.find_one({"uid": user_id})
         if user and 'address' in user:
@@ -96,5 +96,3 @@ def get_user_location(user_id):
 #         return jsonify(error={"message": str(e)})
 
 
-if __name__ == '__main__':
-    app.run(debug=True)

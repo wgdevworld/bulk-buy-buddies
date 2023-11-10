@@ -44,7 +44,6 @@ function calculateDistance(coord1: number[], coord2: number[]): number {
 
 
 
-
 function Locations() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
@@ -80,31 +79,22 @@ function Locations() {
     }
   };
 
-  interface Coordinates {
-    lat: number;
-    lng: number;
-  }
-  
-  function findNearestLocation(userLocation: Coordinates, locations: Location[]): Location {
+
+  function findNearestLocation(userLocation: number[], locations: Location[]): Location {
     let nearestLocation = locations[0];
-    let shortestDistance = calculateDistance(
-      [userLocation.lat, userLocation.lng],
-      [nearestLocation.coordinates[0], nearestLocation.coordinates[1]]
-    );
-  
+    let shortestDistance = calculateDistance(userLocation, nearestLocation.coordinates);
+
     for (const location of locations) {
-      const distance = calculateDistance(
-        [userLocation.lat, userLocation.lng],
-        [location.coordinates[0], location.coordinates[1]]
-      );
+      const distance = calculateDistance(userLocation, location.coordinates);
       if (distance < shortestDistance) {
         shortestDistance = distance;
         nearestLocation = location;
       }
     }
-  
+
     return nearestLocation;
   }
+
 
   const handleLocationSelect = (location: Location) => {
     setSelectedLocation(location);
