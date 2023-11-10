@@ -153,7 +153,7 @@ function EditAccount() {
                             <input 
                                 type="text" 
                                 name="email" 
-                                value={address || ""} 
+                                value={address || user?.address["address"]} 
                                 onChange={(e) => setAddress(e.target.value)}
                             />
                         </div>
@@ -162,28 +162,28 @@ function EditAccount() {
                             <input 
                                 type="text" 
                                 name="email" 
-                                value={city || ""} 
+                                value={city || user?.address["city"]} 
                                 onChange={(e) => setCity(e.target.value)}
                             />
                         </div>
                         <ShopperDropdown
                             name="State"
                             options={states}
-                            value={state}
-                            onSelect={(selectedLocation) => setState(selectedLocation)}
+                            value={state || user?.address["state"]}
+                            onSelect={(selectedState) => setState(selectedState)}
                         />
                         <div>
                             <label>Zip / Postal Code</label>
                             <input 
                                 type="text" 
                                 name="email" 
-                                value={zipcode || ""} 
+                                value={zipcode || user?.address["zipcode"]} 
                                 onChange={(e) => setZipcode(e.target.value)}
                             />
                         </div>
                         <button type="submit"> Update Information </button>
                     </form>
-                    <StandardButton onClick={resetPassword} label="Forgot Password?" />
+                    <StandardButton onClick={resetPassword} label="Change Password" />
                     <div>
                     {passwordSuccess ? 
                         <div> 

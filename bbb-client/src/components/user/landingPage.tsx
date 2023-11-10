@@ -4,24 +4,10 @@ import React, { useState, useEffect } from "react";
 import StandardButton from './button';
 import { useRouter } from 'next/navigation';
 import RequestDisplay from "./requestDisplay";
+import { Account } from "@/components/user/account"
 
 
-export interface Account {
-    _id: string;
-    uid: string;
-    firstname: string;
-    lastname: string;
-    email: string;
-    address: {
-        address: string;
-        city: string;
-        state: string;
-        zipcode: string;
-    }
-    dateJoined: string;
-}
-
-function Account() {
+function LandingPage() {
     const [user, setUser] = useState<Account>();
     const [doneLoading, setDoneLoading] = useState(false);
     const router = useRouter()
@@ -81,4 +67,4 @@ function Account() {
 
 }
 
-export default Account;
+export default LandingPage;
