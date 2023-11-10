@@ -1,9 +1,9 @@
 from flask import Flask, session
-from flask_session import Session
+# from flask_session import Session
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from flask_socketio import SocketIO
-import pyrebase
+# import pyrebase
 import os
 import sys
 import secrets
@@ -25,7 +25,7 @@ password = os.getenv('ATLAS_PWD')
 app.config["MONGO_URI"] = f"mongodb+srv://{username}:{password}@atlascluster.zojbxi7.mongodb.net/bbb?retryWrites=true&w=majority"
 
 
-# PYREBASE Configuration
+# # PYREBASE Configuration
 config = {
     'apiKey': os.getenv('PYREBASE_API_KEY'),
     'authDomain': "bbb-user-auth.firebaseapp.com",
@@ -36,11 +36,11 @@ config = {
     'measurementId': "G-WK22RJ84J3",
     'databaseURL': ""
 }
-firebase = pyrebase.initialize_app(config)
-app.config["FIREBASE_AUTH"] = firebase.auth()
+# firebase = pyrebase.initialize_app(config)
+# app.config["FIREBASE_AUTH"] = firebase.auth()
 curr_user = None
 
-app.config["PYREBASE_API_KEY"] = os.getenv('PYREBASE_API_KEY')
+# app.config["PYREBASE_API_KEY"] = os.getenv('PYREBASE_API_KEY')
 
 # Initialize PyMongo
 app.config["MONGO"]=PyMongo(app)
