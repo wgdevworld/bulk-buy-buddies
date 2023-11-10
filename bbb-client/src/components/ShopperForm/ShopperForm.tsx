@@ -4,6 +4,8 @@ import ShopperDropdown from "./ShopperDropdown";
 import DatePicker from "react-datepicker";
 import "./ShopperForm.css";
 import "react-datepicker/dist/react-datepicker.css";
+import "../locations/locations.css";
+import Locations from "../locations/locations";
 
 // TODO: FIX data type for location once we implement selection from google maps
 
@@ -89,12 +91,13 @@ function ShopperForm() {
       <form onSubmit={handleSubmit}>
         <div className="vertical-container">
           {/* SET LOCATION FROM GOOGLE MAP API */}
-          <ShopperDropdown
+          {/* <ShopperDropdown
             name="Location"
             options={locations}
             value={location}
             onSelect={(selectedLocation) => setLocation(selectedLocation)}
-          />
+          /> */}
+          <Locations />
           <ShopperDropdown
             name="Category"
             options={categories}
