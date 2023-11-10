@@ -6,6 +6,8 @@ from flask_socketio import SocketIO
 from Messaging import messaging_api
 from dotenv import load_dotenv
 from user.user_app import user
+from productrecs.ProductRecs import productRec
+from request import request
 import os
 import sys
 import secrets
@@ -26,6 +28,8 @@ app.config["MONGO"]=PyMongo(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 app.register_blueprint(messaging_api)
 app.register_blueprint(user)
+app.register_blueprint(request)
+app.register_blueprint(productRec)
 
 # Optional: if you want to use a namespace
 # from MessageSocket import PlaySocket

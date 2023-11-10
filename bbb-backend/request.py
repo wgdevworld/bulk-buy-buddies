@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Blueprint, Flask, request, jsonify
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from dotenv import dotenv_values
 
+request = Blueprint('request', __name__)
 app = Flask(__name__)
 CORS(app)
 secrets = dotenv_values(".env")
@@ -20,5 +21,27 @@ def submit_shopping_request():
     except Exception as e:
         return jsonify({'error': 'Failed to process the request'}), 500
 
+
+@app.route('/get-requests', methods=['GET'])
+def get_my_requests():
+    try: 
+        request_collection = mongo.db.requests
+        request_list = []
+        for doc in request_collection.find():
+            request = {
+                "_id": str(doc["_id"]),
+                "userID": doc["userID"],
+                "category": doc["category"],
+                "quantity": doc["quantity"],
+                "location": doc["location"],
+                "timeStart": doc["timeStart"],
+                "timeEnd": doc["timeEnd"],
+                "status": doc["status"]
+            }
+            request_list.append(request)
+        return jsonify(request_list)
+    except Exception as e:
+        return jsonify(error={"message": str(e)})
+
 if __name__ == '__main__':
-    app.run()
+    app.run(port=5000)
