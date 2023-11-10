@@ -15,12 +15,14 @@ from messaging.Messaging import messaging_blueprint
 from productrecs.ProductRecs import productRec_blueprint
 from request import request_blueprint
 from locations.locations import locations_blueprint
+from products import products_blueprint
 
 load_dotenv (find_dotenv())
 username = os.getenv("MONGODB_USER")
 password = os.getenv("MONGODB_PWD")
 # Flask Configurations
 app = Flask(__name__)
+CORS(app)
 
 # MongoDB Configuration
 load_dotenv()
@@ -45,6 +47,9 @@ app.config["FIREBASE_AUTH"] = firebase.auth()
 curr_user = None
 
 app.config["PYREBASE_API_KEY"] = os.getenv('PYREBASE_API_KEY')
+
+with open('../bbb-shared/constants.json', 'r') as file:
+    app.config['CONSTANTS'] = json.load(file)
 
 # Initialize PyMongo
 app.config["MONGO"]=PyMongo(app)
