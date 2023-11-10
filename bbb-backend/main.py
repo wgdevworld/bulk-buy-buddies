@@ -1,5 +1,5 @@
 from flask import Flask, session
-from flask_session import Session
+# from flask_session import Session
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from flask_socketio import SocketIO
@@ -7,16 +7,19 @@ import pyrebase
 import os
 import sys
 import secrets
-from dotenv import load_dotenv
-import json
+from dotenv import load_dotenv, find_dotenv
 
 # Blueprint Imports
 from user.user_app import user_blueprint
 from messaging.Messaging import messaging_blueprint
 from productrecs.ProductRecs import productRec_blueprint
 from request import request_blueprint
+from locations.locations import locations_blueprint
 from products import products_blueprint
 
+load_dotenv (find_dotenv())
+username = os.getenv("MONGODB_USER")
+password = os.getenv("MONGODB_PWD")
 # Flask Configurations
 app = Flask(__name__)
 CORS(app)
@@ -57,7 +60,7 @@ app.register_blueprint(messaging_blueprint)
 app.register_blueprint(user_blueprint)
 app.register_blueprint(request_blueprint)
 app.register_blueprint(productRec_blueprint)
-app.register_blueprint(products_blueprint)
+app.register_blueprint(locations_blueprint)
 
 @app.route('/')
 def index():
