@@ -1,3 +1,5 @@
+import certifi
+import json
 from flask import Flask, session
 # from flask_session import Session
 from flask_cors import CORS
@@ -52,7 +54,7 @@ with open('../bbb-shared/constants.json', 'r') as file:
     app.config['CONSTANTS'] = json.load(file)
 
 # Initialize PyMongo
-app.config["MONGO"]=PyMongo(app)
+app.config["MONGO"]=PyMongo(app, tlsCAFile=certifi.where())
 
 # API Functionality
 socketio = SocketIO(app, cors_allowed_origins="*")
