@@ -1,9 +1,11 @@
-import ShoppingForm from "@/components/ShopperForm/ShopperForm"
+
+/* eslint-disable react/react-in-jsx-scope */
+import ShopperForm from "@/components/ShopperForm/ShopperForm";
 
 export default function ShopperFormApp() {
-    return (
-      <div>
-        <ShoppingForm />
-      </div>
-    );
+  return (
+    <div>
+      <ShopperForm />
+    </div>
+  );
 }
