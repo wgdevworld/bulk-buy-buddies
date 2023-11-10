@@ -1,15 +1,17 @@
+"use client";
+
 import { list } from "postcss";
 import React, { useState, useEffect, Fragment } from "react";
 import ProductCard from "./ProductList/ProductCard";
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 export interface Product {
-    _id: string;
-    name: string;
-    price: number;
-    src: string;
+  _id: string;
+  name: string;
+  price: number;
+  src: string;
 }
-  
+
 const ProductRec = () => {
     // const [userCategory, setUserCategory] = useState<String>('');
     // const [userQuantity, setUserQuantity] = useState<String>('');
@@ -20,59 +22,63 @@ const ProductRec = () => {
     const router = useRouter(); 
     const searchParams = useSearchParams();
     
-    // const buddyID = searchParams.get('userID');
-    // const userCategory = searchParams.get('userCategory');
-    // const userQuantity = searchParams.get('userQuantity');
-    // const buddyQuantity = searchParams.get('buddyQuantity')!;
-    // const location = searchParams.get('location')!;
-    
+
     useEffect(() => {
-            const buddyID = 'aaaa'
-            const userCategory = 'pork'
-            const userQuantity = 3
-            const buddyQuantity = 4
-            const location = '249'
+        (async () => {
+            // retrieve information about the buddy that was clicked
+            // INCLUDES: uid of buddy, preferably also information about the active request clicked
+            // via session storage? or whatever mechanism we find
+            const buddyID = searchParams.get('userID');
+            const userCategory = searchParams.get('userCategory');
+            const userQuantity = searchParams.get('userQuantity');
+            const buddyQuantity = searchParams.get('buddyQuantity')!;
+            const location = searchParams.get('location')!;
+            // get user information about buddy
+            // run request information through backend function to fetch product recommenations 
             fetchBuddy(buddyID);
             fetchProducts(userCategory, userQuantity, buddyQuantity, location)
+        })();
       }, []);
 
-    const fetchProducts = async (userCategory: any, userQuantity: any, buddyQuantity: any, location: any ) => {
-        try {
-            const response = await fetch(
-                `http://127.0.0.1:5000/fetchSimilarProducts?userCategory=${userCategory}&userQuantity=${userQuantity}&buddyQuantity=${buddyQuantity}&location=${location}`
-            );
-            if (!response.ok) {
-              // Handle success, e.g., show a success message
-              console.error('Failed to submit form data');
-            } 
-            const data = await response.json()
-            setProducts(data.results);
-          } catch (error) {
-            console.error('An error occurred while submitting the form:', error);
-          }
-    };
-    const fetchBuddy = async (buddyID: any ) => {
-        try {
-            const response = await fetch(
-                `http://127.0.0.1:5000/fetchBuddyInfo?buddyID=${buddyID}`
-            );
-            if (!response.ok) {
-              // Handle success, e.g., show a success message
-              console.error('Failed to submit form data');
-            } 
-            const data = await response.json();
-            const name = data.firstname + ' ' + data.lastname
-            setName(name);
-            const location = data.dateJoined;
-            setJoined(location);
-          } catch (error) {
-            console.error('An error occurred while submitting the form:', error);
-          }
-    };
-
-    const sendBuddyRequest = () => {
-        // update information 
+  const fetchProducts = async (
+    userCategory: any,
+    userQuantity: any,
+    buddyQuantity: any,
+    location: any
+  ) => {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:5000/fetchSimilarProducts?userCategory=${userCategory}&userQuantity=${userQuantity}&buddyQuantity=${buddyQuantity}&location=${location}`
+      );
+      if (!response.ok) {
+        // Handle success, e.g., show a success message
+        console.error("Failed to submit form data");
+      }
+      const data = await response.json();
+      setProducts(data.results);
+    } catch (error) {
+      console.error("An error occurred while submitting the form:", error);
     }
+  };
+  const fetchBuddy = async (buddyID: any) => {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:5000/fetchBuddyInfo?buddyID=${buddyID}`
+      );
+      if (!response.ok) {
+        // Handle success, e.g., show a success message
+        console.error("Failed to submit form data");
+      }
+      const data = await response.json();
+      const name = data.firstname + " " + data.lastname;
+      setName(name);
+      const location = data.dateJoined;
+      setJoined(location);
+    } catch (error) {
+      console.error("An error occurred while submitting the form:", error);
+    }
+  };
+
     // const onRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     //     setUserCategory(e.currentTarget.value);
     // };
@@ -90,7 +96,7 @@ const ProductRec = () => {
     //     { view: "Coffee", value: "coffee-sweeteners" },
     // ];
     return (
-        <div style = {{display: 'flex',  justifyContent:'center', alignItems:'center',}}>
+        <div style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
             {/* <div>
                 <p>Choose users' product category</p>
                 {radioOptions.map(({view: title, value: option}: any) => {
@@ -108,7 +114,7 @@ const ProductRec = () => {
                     );
                 })}
             </div><br/> */}
-            {/* <div>
+      {/* <div>
                 <label>
                 User Quantity:
                 <input
@@ -129,7 +135,6 @@ const ProductRec = () => {
                 </label>
             </div><br/> */}
             {/* <button type="submit" onClick={handleClick}>Submit</button> */}
-            <h1>Hello World!</h1>
             {name !== '' ? 
                 (<>
                     <h3>Buddy Name: ${name}</h3>
@@ -137,7 +142,6 @@ const ProductRec = () => {
                 </>
                 ) : <></>
             }
-            <button type='submit' onClick={sendBuddyRequest}></button>
             {products.length !== 0 ? 
                 (<>
                     <br/>

@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify, Blueprint, current_app
-from MessagingDBInterface import save_message_to_db
+from messaging.MessagingDBInterface import save_message_to_db
 
 # Flask Blueprint configuration
-messaging_api = Blueprint('messaging_api', __name__)
+messaging_blueprint = Blueprint('messaging_blueprint', __name__)
 
 """Saves a new message to the messages MongoDB collection.
 
@@ -18,7 +18,7 @@ It then unpacks the message data from the POST request body JSON.
 On success, a JSON response with a 'success' key is returned.
 On failure, a JSON response with an 'error' key containing the exception message is returned.
 """
-@messaging_api.route("/save_message", methods=['POST', 'OPTIONS'])
+@messaging_blueprint.route("/save_message", methods=['POST', 'OPTIONS'])
 def save_message():
     print("Saving message API called...")
     if request.method == 'OPTIONS':
@@ -55,7 +55,7 @@ The messages are divided by opponent UID into separate chats.
 The chat messages are returned in a JSON response containing a 
 chats object mapping opponent UID to an array of messages.
 """
-@messaging_api.route("/get_chats", methods=['GET'])
+@messaging_blueprint.route("/get_chats", methods=['GET'])
 def get_chat_messages():
     # Set mongoDB configs
     mongo = current_app.config['MONGO']

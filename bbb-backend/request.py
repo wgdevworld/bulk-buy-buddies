@@ -1,17 +1,14 @@
-from flask import Flask, request, jsonify
+from flask import Blueprint, Flask, request, jsonify, current_app
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from dotenv import dotenv_values
 
-app = Flask(__name__)
-CORS(app)
-secrets = dotenv_values(".env")
-app.config["MONGO_URI"] = f"mongodb+srv://{secrets['ATLAS_USR']}:{secrets['ATLAS_PWD']}@atlascluster.zojbxi7.mongodb.net/bbb?retryWrites=true&w=majority"
+# Flask Blueprint configuration
+request_blueprint = Blueprint('request_blueprint', __name__)
 
-mongo = PyMongo(app)
-
-@app.route('/shopping-request', methods=['POST'])
+@request_blueprint.route('/shopping-request', methods=['POST'])
 def submit_shopping_request():
+    mongo = current_app.config['MONGO']
     try:
         data = request.json
         request_collection = mongo.db.requests
@@ -20,5 +17,25 @@ def submit_shopping_request():
     except Exception as e:
         return jsonify({'error': 'Failed to process the request'}), 500
 
-if __name__ == '__main__':
-    app.run()
+
+@request_blueprint.route('/get-requests', methods=['GET'])
+def get_my_requests():
+    mongo = current_app.config['MONGO']
+    try: 
+        request_collection = mongo.db.requests
+        request_list = []
+        for doc in request_collection.find():
+            request = {
+                "_id": str(doc["_id"]),
+                "userID": doc["userID"],
+                "category": doc["category"],
+                "quantity": doc["quantity"],
+                "location": doc["location"],
+                "timeStart": doc["timeStart"],
+                "timeEnd": doc["timeEnd"],
+                "status": doc["status"]
+            }
+            request_list.append(request)
+        return jsonify(request_list)
+    except Exception as e:
+        return jsonify(error={"message": str(e)})
