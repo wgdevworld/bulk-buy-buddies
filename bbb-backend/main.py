@@ -8,15 +8,18 @@ import os
 import sys
 import secrets
 from dotenv import load_dotenv
+import json
 
 # Blueprint Imports
 from user.user_app import user_blueprint
 from messaging.Messaging import messaging_blueprint
 from productrecs.ProductRecs import productRec_blueprint
 from request import request_blueprint
+from products import products_blueprint
 
 # Flask Configurations
 app = Flask(__name__)
+CORS(app)
 
 # MongoDB Configuration
 load_dotenv()
@@ -42,6 +45,9 @@ curr_user = None
 
 app.config["PYREBASE_API_KEY"] = os.getenv('PYREBASE_API_KEY')
 
+with open('../bbb-shared/constants.json', 'r') as file:
+    app.config['CONSTANTS'] = json.load(file)
+
 # Initialize PyMongo
 app.config["MONGO"]=PyMongo(app)
 
@@ -51,6 +57,7 @@ app.register_blueprint(messaging_blueprint)
 app.register_blueprint(user_blueprint)
 app.register_blueprint(request_blueprint)
 app.register_blueprint(productRec_blueprint)
+app.register_blueprint(products_blueprint)
 
 @app.route('/')
 def index():
