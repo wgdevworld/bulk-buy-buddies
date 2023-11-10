@@ -1,45 +1,41 @@
-from flask import Flask, request, jsonify, Blueprint, session, make_response
+from flask import Flask, request, jsonify, Blueprint, session, make_response, current_app
 # from flask_session import Session
 # from user_model import User
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 import certifi
 from dotenv import dotenv_values, load_dotenv, find_dotenv
-import pyrebase
 from datetime import datetime
 import json
 import os
 
-user = Blueprint('user', __name__)
-app = Flask(__name__)
-load_dotenv(find_dotenv())
+user_blueprint = Blueprint('user_blueprint', __name__)
 
-CORS(app, supports_credentials=True)
-app.config["MONGO_URI"] = f"mongodb+srv://{os.getenv('ATLAS_USR')}:{os.getenv('ATLAS_PWD')}@atlascluster.zojbxi7.mongodb.net/bbb"
-mongo = PyMongo(app,tlsCAFile=certifi.where())
-users = mongo.db.users
-config = {
-    'apiKey': os.getenv('PYREBASE_API_KEY'),
-    'authDomain': "bbb-user-auth.firebaseapp.com",
-    'projectId': "bbb-user-auth",
-    'storageBucket': "bbb-user-auth.appspot.com",
-    'messagingSenderId': "92265669892",
-    'appId': "1:92265669892:web:a7c857ddd158df2d759c51",
-    'measurementId': "G-WK22RJ84J3",
-    'databaseURL': ""
-}
-
-firebase = pyrebase.initialize_app(config)
-auth = firebase.auth()
-
+# mongo = PyMongo(app,tlsCAFile=certifi.where())
 curr_user = None
 
+'''
+Helper Functions
+'''
 def get_user():
     global curr_user
     return curr_user
 
-@user.route('/retrieve_locations_temp', methods=['GET'])
+def refreshToken():
+    global curr_user
+    # curr_user = session.get('user')
+    refresh_user = auth.refresh(curr_user['refreshToken'])
+    curr_user['idToken'] = refresh_user['idToken']
+    curr_user['refreshToken'] = refresh_user['refreshToken']
+
+    session['user'] = curr_user
+
+'''
+API Routes
+'''
+@user_blueprint.route('/retrieve_locations_temp', methods=['GET'])
 def get_locations():
+    mongo = current_app.config['MONGO']
     try: 
         locations_collection = mongo.db.locations
         locations_list = []
@@ -56,10 +52,13 @@ def get_locations():
     except Exception as e:
         return jsonify(error={"message": str(e)})
 
-@user.route("/register", methods=['POST'])
+@user_blueprint.route("/register", methods=['POST'])
 def register():
     print("\nREGISTER")
     global curr_user
+    mongo = current_app.config['MONGO']
+    users = mongo.db.users
+    auth = current_app.config["FIREBASE_AUTH"]
     try:
         registration_info = request.get_json()
         result = users.find_one({"email": registration_info['email']})
@@ -124,10 +123,13 @@ def register():
         return jsonify(error=str(e)), 500
 
 
-@user.route("/login", methods=['POST'])
+@user_blueprint.route("/login", methods=['POST'])
 def login():
     print("\nLOGIN")
     global curr_user
+    mongo = current_app.config['MONGO']
+    users = mongo.db.users
+    auth = current_app.config["FIREBASE_AUTH"]
     try:
         # print(session)
         # print(session.get('user'))
@@ -169,9 +171,10 @@ def login():
         return jsonify(error=str(e)), 500
     
 
-@user.route("/logout", methods=['POST'])
+@user_blueprint.route("/logout", methods=['POST'])
 def logout():
     global curr_user
+    auth = current_app.config["FIREBASE_AUTH"]
     try:
         print("\nLOGOUT")
         # print(session)
@@ -190,10 +193,13 @@ def logout():
         print(f'Exception: {e}')
         return jsonify(error=str(e)), 500
     
-@user.route("/reset_password", methods=['POST'])
+@user_blueprint.route("/reset_password", methods=['POST'])
 def reset_password():
     print("\nRESET PASSWORD")
     global curr_user
+    mongo = current_app.config['MONGO']
+    users = mongo.db.users
+    auth = current_app.config["FIREBASE_AUTH"]
     try:
         user_info = request.get_json()
         result = users.find_one({"email": user_info['email']})
@@ -218,7 +224,7 @@ def reset_password():
         print(f'Exception: {e}')
         return jsonify(error=str(e)), 500
     
-@user.route("/get_acct_info", methods=['GET'])
+@user_blueprint.route("/get_acct_info", methods=['GET'])
 def get_acct_info():
     print("\nACCOUNT INFO")
     global curr_user
@@ -230,10 +236,11 @@ def get_acct_info():
         return jsonify(error=str(e)), 500
     
 
-@user.route("/get_transactions", methods=['GET'])
+@user_blueprint.route("/get_transactions", methods=['GET'])
 def get_transactions():
     print("\nTRANSACTIONS")
     global curr_user
+    mongo = current_app.config['MONGO']
 
     try: 
         requests_collection = mongo.db.requests
@@ -250,10 +257,12 @@ def get_transactions():
         return jsonify(error={"message": str(e)})
     
 
-@user.route("/updateAccount", methods=['POST'])
+@user_blueprint.route("/updateAccount", methods=['POST'])
 def updateAccount():
     print("\nUPDATE ACCOUNT")
     global curr_user
+    mongo = current_app.config['MONGO']
+    users = mongo.db.users
     try:
         new_info = request.get_json()
         print(new_info['firstname'])
@@ -289,12 +298,3 @@ def updateAccount():
         print(f'Exception: {e}')
         return jsonify(error=str(e)), 500
     
-
-def refreshToken():
-    global curr_user
-    # curr_user = session.get('user')
-    refresh_user = auth.refresh(curr_user['refreshToken'])
-    curr_user['idToken'] = refresh_user['idToken']
-    curr_user['refreshToken'] = refresh_user['refreshToken']
-
-    session['user'] = curr_user

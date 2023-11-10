@@ -1,42 +1,67 @@
 from flask import Flask, session
-from Messaging import messaging_api
-import sys
-from user.user_app import user
+from flask_session import Session
 from flask_cors import CORS
 from flask_pymongo import PyMongo
-import secrets
-from request import requests_api
-from locations.locations import locations_api
-from dotenv import load_dotenv, find_dotenv
+from flask_socketio import SocketIO
+import pyrebase
 import os
+import sys
+import secrets
+from dotenv import load_dotenv
 
+# Blueprint Imports
+from user.user_app import user_blueprint
+from messaging.Messaging import messaging_blueprint
+from productrecs.ProductRecs import productRec_blueprint
+from request import request_blueprint
 
 load_dotenv (find_dotenv())
 username = os.getenv("MONGODB_USER")
 password = os.getenv("MONGODB_PWD")
 # Flask Configurations
 app = Flask(__name__)
-# app.secret_key = secrets.token_urlsafe(16)
-# app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
-# app.config["SESSION_PERMANENT"] = False
-# app.config["SESSION_TYPE"] = "filesystem"
-# app.config.from_object(__name__)
-# Session(app)
-CORS(app, supports_credentials=True)
 
 # MongoDB Configuration
-app.config["MONGO_URI"] = f"mongodb+srv://{username}:{password}@atlascluster.zojbxi7.mongodb.net/bbb"
-app.config["MONGO"] = PyMongo(app) 
+load_dotenv()
+username = os.getenv('ATLAS_USR')
+password = os.getenv('ATLAS_PWD')
+app.config["MONGO_URI"] = f"mongodb+srv://{username}:{password}@atlascluster.zojbxi7.mongodb.net/bbb?retryWrites=true&w=majority"
+
+
+# PYREBASE Configuration
+config = {
+    'apiKey': os.getenv('PYREBASE_API_KEY'),
+    'authDomain': "bbb-user-auth.firebaseapp.com",
+    'projectId': "bbb-user-auth",
+    'storageBucket': "bbb-user-auth.appspot.com",
+    'messagingSenderId': "92265669892",
+    'appId': "1:92265669892:web:a7c857ddd158df2d759c51",
+    'measurementId': "G-WK22RJ84J3",
+    'databaseURL': ""
+}
+firebase = pyrebase.initialize_app(config)
+app.config["FIREBASE_AUTH"] = firebase.auth()
+curr_user = None
+
+app.config["PYREBASE_API_KEY"] = os.getenv('PYREBASE_API_KEY')
+
+# Initialize PyMongo
+app.config["MONGO"]=PyMongo(app)
 
 # API Functionality
-app.register_blueprint(messaging_api)
-app.register_blueprint(user)
-app.register_blueprint(requests_api)
-app.register_blueprint(locations_api)
+socketio = SocketIO(app, cors_allowed_origins="*")
+app.register_blueprint(messaging_blueprint)
+app.register_blueprint(user_blueprint)
+app.register_blueprint(request_blueprint)
+app.register_blueprint(productRec_blueprint)
 
 @app.route('/')
 def index():
-    return "Hello from Flask!"
+    return "Hello from BulkBuyBuddies!"
+
+# Make sure to call the function to register your socket events
+from messaging.MessageSocket import register_socket_events
+register_socket_events(socketio)
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    socketio.run(app, debug=True, port=5000)

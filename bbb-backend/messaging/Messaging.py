@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify, Blueprint, current_app
+from messaging.MessagingDBInterface import save_message_to_db
 
 # Flask Blueprint configuration
-messaging_api = Blueprint('messaging_api', __name__)
+messaging_blueprint = Blueprint('messaging_blueprint', __name__)
 
 """Saves a new message to the messages MongoDB collection.
 
@@ -17,13 +18,17 @@ It then unpacks the message data from the POST request body JSON.
 On success, a JSON response with a 'success' key is returned.
 On failure, a JSON response with an 'error' key containing the exception message is returned.
 """
-@messaging_api.route("/save_message", methods=['POST'])
+@messaging_blueprint.route("/save_message", methods=['POST', 'OPTIONS'])
 def save_message():
-    try:
-        # set the messages database
-        mongo = current_app.config['MONGO']
-        messages_collection  = mongo.db.messages
+    print("Saving message API called...")
+    if request.method == 'OPTIONS':
+        # Handle the OPTIONS method
+        response = current_app.make_default_options_response()
+        response.headers['Access-Control-Allow-Origin'] = '*'  # Set appropriate CORS headers
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        return response
 
+<<<<<<< HEAD:bbb-backend/Messaging.py
         # unpack the message data from the request
         message_data = request.get_json()
         message_dict = {
@@ -38,6 +43,15 @@ def save_message():
 
     except Exception as e:
         return jsonify(error=str(e)), 500
+=======
+    message_data = request.get_json()
+    # save the messages database
+    success = save_message_to_db(message_data)
+    if success:
+        return jsonify(success=True)
+    else:
+        return jsonify(error="failed to save message"), 500
+>>>>>>> main:bbb-backend/messaging/Messaging.py
 
 
 """Gets chat messages for a user.
@@ -58,7 +72,7 @@ The messages are divided by opponent UID into separate chats.
 The chat messages are returned in a JSON response containing a 
 chats object mapping opponent UID to an array of messages.
 """
-@messaging_api.route("/get_chats", methods=['GET'])
+@messaging_blueprint.route("/get_chats", methods=['GET'])
 def get_chat_messages():
     # Set mongoDB configs
     mongo = current_app.config['MONGO']

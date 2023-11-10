@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import ShopperDropdown from "./ShopperDropdown";
 import DatePicker from "react-datepicker";
@@ -6,40 +7,60 @@ import "react-datepicker/dist/react-datepicker.css";
 import "../locations/locations.css";
 import Locations from "../locations/locations";
 
+// TODO: FIX data type for location once we implement selection from google maps
+
 interface ShoppingForm {
   //   reqID: string;
-  //   userID: string;
-  category: string | undefined;
+  userID: string;
+  category: string;
   quantity: number | undefined;
-  location: string | undefined;
+  location: string | number | undefined;
   timeStart: Date | null;
   timeEnd: Date | null;
-  status: boolean;
+  status: string | undefined;
 }
 
 const categories = ["beef", "pork", "chicken"];
-const locations = ["Durham", "Charlotte", "Raleigh"];
+const locations = [249, 645, 359];
 
 function ShopperForm() {
-  const [category, setCategory] = useState<string | undefined>("");
+  const [userID, setUserID] = useState<string>("aaaa");
+  const [category, setCategory] = useState<string>("");
   const [quantity, setQuantity] = useState<number | undefined>(0);
-  const [location, setLocation] = useState<string | undefined>("");
+  const [location, setLocation] = useState<string | number | undefined>(0);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
-  const [responseContent, setResponseContent] = useState<any | null>(null);
+  const [responseContent, setResponseContent] = useState<unknown | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const requestData: ShoppingForm = {
+      userID,
       category,
       quantity,
       location,
       timeStart: startDate,
       timeEnd: endDate,
-      status: true,
+      status: "Active",
     };
-
+    setUserID("aaaa");
+    // UNCOMMENT WHEN LOGIN IMPLEMENTED CORRECTLY
+    // try {
+    //   const responseUserID = await fetch(
+    //     "http://127.0.0.1:5000//get_acc_info"
+    //     // {
+    //     //   method: "GET",
+    //     //   headers: {
+    //     //     "Content-Type": "application/json",
+    //     //   },
+    //     // }
+    //   );
+    //   const userData = await responseUserID.json();
+    //   // setUserID(userData);
+    // } catch (e) {
+    //   console.error(e);
+    // }
     try {
       const response = await fetch("http://127.0.0.1:5000/shopping-request", {
         method: "POST",
@@ -50,7 +71,7 @@ function ShopperForm() {
       });
 
       if (response.ok) {
-        const responseData = await response.text(); // Parse the response as text
+        const responseData = await response.text();
         const parsedResponse = JSON.parse(responseData);
         setResponseContent(parsedResponse);
       } else {
@@ -69,6 +90,7 @@ function ShopperForm() {
       </div>
       <form onSubmit={handleSubmit}>
         <div className="vertical-container">
+          {/* SET LOCATION FROM GOOGLE MAP API */}
           {/* <ShopperDropdown
             name="Location"
             options={locations}

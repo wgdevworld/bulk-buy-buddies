@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 
 interface DropdownProps {
-  options: string[];
+  options: string[] | number[];
   onSelect: (selectedOption: string) => void;
-  value: string | undefined;
+  value: string | number | undefined;
   name: string;
 }
 
@@ -13,7 +14,7 @@ export default function Dropdown({
   value,
   name,
 }: DropdownProps) {
-  const [selectedOption, setSelectedOption] = useState<string>("");
+  const [selectedOption, setSelectedOption] = useState<string | number>("");
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = e.target.value;
