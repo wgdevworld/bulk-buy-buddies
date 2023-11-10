@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import RequestCard from "./requestCard";
+import ShopperDropdown from "../ShopperForm/ShopperDropdown";
 
 export interface Transaction {
     _id: string;
@@ -14,6 +15,8 @@ export interface Transaction {
 
 function RequestDisplay() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [fiterType, setFilterType] = useState("most recent")
+    const filterOptions = ["most recent", "fulfilled", "matched", "active"]
 
     useEffect(() => {
         getUserTransactions();
@@ -39,6 +42,12 @@ function RequestDisplay() {
     return (
         <div>
             <h1> History </h1>
+            <ShopperDropdown
+                            name="Filter"
+                            options={filterOptions}
+                            value={fiterType}
+                            onSelect={(selectedFilter) => setFilterType(selectedFilter)}
+                        />
             <ul className="product-list">
                 {transactions.map((request: Transaction) => (
                 <RequestCard request={request} key={request._id} />

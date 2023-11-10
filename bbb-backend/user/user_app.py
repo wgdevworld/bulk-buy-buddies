@@ -46,6 +46,7 @@ def get_locations():
         for doc in locations_collection.find():
             location = {
                 "_id": str(doc["_id"]),
+                "lid": doc["lid"],
                 "name": doc["name"],
                 "address": doc["address"],
                 "coordinates": doc["location"]["coordinates"],
@@ -90,6 +91,7 @@ def register():
             curr_user = dict(user)
             curr_user['idToken'] = firebase_user['idToken']
             curr_user['refreshToken'] = firebase_user['refreshToken']
+            auth.current_user = curr_user
             # session['user'] = curr_user
 
         except Exception as e:
@@ -131,6 +133,7 @@ def login():
             curr_user = dict(user)
             curr_user['idToken'] = firebase_user['idToken']
             curr_user['refreshToken'] = firebase_user['refreshToken']
+            auth.current_user = curr_user
             # session['user'] = curr_user
             # print(session.get('user'))
 
