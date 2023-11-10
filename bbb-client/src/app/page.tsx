@@ -25,7 +25,6 @@ export default function Home() {
       {/* <Login /> */}
       {/* <Locations /> */}
       <ShopperForm />
-
       {/* <ShopperMatch /> */}
       {/* <ResetPassword /> */}
       {/* <Account /> */}

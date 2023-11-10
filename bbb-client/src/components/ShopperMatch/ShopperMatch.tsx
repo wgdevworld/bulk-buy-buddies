@@ -61,7 +61,7 @@ function ShopperMatch() {
 
   return (
     <>
-      <div>Recommended Bulk Buy Buddies</div>
+      <h1>Recommended Bulk Buy Buddies</h1>
       <div>Shoppers we recommend you match with based on your preference.</div>
       <h1>Current UserID: {currentUserID}</h1>
       <div>
