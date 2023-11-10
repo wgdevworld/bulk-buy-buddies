@@ -50,6 +50,7 @@ function Logout() {
             console.log(response.json())
             setSuccess(true)
             console.log("Successfully logged out")
+            router.push('/user/login')
         } catch (error) {
             console.error("Error logging out:", error);
         }
@@ -63,8 +64,9 @@ function Logout() {
                 </div>
                 :
                 <div>
-                    <h1>Logout of account</h1>
-                    <StandardButton onClick={logoutUser} label="Log Out" />
+                    {/* <h1>Logout of account</h1> */}
+                    <button onClick={logoutUser} className="flex rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600" > Log Out </button>
+                    {/* <StandardButton onClick={logoutUser} label="Log Out" /> */}
                 </div>
             }
         </div>

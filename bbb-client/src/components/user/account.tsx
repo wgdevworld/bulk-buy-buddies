@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import StandardButton from './button';
 import { useRouter } from 'next/navigation';
-import RequestDisplay from "./requestDisplay";
+// import RequestDisplay from "./requestDisplay";
 
 
 export interface Account {
@@ -67,15 +67,20 @@ function Account() {
 
     return (
         <div>
-            <h1> Welcome, {user?.firstname} </h1>
+            <h1> ACCOUNT </h1>
+            <p> First Name: {user?.firstname} </p>
+            <p> Last Name: {user?.lastname} </p>
             <p> Account #: {user?.uid} </p>
+            <p> Member Since: {user?.dateJoined} </p>
+            <p> Email: {user?.email} </p>
+            <p> Address: <br /> {user?.address.address} <br /> {user?.address.city}, {user?.address.state} {user?.address.zipcode}</p>
             <StandardButton onClick={navigateUpdateUser} label="Edit account information" />
 
-            {doneLoading ?
+            {/* {doneLoading ?
                 <RequestDisplay/>
                 :
                 <div/>
-            }
+            } */}
         </div>
     )
 

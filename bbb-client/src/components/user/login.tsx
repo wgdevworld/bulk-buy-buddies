@@ -34,7 +34,7 @@ function Login() {
             //TODO: navigate to landing page afterwards 
             setUsername(user_acct['firstname'])
             setSuccess(true)
-            router.push('/user/account')
+            router.push('/user/landingPage')
           }
           console.log(user_acct)
           } catch (error) {
@@ -66,7 +66,7 @@ function Login() {
             console.log(response.json())
             setSuccess(true)
             console.log("Successfully logged in")
-            router.push('/user/account')
+            router.push('/user/landingPage')
         } catch (error) {
             console.error("Error logging in:", error);
         }
