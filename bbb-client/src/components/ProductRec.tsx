@@ -20,22 +20,20 @@ const ProductRec = () => {
     const router = useRouter(); 
     const searchParams = useSearchParams();
     
-
+    // const buddyID = searchParams.get('userID');
+    // const userCategory = searchParams.get('userCategory');
+    // const userQuantity = searchParams.get('userQuantity');
+    // const buddyQuantity = searchParams.get('buddyQuantity')!;
+    // const location = searchParams.get('location')!;
+    
     useEffect(() => {
-        (async () => {
-            // retrieve information about the buddy that was clicked
-            // INCLUDES: uid of buddy, preferably also information about the active request clicked
-            // via session storage? or whatever mechanism we find
-            const buddyID = searchParams.get('userID');
-            const userCategory = searchParams.get('userCategory');
-            const userQuantity = searchParams.get('userQuantity');
-            const buddyQuantity = searchParams.get('buddyQuantity')!;
-            const location = searchParams.get('location')!;
-            // get user information about buddy
-            // run request information through backend function to fetch product recommenations 
+            const buddyID = 'aaaa'
+            const userCategory = 'pork'
+            const userQuantity = 3
+            const buddyQuantity = 4
+            const location = '249'
             fetchBuddy(buddyID);
             fetchProducts(userCategory, userQuantity, buddyQuantity, location)
-        })();
       }, []);
 
     const fetchProducts = async (userCategory: any, userQuantity: any, buddyQuantity: any, location: any ) => {
@@ -72,6 +70,9 @@ const ProductRec = () => {
           }
     };
 
+    const sendBuddyRequest = () => {
+        // update information 
+    }
     // const onRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     //     setUserCategory(e.currentTarget.value);
     // };
@@ -89,7 +90,7 @@ const ProductRec = () => {
     //     { view: "Coffee", value: "coffee-sweeteners" },
     // ];
     return (
-        <div style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
+        <div style = {{display: 'flex',  justifyContent:'center', alignItems:'center',}}>
             {/* <div>
                 <p>Choose users' product category</p>
                 {radioOptions.map(({view: title, value: option}: any) => {
@@ -128,6 +129,7 @@ const ProductRec = () => {
                 </label>
             </div><br/> */}
             {/* <button type="submit" onClick={handleClick}>Submit</button> */}
+            <h1>Hello World!</h1>
             {name !== '' ? 
                 (<>
                     <h3>Buddy Name: ${name}</h3>
@@ -135,6 +137,7 @@ const ProductRec = () => {
                 </>
                 ) : <></>
             }
+            <button type='submit' onClick={sendBuddyRequest}></button>
             {products.length !== 0 ? 
                 (<>
                     <br/>
