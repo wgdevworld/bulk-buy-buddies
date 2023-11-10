@@ -1,5 +1,5 @@
 # MessageSocket.py
-from MessagingDBInterface import save_message_to_db
+from messaging.MessagingDBInterface import save_message_to_db
 from flask import request
 from flask_socketio import emit
 

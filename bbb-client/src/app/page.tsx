@@ -5,7 +5,6 @@
 import Messenger from "@/components/Messenger";
 import ProductRec from "@/components/ProductRec";
 import ProductList from "@/components/ProductList/ProductMain";
-
 import Register from "@/components/user/register";
 import Logout from "@/components/user/logout";
 import Login from "@/components/user/login";
@@ -26,7 +25,7 @@ export default function Home() {
       {/* <Login /> */}
       {/* <Locations /> */}
       {/* <ShopperForm /> */}
-      <ShopperMatch />
+      {/* <ShopperMatch /> */}
       {/* <ResetPassword /> */}
       {/* <Account /> */}
     </div>
