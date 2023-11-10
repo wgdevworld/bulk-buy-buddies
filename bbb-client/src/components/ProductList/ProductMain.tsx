@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ProductCard from "./ProductCard";
 import "./products.css";
+import constants from "../../../../bbb-shared/constants.json";
 
 export interface Product {
   _id: string;
@@ -15,14 +16,19 @@ function ProductMain() {
   const [maxPrice, setMaxPrice] = useState("");
   const [category, setCategory] = useState("");
 
+  const categories = Object.keys(constants.categories);
+
   const handleSearch = async () => {
-    console.log("searching for", searchTerm);
+    console.log("searching for", category);
     try {
-      const response = await fetch(
-        `http://127.0.0.1:5000/search?query=${encodeURIComponent(
-          searchTerm
-        )}&min_price=${minPrice}&max_price=${maxPrice}&category=${category}`
-      );
+      const url = `http://127.0.0.1:5000/search?query=${encodeURIComponent(
+        searchTerm
+      )}&min_price=${encodeURIComponent(
+        minPrice
+      )}&max_price=${encodeURIComponent(
+        maxPrice
+      )}&category=${encodeURIComponent(category)}`;
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -54,12 +60,17 @@ function ProductMain() {
         placeholder="Max price"
       />
       <select value={category} onChange={(e) => setCategory(e.target.value)}>
-        <option value="">All</option>
-        <option value="pork">Pork</option>
-        <option value="chicken">Chicken</option>
-        <option value="turkey">Turkey</option>
-        <option value="coffee-sweeteners">Coffee-Sweeteners</option>
-        <option value="beef">Beef</option>
+        {[
+          <option key={""} value={""}>
+            All
+          </option>,
+          categories.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          )),
+          ,
+        ]}
       </select>
       <button onClick={handleSearch}>Search</button>
         <ul className="product-list">
