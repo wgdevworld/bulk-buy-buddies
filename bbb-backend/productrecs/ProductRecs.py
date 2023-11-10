@@ -1,18 +1,13 @@
-from flask import Blueprint, Flask, jsonify, request
+from flask import Blueprint, Flask, jsonify, request, current_app
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from dotenv import dotenv_values
 
-productRec = Blueprint('productRec', __name__)
-app = Flask(__name__)
-CORS(app)
-secrets = dotenv_values(".env")
-app.config["MONGO_URI"] = f"mongodb+srv://{secrets['ATLAS_USR']}:{secrets['ATLAS_PWD']}@atlascluster.zojbxi7.mongodb.net/bbb"
+productRec_blueprint = Blueprint('productRec', __name__)
 
-mongo = PyMongo(app)
-
-@app.route("/fetchSimilarProducts", methods=['GET'])
+@productRec_blueprint.route("/fetchSimilarProducts", methods=['GET'])
 def fetchBestProduct():
+    mongo = current_app.config['MONGO']
     try:
         category_str = request.args.get('userCategory')
 
@@ -38,15 +33,12 @@ def fetchBestProduct():
     except Exception as e:
         return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
 
-@app.route("/fetchBuddyInfo", methods=['GET'])
+@productRec_blueprint.route("/fetchBuddyInfo", methods=['GET'])
 def fetchBuddyInfo():
+    mongo = current_app.config['MONGO']
     try:
         buddyID = request.args.get('buddyID')
         buddyInfo = mongo.db.users.find_one({'uid':buddyID})
         return jsonify(results=buddyInfo)
     except Exception as e:
         return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
-
-
-if __name__ == '__main__':
-    app.run(port=6000)
