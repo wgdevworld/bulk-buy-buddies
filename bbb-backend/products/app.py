@@ -9,6 +9,7 @@ from dotenv import dotenv_values
 import re
 from enum import Enum
 from requests.exceptions import HTTPError
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -16,58 +17,6 @@ secrets = dotenv_values(".env")
 app.config["MONGO_URI"] = f"mongodb+srv://{secrets['ATLAS_USR']}:{secrets['ATLAS_PWD']}@atlascluster.zojbxi7.mongodb.net/bbb?retryWrites=true&w=majority"
 
 mongo = PyMongo(app)
-
-class Warehouses(Enum):
-    RALEIGH = 645
-    APEX = 1206
-    DURHAM = 249
-
-# due to the fact that Costco blocks scrapers from scraping their product categories page (refer to https://www.costco.com/robots.txt)
-# we keep a dictionary of categories and manually insert into the mongodb database
-categories_dict = {
-    "Deli & Cheese Collections" : "deli-gift-collections",
-    "Fruit & Nut Gift Baskets" : "fruit-gift-baskets-towers",
-    "Gift Baskets & Treats" : "all-gift-baskets-towers",
-    "Bakery & Desserts" : "cakes-cookies",
-    "Juice" : "juice",
-    "Milk & Milk Substitutes" : "milk",
-    "Powdered Drink Mix" : "drink-mix",
-    "Soda, Pop & Soft Drinks" : "soft-drinks",
-    "Sports & Energy Drinks" : "energy-drinks",
-    "Tea" : "tea",
-    "Water" : "bottled-water",
-    "Cereal, Oatmeal, Granola & Oats" : "breakfast-cereal",
-    "Candy" : "candy",
-    "Chocolates" : "chocolates",
-    "Gum & Mints" : "gum-mints",
-    "Hard & Gummy Candy" : "hard-gummy-candy",
-    "Coffee Creamers" : "creamer-sweeteners",
-    "Ground Coffee" : "ground-coffee",
-    "Instant Coffee" : "instant-coffee",
-    "K-Cups, Coffee Pods & Capsules" : "single-serve-coffee",
-    "Whole Bean Coffee" : "whole-bean-coffee",
-    "Dairy" : "dairy",
-    "Deli" : "deli",
-    "Caviar" : "caviar",
-    "Prosciutto, Smoked & Cured Meats" : "prosciutto-smoked-cured-meats",
-    "Beef" : "beef",
-    "Lamb" : "lamb",
-    "Plant Based Protein" : "meat-substitutes",
-    "Pork" : "pork",
-    "Chicken" : "chicken",
-    "Duck" : "duck",
-    "Turkey" : "turkey",
-    "Seafood" : "seafood",
-    "Pasta, Rice & Grains" : "beans-grains-rice",
-    "Flour & Baking Supplies" : "baking",
-    "Honey" : "honey",
-    "Nut Butters, Jelly & Jam" : "spreads",
-    "Paper Towels & Napkins" : "paper-towels-napkins",
-    "Paper, Plastic & Disposable Plates" : "food-wrap",
-    "Plastic & Disposable Utensils" : "plastic-disposable-utensils",
-    "Plastic, Paper & Disposable Cups" : "cups-lids",
-    "Toilet Paper" : "toilet-paper"
-}
 
 BASE_URL = f"https://www.costco.com/"
 
@@ -82,20 +31,42 @@ headers = {
     "Host": "www.costco.com"
 }
 
-@app.route('/insert_categories', methods=['GET'])
+with open('../../bbb-shared/constants.json', 'r') as file:
+    constants = json.load(file)
+
+Warehouses = constants['warehouses']
+categories_dict = constants['categories']
+
+@app.route('/insert-categories', methods=['GET'])
 def scrape_categories():
     categories_collection = mongo.db.categories
-
-    for name, link in categories_dict.items():
-        print('ℹ️ Scraping category' + name)
+    for category in categories_dict:
+        print('ℹ️ Scraping category' + category)
         subcategory_document = {
-            'name': name,
-            'link': link
+            'name': category,
+            'link': categories_dict[category][0],
+            'unit': categories_dict[category][1]
         }
-        categories_collection.insert_one(subcategory_document)
-
-
+        categories_collection.update_one(
+            {'name': category},
+            {'$set': subcategory_document},
+            upsert=True
+        )
     return "Categories scraping is done!"
+
+
+def convert_to_pounds(quantity, unit):
+    unit = unit.lower()
+    if unit == 'lb':
+        return quantity
+    elif unit == 'oz':
+        return quantity / 16.0
+    elif unit == 'kg':
+        return quantity * 2.20462
+    elif unit == 'g':
+        return quantity / 453.592
+    else:
+        return None
 
 def scrape_page(session, url, page=1):
     url = f"{url}?currentPage={page}"
@@ -125,7 +96,7 @@ def extract_price(price_str):
 def update_products_in_db(products_collection, product, warehouse_id):
     try:
         update_operations = {
-            "$setOnInsert": product,
+            "$set": product,
             "$addToSet": {"locations": {"$each": [warehouse_id]}}
         }
         
@@ -144,24 +115,25 @@ def update_products_in_db(products_collection, product, warehouse_id):
         print(f"Database operation failed: {e}")
 
 
-@app.route('/scrape_products', methods=['GET'])
+@app.route('/scrape-products', methods=['GET'])
 def index():
     products_collection = mongo.db.products
     all_products = []
     scraped_products_names = set()
     
     for warehouse in Warehouses:
-        print(f"Scraping location {warehouse.name} with ID {warehouse.value}")
+        print(f"Scraping location {warehouse} with ID {Warehouses[warehouse]}")
         with requests.Session() as session:
             session.headers.update(headers)
-            warehouse_update_url = f"https://www.costco.com/AjaxWarehouseUpdateCmd?warehouseId={warehouse.value}"
+            warehouse_update_url = f"https://www.costco.com/AjaxWarehouseUpdateCmd?warehouseId={Warehouses[warehouse]}"
             try:
                 session.get(warehouse_update_url, timeout=10)
             except requests.RequestException as e:
                 return jsonify(error=f"Failed to set warehouse: {str(e)}"), 500
             
-            for category_name, category_path in categories_dict.items():
-                print(f"Scraping category {category_name}")
+            for category in categories_dict:
+                category_path, regex_pattern = categories_dict[category]
+                print(f"Scraping category {category}")
                 BASE_URL = f"https://www.costco.com/{category_path}.html"
                 page = 1
                 while True:
@@ -172,27 +144,36 @@ def index():
                     for name, price_str, src in zip(product_names, product_prices, product_images):
                         price = extract_price(price_str)
 
-                        match = re.search(r'(?i)(\d+(\.\d+)?)\s*lb\.?', name)
-                        if match:
+                        unit_pattern = fr'(?i)(\d+\.?\d+|\d+)[-\s]*({regex_pattern})'
+
+                        match = re.search(unit_pattern, name)
+                        if 'lb' in regex_pattern and match:
+                            quantity_value = float(match.group(1))
+                            unit = match.group(2).lower()
+                            quantity = convert_to_pounds(quantity_value, unit)
+                            print(quantity)
+                        elif 'count' in regex_pattern and match:
                             quantity = float(match.group(1))
+                            print(quantity)
                         else:
                             quantity = None
-                        product_data = {
-                            "name": name, 
-                            "price": extract_price(price_str), 
-                            "src": src, 
-                            "category": category_name,
-                            "quantity": quantity,
-                        }
-                        update_products_in_db(products_collection, product_data, warehouse.value)
-                        scraped_products_names.add(name)
-                        all_products.append(product_data)
+                        if (quantity != None): 
+                            product_data = {
+                                "name": name, 
+                                "price": extract_price(price_str), 
+                                "src": src, 
+                                "category": category,
+                                "quantity": quantity,
+                            }
+                            update_products_in_db(products_collection, product_data, Warehouses[warehouse])
+                            scraped_products_names.add(name)
+                            all_products.append(product_data)
                     page += 1
 
-        all_products_in_db = products_collection.find({"locations": warehouse.value}, {"name": 1})
+        all_products_in_db = products_collection.find({"locations": Warehouses[warehouse]}, {"name": 1})
         for product in all_products_in_db:
             if product["name"] not in scraped_products_names:
-                products_collection.update_one({"name": product["name"]}, {"$pull": {"locations": warehouse.value}})
+                products_collection.update_one({"name": product["name"]}, {"$pull": {"locations": Warehouses[warehouse]}})
     return jsonify(products=all_products)
 
 @app.route('/search', methods=['GET'])
