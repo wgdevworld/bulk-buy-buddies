@@ -46,7 +46,7 @@ function calculateDistance(coord1: number[], coord2: number[]): number {
 
 function Locations() {
   const [locations, setLocations] = useState<Location[]>([]);
-  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>({ lat: 36.028848, lng: -78.915528 }); 
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
 
   useEffect(() => {
@@ -57,27 +57,35 @@ function Locations() {
   const fetchLocations = async () => {
     try {
       const response = await fetch("http://127.0.0.1:5000/get_locations");
-      const data = await response.json();
-      console.log(data);
-      setLocations(data);
+      const locationsData = await response.json();
+      setLocations(locationsData);
     } catch (error) {
-      console.error(error);
+      console.error("An error occurred while fetching locations:", error);
+      setLocations([]); 
     }
   };
-
+  
   const fetchUserLocation = async () => {
-    // Need to replace 'user-id' with the current user id
     try {
-      const response = await fetch(`http://127.0.0.1:5000/get_user_location/user-id`);
-      const userLocation = await response.json();
-      const nearestLocation = findNearestLocation(userLocation, locations);
-      setMapCenter({ lat: nearestLocation.coordinates[1], lng: nearestLocation.coordinates[0] });
-      setSelectedLocation(nearestLocation);
+      const acctResponse = await fetch('http://127.0.0.1:5000/users/get_acct_info');
+      const acctData = await acctResponse.json();
+      const userId = acctData.uid; 
+  
+      const locationResponse = await fetch(`http://127.0.0.1:5000/locations/get_user_location/${userId}`);
+      const userLocation = await locationResponse.json();
+      if (locations.length > 0) {
+        const nearestLocation = findNearestLocation(userLocation, locations);
+        setMapCenter({ lat: nearestLocation.coordinates[1], lng: nearestLocation.coordinates[0] });
+        setSelectedLocation(nearestLocation);
+      }
     } catch (error) {
-      console.error("Error fetching user location:", error);
-      setMapCenter({ lat: 36.028848, lng: -78.915528 });
+      console.error("Error fetching user information:", error);
+      setMapCenter({ lat: 36.028848, lng: -78.915528 }); 
     }
   };
+  
+  
+  
 
 
   function findNearestLocation(userLocation: number[], locations: Location[]): Location {
@@ -100,11 +108,6 @@ function Locations() {
     setSelectedLocation(location);
     setMapCenter({ lat: location.coordinates[1], lng: location.coordinates[0] });
   };
-  
-
-  if (!mapCenter) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="locations">
@@ -118,5 +121,6 @@ function Locations() {
     </div>
   );
 }
+
 
 export default Locations;
