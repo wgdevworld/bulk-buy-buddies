@@ -30,7 +30,7 @@ export default function ShopperCard({
   const query = {
     userID: userID,
     userCategory: category,
-    userQuantity: 3, // add current user's quantity later
+    userQuantity: 1, // add current user's quantity later
     buddyQuantity: quantity,
     location: 249,
   };

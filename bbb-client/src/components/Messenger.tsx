@@ -1,18 +1,23 @@
+"use client";
 import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { v4 as uuidv4 } from "uuid";
 import "./Messenger.css";
 import { Chat, IMessage, fetchChats, sendMessage } from "./MessengerHelper";
 import io from "socket.io-client";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 const Messenger = () => {
-  const [uid, setUid] = useState("");
   const [newUid, setNewUid] = useState("");
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [messageBuffer, setBuffer] = useState<string>("");
   const [chats, setChats] = useState<Chat[]>([]);
-  const [selectedChat, setSelectedChat] = useState<string>("");
   const [newChatUid, setNewChatUid] = useState<string>("");
   const [socket, setSocket] = useState<any>(null);
+  const searchParams = useSearchParams();
+  const [uid, setUid] = useState(searchParams.get("currentUserID")!);
+  const [selectedChat, setSelectedChat] = useState<string>(
+    searchParams.get("buddyUserID")!
+  );
 
   useEffect(() => {
     // Only initialize the socket if the uid is set
