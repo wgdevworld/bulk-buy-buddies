@@ -21,7 +21,7 @@ from products.products import products_blueprint
 
 # Flask Configurations
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 # Constants file
 CONSTANTS_FILENAME = os.path.join(os.path.dirname(__file__), '../bbb-shared/constants.json')

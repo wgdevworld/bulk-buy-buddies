@@ -181,9 +181,13 @@ def search():
     try:
         search_term = request.args.get('query', '').strip()
 
+
         min_price_str = request.args.get('min_price')
         max_price_str = request.args.get('max_price')
         category = request.args.get('category')
+        location = request.args.get('location')
+        location = int(location) if location else None
+        
         min_price = float(min_price_str) if min_price_str != "" else 0
         max_price = float(max_price_str) if max_price_str != "" else float('inf')
 
@@ -193,6 +197,8 @@ def search():
         }
         if (category) :
             query["category"] = category
+        if location is not None:
+            query["locations"] = {"$in": [location]}
 
         products = list(mongo.db.products.find(query))
 

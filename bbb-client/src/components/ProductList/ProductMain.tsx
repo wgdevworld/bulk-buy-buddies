@@ -15,8 +15,19 @@ function ProductMain() {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [category, setCategory] = useState("");
+  const [location, setLocation] = useState("");
 
   const categories = Object.keys(constants.categories);
+  const warehouses = constants.warehouses;
+
+  const handleString = (string: string) => {
+    let ret = "";
+    string.split("_").forEach((word) => {
+      ret +=
+        word.charAt(0).toUpperCase() + word.substring(1).toLowerCase() + " ";
+    });
+    return ret;
+  };
 
   const handleSearch = async () => {
     console.log("searching for", category);
@@ -27,7 +38,9 @@ function ProductMain() {
         minPrice
       )}&max_price=${encodeURIComponent(
         maxPrice
-      )}&category=${encodeURIComponent(category)}`;
+      )}&category=${encodeURIComponent(
+        category
+      )}&location=${encodeURIComponent(location)}`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -60,24 +73,32 @@ function ProductMain() {
         placeholder="Max price"
       />
       <select value={category} onChange={(e) => setCategory(e.target.value)}>
-        {[
-          <option key={""} value={""}>
-            All
-          </option>,
-          categories.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          )),
-          ,
-        ]}
+        <option key={""} value={""}>
+          All
+        </option>
+        {categories.map((item) => (
+          <option key={item} value={item}>
+            {item}
+          </option>
+        ))}
       </select>
+      <select value={location} onChange={(e) => setLocation(e.target.value)}>
+        <option key={""} value={""}>
+          All
+        </option>
+        {Object.entries(warehouses).map(([location, code]) => (
+          <option key={location} value={code}>
+            {handleString(location)}
+          </option>
+        ))}
+      </select>
+
       <button onClick={handleSearch}>Search</button>
-        <ul className="product-list">
-          {products.map((product: Product) => (
-            <ProductCard product={product} key={product._id} />
-          ))}
-        </ul>
+      <ul className="product-list">
+        {products.map((product: Product) => (
+          <ProductCard product={product} key={product._id} />
+        ))}
+      </ul>
     </div>
   );
 }
