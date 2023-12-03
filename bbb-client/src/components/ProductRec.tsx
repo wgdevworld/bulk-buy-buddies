@@ -21,22 +21,25 @@ const ProductRec = () => {
   const [dateJoined, setJoined] = useState();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const buddyID = searchParams.get("userID");
+  const userCategory = searchParams.get("userCategory");
+  const userQuantity = searchParams.get("userQuantity");
+  const buddyQuantity = searchParams.get("buddyQuantity")!;
+  const location = searchParams.get("location")!;
 
   useEffect(() => {
-    (async () => {
-      // retrieve information about the buddy that was clicked
-      // INCLUDES: uid of buddy, preferably also information about the active request clicked
-      // via session storage? or whatever mechanism we find
-      const buddyID = searchParams.get("userID");
-      const userCategory = searchParams.get("userCategory");
-      const userQuantity = searchParams.get("userQuantity");
-      const buddyQuantity = searchParams.get("buddyQuantity")!;
-      const location = searchParams.get("location")!;
-      // get user information about buddy
-      // run request information through backend function to fetch product recommenations
-      fetchBuddy(buddyID);
-      fetchProducts(userCategory, userQuantity, buddyQuantity, location);
-    })();
+    console.log(products);
+  }, [products]);
+
+  useEffect(() => {
+    console.log("buddyid ", buddyID);
+    // retrieve information about the buddy that was clicked
+    // INCLUDES: uid of buddy, preferably also information about the active request clicked
+    // via session storage? or whatever mechanism we find
+    // get user information about buddy
+    // run request information through backend function to fetch product recommenations
+    fetchBuddy(buddyID);
+    fetchProducts(userCategory, userQuantity, buddyQuantity, location);
   }, []);
 
   const fetchProducts = async (
@@ -69,13 +72,36 @@ const ProductRec = () => {
         console.error("Failed to submit form data");
       }
       const data = await response.json();
-      const name = data.firstname + " " + data.lastname;
+      const name = data.results.firstname + " " + data.results.lastname;
+
+      console.log("data: ", data);
       setName(name);
       const location = data.dateJoined;
       setJoined(location);
     } catch (error) {
       console.error("An error occurred while submitting the form:", error);
     }
+  };
+
+  const sendBuddyRequest = async () => {
+    try {
+      const query = {
+        currentUserID: "abcd",
+        buddyUserID: buddyID,
+      };
+      console.log("To Messenger");
+      router.push("/messenger" + "?" + createQueryString(query));
+    } catch (error) {
+      console.error("Error going to Messenger page", error);
+    }
+  };
+
+  const createQueryString = (query: object) => {
+    const params = new URLSearchParams();
+    for (const [name, value] of Object.entries(query)) {
+      params.set(name, value);
+    }
+    return params.toString();
   };
 
   // const onRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,6 +174,9 @@ const ProductRec = () => {
       ) : (
         <></>
       )}
+      <button type="submit" onClick={sendBuddyRequest}>
+        Send Buddy Request
+      </button>
       {products.length !== 0 ? (
         <>
           <br />

@@ -12,7 +12,7 @@ import os
 user_blueprint = Blueprint('user_blueprint', __name__)
 
 # mongo = PyMongo(app,tlsCAFile=certifi.where())
-# curr_user = None
+curr_user = None
 
 '''
 Helper Functions
@@ -42,6 +42,7 @@ def get_locations():
         for doc in locations_collection.find():
             location = {
                 "_id": str(doc["_id"]),
+                "lid": doc["lid"],
                 "name": doc["name"],
                 "address": doc["address"],
                 "coordinates": doc["location"]["coordinates"],
@@ -82,13 +83,14 @@ def register():
             "lastname": registration_info['lastname'],
             "email": registration_info['email'],
             "dateJoined": str(datetime.now()),
-            "location": registration_info.get('location', None)
+            "address": registration_info.get('address', None)
         }
 
         try:
             curr_user = dict(user)
             curr_user['idToken'] = firebase_user['idToken']
             curr_user['refreshToken'] = firebase_user['refreshToken']
+            auth.current_user = curr_user
             # session['user'] = curr_user
 
         except Exception as e:
@@ -98,23 +100,10 @@ def register():
 
         if users.insert_one(user):
             del user['_id']
-            # resp = make_response(user)
-            # resp.set_cookie('uid', value=user['id'], domain='127.0.0.1:3000')
-            # return resp, 200
             return jsonify(user), 200
         
         auth.delete_user_account(curr_user['idToken'])
         return jsonify({"error": "Failed to sign up"}), 400
-    
-        # result = User.email_exists(registration_info['email'])
-        # if result:
-        #     return jsonify({"error": "email address is already in use"})
-
-        # else:
-        # user = User.register(registration_info['firstname'], registration_info['lastname'],
-        #                     registration_info['username'], registration_info['password'])
-        # print(user)
-        # return jsonify({"user": user})
 
     except ValueError as e:
         return jsonify(error="Invalid value provided"), 400
@@ -146,6 +135,7 @@ def login():
             curr_user = dict(user)
             curr_user['idToken'] = firebase_user['idToken']
             curr_user['refreshToken'] = firebase_user['refreshToken']
+            auth.current_user = curr_user
             # session['user'] = curr_user
             # print(session.get('user'))
 
@@ -245,9 +235,7 @@ def get_transactions():
     try: 
         requests_collection = mongo.db.requests
         transactions = []
-        results = requests_collection.find({"uid": curr_user['uid']})
-        print(results)
-        for transaction in requests_collection.find({"uid": curr_user['uid']}):
+        for transaction in requests_collection.find({"userID": curr_user['uid']}):
             transaction["_id"] = str(transaction["_id"])
             transactions.append(transaction)
 
@@ -270,8 +258,8 @@ def updateAccount():
             return jsonify(error="first name cannot be empty"), 500
         elif new_info['lastname'] == "":
             return jsonify(error="last name cannot be empty"), 500
-        elif new_info['location'] == "":
-            return jsonify(error="location cannot be empty"), 500
+        elif new_info['address'] == "":
+            return jsonify(error="address cannot be empty"), 500
         
         try:
             user = users.update_one({"uid": curr_user['uid']},
@@ -279,13 +267,13 @@ def updateAccount():
                                         '$set': {
                                             'firstname': new_info['firstname'],
                                             'lastname': new_info['lastname'],
-                                            'location': new_info['location'],
+                                            'address': new_info['address'],
                                         }
                                     })
             
             curr_user['firstname'] = new_info['firstname']
             curr_user['lastname'] = new_info['lastname']
-            curr_user['location'] = new_info['location']
+            curr_user['address'] = new_info['address']
 
             return jsonify({'result': "success"}), 200
         except Exception as e:

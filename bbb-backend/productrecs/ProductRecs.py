@@ -22,8 +22,10 @@ def fetchBestProduct():
         desired_quantity = user_quantity + buddy_quantity
         lower_bound = int(desired_quantity*0.8)
         upper_bound = int(desired_quantity*1.2)       
+
+        print(category_str, location, location_int, user_quantity, buddy_quantity, lower_bound, upper_bound)
         
-        products = list(mongo.db.products.find({'category':category_str, 'location': location_int, 'quantity':{'$lte':upper_bound,'$gt':lower_bound}}))
+        products = list(mongo.db.products.find({'category':category_str, 'locations': location_int, 'quantity':{'$lte':upper_bound,'$gte':lower_bound}}))
         results = []
         for product in products:
             product['_id'] = str(product['_id'])
@@ -39,6 +41,11 @@ def fetchBuddyInfo():
     try:
         buddyID = request.args.get('buddyID')
         buddyInfo = mongo.db.users.find_one({'uid':buddyID})
+        print("buddy: ", buddyID, buddyInfo)
+
+        # Mongo's _id is not serializable
+        if buddyInfo and "_id" in buddyInfo:
+            buddyInfo["_id"] = str(buddyInfo["_id"])
         return jsonify(results=buddyInfo)
     except Exception as e:
         return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500

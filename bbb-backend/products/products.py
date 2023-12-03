@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Blueprint, current_app
 from flask_cors import CORS
 from bs4 import BeautifulSoup
 import requests
@@ -9,15 +9,8 @@ from dotenv import dotenv_values
 import re
 from enum import Enum
 from requests.exceptions import HTTPError
-import json
 
-app = Flask(__name__)
-CORS(app)
-secrets = dotenv_values(".env")
-app.config["MONGO_URI"] = f"mongodb+srv://{secrets['ATLAS_USR']}:{secrets['ATLAS_PWD']}@atlascluster.zojbxi7.mongodb.net/bbb?retryWrites=true&w=majority"
-
-mongo = PyMongo(app)
-
+products_blueprint = Blueprint('products_blueprint', __name__)
 BASE_URL = f"https://www.costco.com/"
 
 headers = {
@@ -31,14 +24,13 @@ headers = {
     "Host": "www.costco.com"
 }
 
-with open('../../bbb-shared/constants.json', 'r') as file:
-    constants = json.load(file)
 
-Warehouses = constants['warehouses']
-categories_dict = constants['categories']
-
-@app.route('/insert-categories', methods=['GET'])
+@products_blueprint.route('/insert-categories', methods=['GET'])
 def scrape_categories():
+    mongo = current_app.config['MONGO']
+    constants = current_app.config['CONSTANTS']
+    Warehouses = constants['warehouses']
+    categories_dict = constants['categories']
     categories_collection = mongo.db.categories
     for category in categories_dict:
         print('ℹ️ Scraping category' + category)
@@ -115,11 +107,15 @@ def update_products_in_db(products_collection, product, warehouse_id):
         print(f"Database operation failed: {e}")
 
 
-@app.route('/scrape-products', methods=['GET'])
+@products_blueprint.route('/scrape-products', methods=['GET'])
 def index():
+    mongo = current_app.config['MONGO']
     products_collection = mongo.db.products
     all_products = []
     scraped_products_names = set()
+    constants = current_app.config['CONSTANTS']
+    Warehouses = constants['warehouses']
+    categories_dict = constants['categories']
     
     for warehouse in Warehouses:
         print(f"Scraping location {warehouse} with ID {Warehouses[warehouse]}")
@@ -176,8 +172,12 @@ def index():
                 products_collection.update_one({"name": product["name"]}, {"$pull": {"locations": Warehouses[warehouse]}})
     return jsonify(products=all_products)
 
-@app.route('/search', methods=['GET'])
+@products_blueprint.route('/search', methods=['GET'])
 def search():
+    mongo = current_app.config['MONGO']
+    constants = current_app.config['CONSTANTS']
+    Warehouses = constants['warehouses']
+    categories_dict = constants['categories']
     try:
         search_term = request.args.get('query', '').strip()
 
@@ -206,7 +206,3 @@ def search():
         return jsonify(error="Invalid value provided for price"), 400
     except Exception as e:
         return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
-
-
-if __name__ == '__main__':
-    app.run(port=5000)
