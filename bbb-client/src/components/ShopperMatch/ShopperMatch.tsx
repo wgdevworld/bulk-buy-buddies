@@ -2,7 +2,6 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
-import { matches } from "./SampleShoppers";
 import ShopperCard from "./ShopperCard";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -27,7 +26,6 @@ function ShopperMatch() {
 
   useEffect(() => {
     fetchMyRequests();
-    // getUserAcctInfo();
   }, []);
 
   const fetchMyRequests = async () => {
@@ -38,24 +36,7 @@ function ShopperMatch() {
       setRequests(data);
     } catch (error) {
       console.error(error);
-    }
-  };
-
-  // change code to extract only the id
-  const getUserAcctInfo = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:5000/get_acct_info", {
-        credentials: "include",
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const user_acct = await response.json();
-      console.log(user_acct);
-      setUser(user_acct);
-    } catch (error) {
-      console.error(error);
+      setRequests([]);
     }
   };
 
@@ -64,7 +45,7 @@ function ShopperMatch() {
       <h1>Recommended Bulk Buy Buddies</h1>
       <div>Shoppers we recommend you match with based on your preference.</div>
       <h1>Current UserID: {currentUserID}</h1>
-      <div>
+      {/* <div>
         {requests.map((item, index) => (
           <ShopperCard
             key={index}
@@ -76,6 +57,23 @@ function ShopperMatch() {
             timeEnd={item.timeEnd}
           />
         ))}
+      </div> */}
+      <div>
+        {requests && requests.length > 0 ? (
+          requests.map((item, index) => (
+            <ShopperCard
+              key={index}
+              userID={item.userID}
+              category={item.category}
+              quantity={item.quantity}
+              location={item.location}
+              timeStart={item.timeStart}
+              timeEnd={item.timeEnd}
+            />
+          ))
+        ) : (
+          <p>No requests found.</p>
+        )}
       </div>
     </>
   );

@@ -1,12 +1,12 @@
 "use client";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ShopperDropdown from "./ShopperDropdown";
 import DatePicker from "react-datepicker";
 import "./ShopperForm.css";
 import "react-datepicker/dist/react-datepicker.css";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import "../locations/locations.css";
 import Locations from "../locations/locations";
 import constants from "../../../../bbb-shared/constants.json";
@@ -27,7 +27,7 @@ interface ShoppingForm {
 const categories = Object.keys(constants.categories);
 
 function ShopperForm() {
-  const [userID, setUserID] = useState<string>("abcd");
+  const [userID, setUserID] = useState<string>("");
   const [category, setCategory] = useState<string>("");
   const [quantity, setQuantity] = useState<number | undefined>(0);
   const [location, setLocation] = useState<string | number | undefined>(0);
@@ -38,6 +38,14 @@ function ShopperForm() {
   );
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentUserID = searchParams.get("uid");
+
+  useEffect(() => {
+    if (currentUserID !== null) {
+      setUserID(currentUserID);
+    }
+  }, [currentUserID]);
 
   const navigateShopperMatch = async () => {
     try {
@@ -76,23 +84,7 @@ function ShopperForm() {
       timeEnd: endDate,
       status: "Active",
     };
-    setUserID("aaaa");
-    // UNCOMMENT WHEN LOGIN IMPLEMENTED CORRECTLY
-    // try {
-    //   const responseUserID = await fetch(
-    //     "http://127.0.0.1:5000//get_acc_info"
-    //     // {
-    //     //   method: "GET",
-    //     //   headers: {
-    //     //     "Content-Type": "application/json",
-    //     //   },
-    //     // }
-    //   );
-    //   const userData = await responseUserID.json();
-    //   // setUserID(userData);
-    // } catch (e) {
-    //   console.error(e);
-    // }
+
     try {
       const response = await fetch("http://127.0.0.1:5000/shopping-request", {
         method: "POST",
@@ -116,19 +108,12 @@ function ShopperForm() {
   };
   return (
     <>
-      <div>Form Submission</div>
+      <div>Form Submission for {currentUserID}</div>
       <div>
         Let us know your preferences for grocery items you want to split.
       </div>
       <form onSubmit={handleSubmit}>
         <div className="vertical-container">
-          {/* SET LOCATION FROM GOOGLE MAP API */}
-          {/* <ShopperDropdown
-            name="Location"
-            options={locations}
-            value={location}
-            onSelect={(selectedLocation) => setLocation(selectedLocation)}
-          /> */}
           <Locations />
           <ShopperDropdown
             name="Category"
