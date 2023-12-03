@@ -25,8 +25,6 @@ interface ShoppingForm {
 }
 
 const categories = Object.keys(constants.categories);
-// const categories = ["beef", "pork", "chicken"];
-// const locations = [249, 645, 359];
 
 function ShopperForm() {
   const [userID, setUserID] = useState<string>("abcd");
