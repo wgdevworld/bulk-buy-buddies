@@ -9,6 +9,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useRouter } from "next/navigation";
 import "../locations/locations.css";
 import Locations from "../locations/locations";
+import constants from "../../../../bbb-shared/constants.json";
 
 // TODO: FIX data type for location once we implement selection from google maps
 
@@ -23,8 +24,9 @@ interface ShoppingForm {
   status: string | undefined;
 }
 
-const categories = ["beef", "pork", "chicken"];
-const locations = [249, 645, 359];
+const categories = Object.keys(constants.categories);
+// const categories = ["beef", "pork", "chicken"];
+// const locations = [249, 645, 359];
 
 function ShopperForm() {
   const [userID, setUserID] = useState<string>("abcd");
