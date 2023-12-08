@@ -5,21 +5,29 @@ import { useRouter } from 'next/navigation';
 import ShopperCardProps from "@/components/ShopperMatch/ShopperCard"
 
 export interface MatchedRequest {
+    _id: string;
+    userID: string;
     category: string;
     buddy: string;
+    buddyID: string;
     quantity: number;
     location: string;
     timeStart: Date;
     timeEnd: Date;
+    status: string;
 }
 
 function MatchedRequestCard({
+    _id,
+    userID,
     category,
     buddy,
+    buddyID,
     quantity,
     location,
     timeStart,
     timeEnd,
+    status,
 }: MatchedRequest) {
 
     return (

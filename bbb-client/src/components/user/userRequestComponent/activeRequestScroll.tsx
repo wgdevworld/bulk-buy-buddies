@@ -2,47 +2,16 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
-import ShopperCardProps from "@/components/ShopperMatch/ShopperCard"
 import ActiveRequestCard, { RequestWithMatches } from "@/components/user/userRequestComponent/activeRequestCard"
 
 function ActiveRequestScroll() {
     const [activeReqs, setActiveReqs] = useState<RequestWithMatches[]>([]);
-    const router = useRouter()
-    const handleScroll = (event) => {
-        const container = event.target;
-        const scrollAmount = event.deltaY;
-        container.scrollTo({
-          top: 0,
-          left: container.scrollLeft + scrollAmount,
-          behavior: 'smooth'
-        });
-      };
-      
+    const router = useRouter()     
 
     useEffect(() => {
         getUserActiveReqs();
     }, []);
 
-    const handleSearch = async () => {
-        console.log("searching for", category);
-        try {
-          const url = `http://127.0.0.1:5000/search?query=${encodeURIComponent(
-            searchTerm
-          )}&min_price=${encodeURIComponent(
-            minPrice
-          )}&max_price=${encodeURIComponent(
-            maxPrice
-          )}&category=${encodeURIComponent(category)}`;
-          const response = await fetch(url);
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          const data = await response.json();
-          setProducts(data.results);
-        } catch (error) {
-          console.error("Error fetching products:", error);
-        }
-    };
 
     //status, category, date min, date max, location
     /*
@@ -78,22 +47,29 @@ function ActiveRequestScroll() {
                 <span className="text-xl font-bold tracking-tight text-gray-900"> Top Active Requests </span>
                 <a href="/user/account" className="ml-3 underline underline-offset-auto font-light text-xs hover:underline-offset-2">View all active requests >> </a>
             </p>
-            <ul className="flex flex-row overflow-x-auto flex-nowrap" onWheel={handleScroll}>
-                {activeReqs.map((item) => (
-                    <ActiveRequestCard 
-                        key={item._id}
-                        _id={item._id}
-                        userID={item.userID}
-                        category={item.category}
-                        quantity={item.quantity}
-                        location={item.location}
-                        timeStart={item.timeStart}
-                        timeEnd={item.timeEnd}
-                        status={item.status}
-                        matches={item.matches}
-                    />
-                ))}
-            </ul>
+            
+            {activeReqs.length == 0 ?
+                <div className="mt-2 mb-10 p-2 sm:mt-0 sm:w-full sm:max-w-sm sm:flex-shrink-0">
+                    <p className="break-normal text-base font-medium ml-1 text-gray-600"> No current matched requests </p>
+                </div>
+                :
+                <ul className="flex flex-row overflow-x-auto flex-nowrap">
+                    {activeReqs.map((item) => (
+                        <ActiveRequestCard 
+                            key={item._id}
+                            _id={item._id}
+                            userID={item.userID}
+                            category={item.category}
+                            quantity={item.quantity}
+                            location={item.location}
+                            timeStart={item.timeStart}
+                            timeEnd={item.timeEnd}
+                            status={item.status}
+                            matches={item.matches}
+                        />
+                    ))}
+                </ul>
+            }
         </div>
     );
 }
