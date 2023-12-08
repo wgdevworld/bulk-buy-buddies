@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation';
 import RequestDisplay from "./requestDisplay";
 import { Account } from "@/components/user/account";
 import Logout from "@/components/user/logout";
+import ActiveRequestCard from "@/components/user/userRequestComponent/activeRequestCard"
+import MatchedRequestCard from "@/components/user/userRequestComponent/matchedRequestCard"
+import ActiveRequestScroll from "./userRequestComponent/activeRequestScroll";
 
 
 function LandingPage() {
@@ -87,7 +90,10 @@ function LandingPage() {
             <Logout />
 
             {doneLoading ?
-                <RequestDisplay/>
+                // <ActiveRequestCard/>
+                // <MatchedRequestCard/>
+                <ActiveRequestScroll/>
+                // <RequestDisplay/>
                 :
                 <div/>
             }
