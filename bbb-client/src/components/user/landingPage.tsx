@@ -77,7 +77,7 @@ function LandingPage() {
     };
 
     return (
-        <div>
+        <div className="m-4">
             <h2 className="mt-10 text-left text-xl font-bold leading-9 tracking-tight text-gray-900">
                 Welcome, {user?.firstname}
             </h2>
@@ -92,8 +92,8 @@ function LandingPage() {
                 <div>
                     <ActiveRequestScroll/>
                     <MatchedRequestScroll/>
+                    <a href="/user/account" className="mt-2 p-2 text-xl font-bold tracking-tight underline underline-offset-auto hover:underline-offset-2 hover:decoration-2 text-gray-900"> View All Requests </a>
                 </div>
-                // <RequestDisplay/>
                 :
                 <div/>
             }
