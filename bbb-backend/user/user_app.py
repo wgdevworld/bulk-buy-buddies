@@ -30,6 +30,16 @@ def refreshToken():
 
     session['user'] = curr_user
 
+def findLocation(code):
+    code_num = int(code)
+    constants = current_app.config['CONSTANTS']
+    warehouses = constants["warehouses"]
+    for warehouse in warehouses:
+        if warehouses[warehouse] == code_num: return warehouse
+    
+    return "Location not Found"
+
+
 '''
 API Routes
 '''
@@ -240,6 +250,87 @@ def get_transactions():
             transactions.append(transaction)
 
         return jsonify(transactions)
+    except Exception as e:
+        print(str(e))
+        return jsonify(error={"message": str(e)})
+    
+
+@user_blueprint.route("/search_reqs", methods=['GET'])
+def search_reqs():
+    print("\nACTIVE REQUESTS")
+    global curr_user
+    mongo = current_app.config['MONGO']
+
+    try:
+        requests_collection = mongo.db.requests
+        active_requests = []
+
+        status = request.args.get('status', '').strip()
+        category = request.args.get('category')
+        minDate = request.args.get('minDate')
+        maxDate = request.args.get('maxDate')
+        location = request.args.get('location')
+
+        query = {
+            "$and": [
+                {"userID": curr_user['uid']}
+            ]
+        }
+
+        if (status):
+            query["$and"].append({"status": status})
+        if (category):
+            query["$and"].append({"category": category})
+        if (location):
+            query["$and"].append({"location": location})
+        if (minDate and maxDate):
+            query["and"].append({"timeStart": {"$gte": maxDate, "$lte": minDate}})
+        
+        for req in requests_collection.find(query):
+            req["_id"] = str(req["_id"])
+            req["location"] = findLocation(req["location"])
+            active_requests.append(req)
+
+    except Exception as e:
+        print(str(e))
+        return jsonify(error={"message": str(e)})
+    
+
+@user_blueprint.route("/get_active_reqs", methods=['GET'])
+def get_active_reqs():
+    print("\nACTIVE REQUESTS")
+    global curr_user
+    mongo = current_app.config['MONGO']
+
+    try: 
+        requests_collection = mongo.db.requests
+        userInteractions_collection = mongo.db.userInteractions
+        active_requests = []
+        query = {
+            "$and": [
+                {"userID": curr_user['uid']},
+                {"status": "Active"}
+            ]
+        }
+        for req in requests_collection.find(query):
+            req["_id"] = str(req["_id"])
+            req["location"] = findLocation(req["location"])
+            req["matches"] = []
+            query = {
+                "$and": [
+                    {"to_requestID": req["_id"]},
+                    {"status": "requested"}
+                ]
+            }
+            for u in userInteractions_collection.find(query):
+                req["matches"].append(u["from_requestID"])
+
+            active_requests.append(req)
+
+        active_requests = sorted(active_requests, key=lambda x: -len(x['matches']))
+        if len(active_requests) > 10:
+            return jsonify(active_requests[:10])
+        return jsonify(active_requests)
     except Exception as e:
         print(str(e))
         return jsonify(error={"message": str(e)})
