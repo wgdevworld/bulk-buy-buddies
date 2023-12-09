@@ -12,6 +12,7 @@ interface ShopperCardProps {
   location: string;
   timeStart: Date;
   timeEnd: Date;
+  matchScore: number;
   //   status: boolean;
 }
 
@@ -22,6 +23,7 @@ export default function ShopperCard({
   location,
   timeStart,
   timeEnd,
+  matchScore,
 }: ShopperCardProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -52,6 +54,7 @@ export default function ShopperCard({
       <p>Quantity: {quantity}</p>
       <p>Start time: {new Date(timeStart).toLocaleString()}</p>
       <p>End time: {new Date(timeEnd).toLocaleString()}</p>
+      <p>Match Score: {matchScore}%</p>
       <div className="button-container">
         <button className="button">Select Buddy</button>
         <button

@@ -41,6 +41,23 @@ function ShopperMatch() {
       );
       const data = await response.json();
       console.log(data);
+      const sortedRequest = data.sort(
+        (a: ShoppingForm, b: ShoppingForm) =>
+          calculateMatchScore(
+            currentCategory,
+            currentLocation,
+            currentTimeStart,
+            currentTimeEnd,
+            b
+          ) -
+          calculateMatchScore(
+            currentCategory,
+            currentLocation,
+            currentTimeStart,
+            currentTimeEnd,
+            a
+          )
+      );
       setRequests(data);
     } catch (error) {
       console.error(error);
@@ -70,6 +87,13 @@ function ShopperMatch() {
               location={item.location}
               timeStart={item.timeStart}
               timeEnd={item.timeEnd}
+              matchScore={calculateMatchScore(
+                currentCategory,
+                currentLocation,
+                currentTimeStart,
+                currentTimeEnd,
+                item
+              )}
             />
           ))
         ) : (
