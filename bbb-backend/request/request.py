@@ -39,3 +39,31 @@ def get_my_requests():
         return jsonify(request_list)
     except Exception as e:
         return jsonify(error={"message": str(e)})
+    
+@request_blueprint.route('/get-match-requests', methods=['GET'])
+def get_match_requests():
+    mongo = current_app.config['MONGO']
+    try:
+        request_collection = mongo.db.requests
+        current_user_id = request.args.get('userID')
+        print(f"Current User ID: {current_user_id}")
+        request_list = []
+
+        query = {'userID': {'$ne': current_user_id}, 'status': 'Active'}
+
+        for doc in request_collection.find(query):
+            requests = {
+                "_id": str(doc["_id"]),
+                "userID": doc["userID"],
+                "category": doc["category"],
+                "quantity": doc["quantity"],
+                "location": doc["location"],
+                "timeStart": doc["timeStart"],
+                "timeEnd": doc["timeEnd"],
+                "status": doc["status"]
+            }
+            request_list.append(requests)
+
+        return jsonify(request_list)
+    except Exception as e:
+        return jsonify(error={"message": str(e)})

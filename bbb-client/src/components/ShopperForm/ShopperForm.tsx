@@ -53,6 +53,7 @@ function ShopperForm() {
         userID: userID,
         category: category,
         location: location,
+        quantity: quantity,
         timeStart: startDate,
         timeEnd: endDate,
         status: "Active",
@@ -114,6 +115,7 @@ function ShopperForm() {
       </div>
       <form onSubmit={handleSubmit}>
         <div className="vertical-container">
+          {/* I need a way to get location from Locations below */}
           <Locations />
           <ShopperDropdown
             name="Category"
