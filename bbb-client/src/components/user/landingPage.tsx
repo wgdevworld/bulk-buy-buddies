@@ -46,7 +46,7 @@ function LandingPage() {
         const params = new URLSearchParams();
         params.set(name, value);
         return params.toString();
-      };
+    };
 
 
     const navigateNewRequest = async () => {
@@ -105,7 +105,7 @@ function LandingPage() {
             <div className="absolute m-5" style={{marginTop: "625px"}}>
                 {doneLoading ?
                     <div>
-                        <ActiveRequestScroll/>
+                        <ActiveRequestScroll userID={user?.uid}/>
                         <MatchedRequestScroll/>
                         <a href="/user/account" className="mt-2 p-2 text-xl font-bold tracking-tight underline underline-offset-auto hover:underline-offset-2 hover:decoration-2 text-gray-900"> View All Requests </a>
                     </div>

@@ -38,7 +38,7 @@ function MatchedRequestScroll() {
             
             {matchedReqs.length == 0 ?
                 <div className="mt-2 mb-10 p-2 sm:mt-0 sm:w-full sm:max-w-sm sm:flex-shrink-0">
-                    <p className="break-normal text-base font-medium ml-1 text-gray-600"> No current matched requests </p>
+                    <span className="break-normal text-base font-medium ml-1 text-gray-600"> No current matched requests </span>
                 </div>
                 :
                 <ul className="flex flex-row overflow-x-auto flex-nowrap">

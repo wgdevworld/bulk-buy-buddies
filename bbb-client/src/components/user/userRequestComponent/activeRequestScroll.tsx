@@ -3,14 +3,35 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import ActiveRequestCard, { RequestWithMatches } from "@/components/user/userRequestComponent/activeRequestCard"
+import { Account } from "@/components/user/account";
 
-function ActiveRequestScroll() {
+function ActiveRequestScroll({ userID }: { userID: string | undefined }) {
     const [activeReqs, setActiveReqs] = useState<RequestWithMatches[]>([]);
     const router = useRouter()     
 
     useEffect(() => {
         getUserActiveReqs();
     }, []);
+
+    const createQueryString = (name: string, value: string) => {
+        const params = new URLSearchParams();
+        params.set(name, value);
+        return params.toString();
+    };
+
+    const navigateNewRequest = async () => {
+        try {
+            console.log("go to make new request page")
+            if (userID) {
+                router.push('/shopper/shopperForm?' + createQueryString("uid", userID) )
+            }
+            else {
+                console.error("uid does not exist") 
+            }
+        } catch (error) {
+            console.error("Error going to udpate page:", error);
+        }
+    }
 
 
     //status, category, date min, date max, location
@@ -50,10 +71,11 @@ function ActiveRequestScroll() {
             
             {activeReqs.length == 0 ?
                 <div className="mt-2 mb-10 p-2 sm:mt-0 sm:w-full sm:max-w-sm sm:flex-shrink-0">
-                    <p className="break-normal text-base font-medium ml-1 text-gray-600"> No current matched requests </p>
+                    <span className="break-normal text-base font-medium ml-1 text-gray-600"> No current active requests. </span>
+                    <a onClick={navigateNewRequest} className="ml-2 underline underline-offset-auto text-base font-medium hover:underline-offset-2 text-gray-600"> Make a new request </a>
                 </div>
                 :
-                <ul className="flex flex-row overflow-x-auto flex-nowrap">
+                <ul className="flex flex-row overflow-x-auto flex-nowrap w-full">
                     {activeReqs.map((item) => (
                         <ActiveRequestCard 
                             key={item._id}
