@@ -11,7 +11,7 @@ def fetchBestProduct():
     mongo = current_app.config['MONGO']
     try:
         category_str = request.args.get('userCategory')
-
+        print('hi!')
         user_quantity_str = request.args.get('userQuantity')
         buddy_quantity_str = request.args.get('buddyQuantity')
 
@@ -26,12 +26,14 @@ def fetchBestProduct():
 
         print(category_str, location, location_int, user_quantity, buddy_quantity, lower_bound, upper_bound)
         
-        products = list(mongo.db.products.find({'category':category_str, 'locations': {'$in' : [location_int]}, 'quantity':{'$lte':upper_bound,'$gte':lower_bound}}))
+        # products = list(mongo.db.products.find({'category':category_str, 'locations': {'$in' : [location_int]}, 'quantity':{'$lte':upper_bound,'$gte':lower_bound}}))
+        products = list(mongo.db.products.find({'category':category_str, 'quantity':{'$lte':upper_bound,'$gte':lower_bound}}))
+
         results = []
         for product in products:
             product['_id'] = str(product['_id'])
             results.append(product)
-
+        print("length is", len(results))
         return jsonify(results=results)
     except Exception as e:
         return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
@@ -68,8 +70,10 @@ def fetchRequestInfo():
         data = request.args.get('requestID')
         print("Object ID value is:", data)
         request_object = ObjectId(data)
+        print(request_object)
         requestsCollection = mongo.db.requests
         request_info = requestsCollection.find_one({'_id': request_object})
+        print(request_info)
         # Mongo's _id is not serializable
         if request_info and "_id" in request_info:
             request_info["_id"] = str(request_info["_id"])

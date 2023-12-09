@@ -3,14 +3,8 @@
 import { list } from "postcss";
 import React, { useState, useEffect, Fragment } from "react";
 import ProductCard from "./ProductList/ProductCard";
+import { Product } from "./ProductList/ProductMain";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-
-export interface Product {
-  _id: string;
-  name: string;
-  price: number;
-  src: string;
-}
 
 interface userInteraction {
   fromRequest: string | null;
@@ -43,8 +37,6 @@ const ProductRec = () => {
   // const location = searchParams.get("location")!;
 
   useEffect(() => {
-    console.log(userRequest)
-    console.log(buddyRequest)
     // console.log("buddyid ", buddyID);
     // TODO: create fetch that takes in requestID and returns relevant info: ID, quantity, category, location
     fetchRequestInfo(userRequest, 'user');
@@ -59,7 +51,9 @@ const ProductRec = () => {
   }, [buddyID]);
 
   useEffect(() => {
-    if(userCategory && userQuantity && buddyQuantity && location){
+    console.log('endpoint is hit?')
+    if(userCategory != null && userQuantity != null && buddyQuantity != null && location != null){
+      console.log('endpoint is hit!')
       // fetch the buddies' information
       fetchProducts(userCategory, userQuantity, buddyQuantity, location);
     }    
@@ -73,7 +67,7 @@ const ProductRec = () => {
   ) => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/fetchSimilarProducts?userCategory=${userCategory}&userQuantity=${userQuantity}&buddyQuantity=${buddyQuantity}&location=${location}`
+        `http://127.0.0.1:5000/fetchSimilarProducts?userCategory=${encodeURIComponent(userCategory)}&userQuantity=${encodeURIComponent(userQuantity)}&buddyQuantity=${encodeURIComponent(buddyQuantity)}&location=${encodeURIComponent(location)}`
       );
       if (!response.ok) {
         // Handle success, e.g., show a success message
@@ -96,9 +90,8 @@ const ProductRec = () => {
       }
       const data = await response.json();
       const name = data.results.firstname + " " + data.results.lastname;
-      console.log("data: ", data);
       setName(name);
-      const date = data.dateJoined;
+      const date = data.results.dateJoined;
       setJoined(date);
     } catch (error) {
       console.error("An error occurred while fetching the data:", error);
@@ -117,14 +110,19 @@ const ProductRec = () => {
       }
       const data = await response.json();
       if(forUserType == 'user'){
-        setUserID(data.userID);  
-        setUserCategory(data.category);  
-        setUserQuantity(data.quantity); 
-        setLocation(data.location);  
+        setUserID(data.results.userID);
+        console.log('user category is', data.results.category)  
+        setUserCategory(data.results.category);  
+        console.log('user quantity is', data.results.quantity)  
+        setUserQuantity(data.results.quantity); 
+        console.log('user location is', data.results.location)  
+        setLocation(data.results.location);  
       } 
       else if(forUserType == 'buddy'){
-        setBuddyID(data.userID);  
-        setBuddyQuantity(data.quantity);
+        console.log('buddy ID is', data.results.userID)
+        setBuddyID(data.results.userID);  
+        console.log('buddy quantity is', data.results.quantity)
+        setBuddyQuantity(data.results.quantity);
       } 
     } catch (error) {
       console.error("An error occurred while fetching the data:", error);
@@ -206,11 +204,11 @@ const ProductRec = () => {
       </button>
       {products.length !== 0 ? (
         <>
-          <br />
+          <br/>
           <p>Here are products you recommend you purchase with {name}!</p>
           <ul className="product-list">
             {products.map((product: Product) => (
-              <ProductCard product={product} key={product._id} />
+              <ProductCard product={product} setModalVisible={()=> {}} setSelectedProductId={()=> {}}/>
             ))}
           </ul>
         </>
