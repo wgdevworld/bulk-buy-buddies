@@ -1,6 +1,7 @@
 from flask import Blueprint, Flask, jsonify, request, current_app
 from flask_cors import CORS
 from flask_pymongo import PyMongo
+from bson.objectid import ObjectId
 from dotenv import dotenv_values
 
 productRec_blueprint = Blueprint('productRec', __name__)
@@ -41,11 +42,35 @@ def fetchBuddyInfo():
     try:
         buddyID = request.args.get('buddyID')
         buddyInfo = mongo.db.users.find_one({'uid':buddyID})
-        print("buddy: ", buddyID, buddyInfo)
-
         # Mongo's _id is not serializable
         if buddyInfo and "_id" in buddyInfo:
             buddyInfo["_id"] = str(buddyInfo["_id"])
         return jsonify(results=buddyInfo)
     except Exception as e:
         return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
+
+@productRec_blueprint.route("/buddy-request", methods=['POST'])
+def submit_buddy_request():
+    mongo = current_app.config['MONGO']
+    try:
+        data = request.json
+        userInteractions = mongo.db.userInteractions
+        userInteractions.insert_one(data)
+        return jsonify({'message': 'Buddy request submitted successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to process the request'}), 500
+
+@productRec_blueprint.route("/fetchRequestInfo", methods=['GET'])
+def fetchRequestInfo():
+    mongo = current_app.config['MONGO']
+    try:
+        data = request.args.get('requestID')
+        request_object = ObjectId(data)
+        requestsCollection = mongo.db.requests
+        request_info = requestsCollection.find_one({'_id': request_object})
+        # Mongo's _id is not serializable
+        if request_info and "_id" in request_info:
+            request_info["_id"] = str(request_info["_id"])
+        return jsonify(results=request_info)
+    except Exception as e:
+        return jsonify({'error': 'Failed to process the request'}), 500
