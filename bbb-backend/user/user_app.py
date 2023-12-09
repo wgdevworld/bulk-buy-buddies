@@ -8,6 +8,7 @@ from dotenv import dotenv_values, load_dotenv, find_dotenv
 from datetime import datetime
 import json
 import os
+from bson.objectid import ObjectId
 
 user_blueprint = Blueprint('user_blueprint', __name__)
 
@@ -317,13 +318,13 @@ def get_matched_reqs():
         for req in requests_collection.find(query):
             req["_id"] = str(req["_id"])
             req["location"] = findLocation(req["location"])
+
             query = {
                 "$and": [
                     {"to_requestID": req["_id"]},
                     {"status": "matched"}
                 ]
             }
-
             match = userInteractions_collection.find_one(query)
             # query = {
             #     "$and": [
@@ -331,16 +332,17 @@ def get_matched_reqs():
             #         {"status": "Matched"}
             #     ]
             # }
-            matching_req = requests_collection.find_one({"_id": match["from_requestID"]})
-            buddy = users.find_one({"uid": matching_req["userID"]})
-            req["buddy"].append(f"{buddy['firstname']} {buddy['lastname']}")
-            req["buddyID"].append(buddy["uid"])
-
-            matched_requests.append(req)
+            if (match):
+                matching_req = requests_collection.find_one({"_id": ObjectId(match["from_requestID"])})
+                buddy = users.find_one({"uid": matching_req["userID"]})
+                req["buddy"]=f"{buddy['firstname']} {buddy['lastname']}"
+                req["buddyID"]=buddy["uid"]
+                matched_requests.append(req)
 
         matched_requests = sorted(matched_requests, key=lambda x: -len(x['timeStart']))
         if len(matched_requests) > 10:
             return jsonify(matched_requests[:10])
+        
         return jsonify(matched_requests)
     except Exception as e:
         print(str(e))
