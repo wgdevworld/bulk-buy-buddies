@@ -9,6 +9,7 @@ from dotenv import dotenv_values
 import re
 from enum import Enum
 from requests.exceptions import HTTPError
+from bson import ObjectId
 
 products_blueprint = Blueprint('products_blueprint', __name__)
 BASE_URL = f"https://www.costco.com/"
@@ -212,3 +213,35 @@ def search():
         return jsonify(error="Invalid value provided for price"), 400
     except Exception as e:
         return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
+
+
+@products_blueprint.route('/remove-location', methods=['POST'])
+def remove_location():
+    mongo = current_app.config['MONGO']
+    products_collection = mongo.db.products
+
+    try:
+        data = request.get_json()
+        product_id = data['product_id']
+        location_id = data['location_id']
+
+        if isinstance(product_id, str):
+            product_id = ObjectId(product_id)
+        
+        if isinstance(location_id, str):
+            location_id = int(location_id)
+
+        result = products_collection.update_one(
+            {"_id": product_id},
+            {"$pull": {"locations": location_id}}
+        )
+
+        if result.modified_count == 0:
+            return jsonify(message="No changes made. Product not found or location already removed."), 404
+        return jsonify(message="Location removed successfully."), 200
+
+    except KeyError:
+        return jsonify(error="Missing product_id or location_id in request"), 400
+    except Exception as e:
+        return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
+
