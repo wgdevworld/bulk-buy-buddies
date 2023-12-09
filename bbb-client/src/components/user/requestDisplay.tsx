@@ -55,6 +55,6 @@ function RequestDisplay() {
             </ul>
         </div>
     );
-  }
+}
   
-  export default RequestDisplay;
+export default RequestDisplay;
