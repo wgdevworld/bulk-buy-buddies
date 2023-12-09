@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
-import ShopperCardProps from "@/components/ShopperMatch/ShopperCard"
 
 export interface RequestWithMatches {
     _id: string;
@@ -43,7 +42,7 @@ function ActiveRequestCard({
         <div className="-mt-2 p-2 sm:mt-0 sm:w-full sm:max-w-sm sm:flex-shrink-0">
             <div className="rounded-2xl bg-gray-50 py-10 text-left ring-1 ring-inset ring-gray-900/5 sm:flex sm:flex-col sm:py-8 sm:justify-start">
                 <div className=" max-w-none px-8">
-                    <p className="text-2xl font-bold tracking-tight text-gray-900"> {category} </p>
+                    <p className="text-2xl font-bold tracking-tight text-gray-900 truncate"> {category} </p>
                     <p>
                         <span className="break-normal text-base font-bold text-lime-600"> • </span>
                         <span className="text-base font-medium text-gray-600">{matches.length} requests pending </span>

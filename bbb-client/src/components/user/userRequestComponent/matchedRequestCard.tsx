@@ -34,7 +34,7 @@ function MatchedRequestCard({
         <div className="-mt-2 p-2 sm:mt-0 sm:w-full sm:max-w-sm sm:flex-shrink-0">
             <div className="rounded-2xl bg-gray-50 py-10 text-left ring-1 ring-inset ring-gray-900/5 sm:flex sm:flex-col sm:py-8 sm:justify-start">
                 <div className=" max-w-none px-8">
-                    <p className="text-2xl font-bold tracking-tight text-gray-900"> {category} </p>
+                    <p className="text-2xl font-bold tracking-tight text-gray-900 truncate"> {category} </p>
                     <p>
                     <span className="inline-flex items-baseline">
                         <img src="../images/buddy.png" alt="" className="self-center w-5 h-5 mx-1" />
