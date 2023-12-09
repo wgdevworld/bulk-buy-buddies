@@ -6,8 +6,6 @@ import { Account } from "@/components/user/account";
 import Logout from "@/components/user/logout";
 import ActiveRequestScroll from "./userRequestComponent/activeRequestScroll";
 import MatchedRequestScroll from "./userRequestComponent/matchedRequestScroll";
-import AmountSavedStat from "./userStatsComponent/amtSaved";
-
 
 function LandingPage() {
     const [user, setUser] = useState<Account>();
@@ -66,6 +64,15 @@ function LandingPage() {
         }
     }
 
+    const navigateRequests = async () => {
+        try {
+            console.log("go to requests page");
+            router.push("/user/requestsPage");
+        } catch (error) {
+            console.error("Error going to request page:", error);
+        }
+    };
+
     const navigateAccount = async () => {
         try {
             console.log("go to account page");
@@ -76,10 +83,6 @@ function LandingPage() {
     };
 
     return (
-        // <div
-        //     className="relative overflow-hidden rounded-lg bg-cover bg-no-repeat p-12 text-center"
-        //     style="background-image: url('...'); height: 400px">
-        //  <div className="m-4 bg-fixed" style={{backgroundImage: "../images/costco.jpg"}}>
         <div>
             <div className="absolute bg-cover opacity-20 z-0" style={{backgroundImage: "url('../images/costco.jpg')", height: "600px"}}>
                 <img src="../images/costco.jpg" className="opacity-0"/>
@@ -93,22 +96,20 @@ function LandingPage() {
                         <p className="text-base font-semibold text-gray-900 my-1">It&#39;s time to embark on your bulk sharing journey!</p>
                         <p className="text-base font-semibold text-gray-900">Make a request, save money, and find you bulk buy buddy today!</p>
                     </p>
-                    {/* <h1> Welcome, {user?.firstname} </h1> */}
-                    <button onClick={navigateNewRequest} className="flex ml-12 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" > Make a Request </button>
-                    {/* <button onClick={navigateAccount} className="flex rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" > View Account Information </button>
-                    <Logout /> */}
+                    <div className="ml-12 flex items-center justify-start gap-x-4">
+                        <button onClick={navigateNewRequest} className="flex mb-3 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" > Make a Request </button>
+                        <button onClick={navigateRequests} className="flex mb-3 rounded-md bg-gray-100 outline outline-1 outline-blue-600 px-3  py-1.5 text-sm font-semibold leading-6 text-blue-900 shadow-sm hover:bg-blue-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" > View my Requests </button>
+                    </div>
+                    <button onClick={navigateAccount} className="flex rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" > View Account Information </button>
+                    <Logout />
                 </div>
-                {/* <div className="image-background"> */}
-                    {/* <img src="../images/costco.jpg" className="z-50 opacity-30"/> */}
-                    
-                {/* </div> */}
             </div>
             <div className="absolute m-5" style={{marginTop: "625px"}}>
                 {doneLoading ?
                     <div>
                         <ActiveRequestScroll userID={user?.uid}/>
                         <MatchedRequestScroll/>
-                        <a href="/user/account" className="mt-2 p-2 text-xl font-bold tracking-tight underline underline-offset-auto hover:underline-offset-2 hover:decoration-2 text-gray-900"> View All Requests </a>
+                        <a href="/user/requestsPage" className="mt-2 p-2 text-xl font-bold tracking-tight underline underline-offset-auto hover:underline-offset-2 hover:decoration-2 text-gray-900"> View All Requests </a>
                     </div>
                     :
                     <div/>

@@ -33,7 +33,7 @@ function MatchedRequestScroll() {
         <div className="mt-2 p-2">
             <p>
                 <span className="text-xl font-bold tracking-tight text-gray-900"> Top Matched Requests </span>
-                <a href="/user/account" className="ml-3 underline underline-offset-auto font-light text-xs hover:underline-offset-2">View all matched requests >> </a>
+                <a href="/user/requestsPage" className="ml-3 underline underline-offset-auto font-light text-xs hover:underline-offset-2">View all matched requests >> </a>
             </p>
             
             {matchedReqs.length == 0 ?

@@ -66,7 +66,7 @@ function ActiveRequestScroll({ userID }: { userID: string | undefined }) {
         <div className="mt-2 p-2">
             <p>
                 <span className="text-xl font-bold tracking-tight text-gray-900"> Top Active Requests </span>
-                <a href="/user/account" className="ml-3 underline underline-offset-auto font-light text-xs hover:underline-offset-2">View all active requests >> </a>
+                <a href="/user/requestsPage" className="ml-3 underline underline-offset-auto font-light text-xs hover:underline-offset-2">View all active requests >> </a>
             </p>
             
             {activeReqs.length == 0 ?
