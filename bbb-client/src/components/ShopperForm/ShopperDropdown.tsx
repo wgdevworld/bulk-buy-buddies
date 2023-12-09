@@ -24,9 +24,13 @@ export default function Dropdown({
   };
 
   return (
-    <div>
-      <label>{name}:</label>
-      <select value={selectedOption} onChange={handleSelectChange}>
+    <div className="flex flex-col items-center">
+      <label>What category are you looking for?</label>
+      <select
+        value={selectedOption}
+        onChange={handleSelectChange}
+        className="block w-full px-3 py-2 mt-2 mb-4 border rounded-lg"
+      >
         <option value="">Choose {name}</option>
         {options.map((option) => (
           <option key={option} value={option}>

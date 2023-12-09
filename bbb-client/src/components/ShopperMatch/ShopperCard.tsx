@@ -5,7 +5,6 @@ import "./ShopperCard.css";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface ShopperCardProps {
-  //   reqID: string;
   userID: string;
   category: string;
   quantity: number;
@@ -32,16 +31,6 @@ export default function ShopperCard({
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentUserID = searchParams.get("userID");
-  const buddyReqId = reqID;
-  const myReqID = currentReqID;
-
-  // const query = {
-  //   userID: userID,
-  //   userCategory: category,
-  //   userQuantity: 1, // add current user's quantity later
-  //   buddyQuantity: quantity,
-  //   location: 249,
-  // };
 
   const query = {
     userReqID: currentReqID,
@@ -60,9 +49,8 @@ export default function ShopperCard({
       <h2>Current UserID: {currentUserID}</h2>
       <h2>UserID: {userID}</h2>
       <h2>ReqID: {reqID}</h2>
-      <p>
-        Shopping for {category} at {location}
-      </p>
+      <p>Shopping for {category}</p>
+      {/* <p>at {location}</p> */}
       <p>Quantity: {quantity}</p>
       <p>Start time: {new Date(timeStart).toLocaleString()}</p>
       <p>End time: {new Date(timeEnd).toLocaleString()}</p>

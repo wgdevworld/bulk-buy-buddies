@@ -19,10 +19,10 @@ export default function Home() {
     <div>
       {/* <Messenger /> */}
       {/* <ProductRec /> */}
-      <ProductList />
+      {/* <ProductList /> */}
       {/* <Register /> */}
       {/* <Logout/> */}
-      {/* <Login /> */}
+      <Login />
       {/* <Locations /> */}
       {/* <ShopperForm /> */}
       {/* <ShopperMatch /> */}

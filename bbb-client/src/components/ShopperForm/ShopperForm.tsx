@@ -99,15 +99,10 @@ function ShopperForm() {
       });
 
       if (response.ok) {
-        // const responseData = await response.text();
-        // const parsedResponse = JSON.parse(responseData);
-        // const generatedID = parsedResponse._id;
         const responseData = await response.json();
         const generatedID = responseData._id;
         setGeneratedID(generatedID);
         setFormSubmitted(true);
-        // navigateShopperMatch();
-        // setResponseContent(parsedResponse);
       } else {
         setResponseContent(null);
         setFormSubmitted(false);
@@ -117,33 +112,38 @@ function ShopperForm() {
       setResponseContent(null);
       setFormSubmitted(false);
     }
-
-    // navigateShopperMatch();
   };
   return (
     <>
-      <div>Form Submission for {currentUserID}</div>
-      <div>
+      <div className="text-xl font-bold">
+        Form Submission for {currentUserID}
+      </div>
+      <div className="mt-4">
         Let us know your preferences for grocery items you want to split.
       </div>
-      <form onSubmit={handleSubmit}>
-        <div className="vertical-container">
+      <form onSubmit={handleSubmit} className="mt-4">
+        <div className="mt-4 flex flex-col items-center">
           {/* I need a way to get location from Locations below */}
-          <Locations />
+          {/* <Locations /> */}
           <ShopperDropdown
             name="Category"
             options={categories}
             value={category}
             onSelect={(selectedCategory) => setCategory(selectedCategory)}
           />
+          <label>How many do you want?</label>
           <input
             type="number"
             placeholder="Enter quantity"
             value={quantity}
+            min={1}
+            className="px-4 py-2 border rounded-lg mt-2"
             onChange={(e) => setQuantity(Number(e.target.value))}
           />
-          <div>
+          <label className="mt-4">When will you be shopping?</label>
+          <div className="mt-4">
             <DatePicker
+              showIcon
               showTimeSelect
               dateFormat="MM/dd/yyyy h:mm aa"
               selected={startDate}
@@ -151,6 +151,7 @@ function ShopperForm() {
               onChange={(date) => setStartDate(date)}
             />
             <DatePicker
+              showIcon
               showTimeSelect
               dateFormat="MM/dd/yyyy h:mm aa"
               selected={endDate}
@@ -158,25 +159,55 @@ function ShopperForm() {
               onChange={(date) => setEndDate(date)}
             />
           </div>
-          <button type="submit">Submit</button>
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4"
+          >
+            Submit
+          </button>
         </div>
       </form>
 
-      {formSubmitted && (
-        <div>
-          <h2>Form Values:</h2>
-          <p>User ID: {userID}</p>
-          <p>Category: {category}</p>
-          <p>Quantity: {quantity}</p>
-          <p>Location: {location}</p>
-          <p>Start Date: {startDate?.toLocaleString()}</p>
-          <p>End Date: {endDate?.toLocaleString()}</p>
-          <p>Request ID: {generatedID}</p>
-        </div>
-      )}
-      {generatedID && (
-        <button onClick={navigateShopperMatch}>Match Shoppers</button>
-      )}
+      <div className="flex flex-col items-center mt-8">
+        {formSubmitted && (
+          <div className="p-4 border rounded-md shadow-md text-center max-w-md">
+            <h2 className="text-xl font-bold mb-4">Form Values:</h2>
+            <p>
+              <span className="font-bold">User ID:</span> {userID}
+            </p>
+            <p>
+              <span className="font-bold">Category:</span> {category}
+            </p>
+            <p>
+              <span className="font-bold">Quantity:</span> {quantity}
+            </p>
+            <p>
+              <span className="font-bold">Location:</span> {location}
+            </p>
+            <p>
+              <span className="font-bold">Start Date:</span>{" "}
+              {startDate?.toLocaleString()}
+            </p>
+            <p>
+              <span className="font-bold">End Date:</span>{" "}
+              {endDate?.toLocaleString()}
+            </p>
+            <p>
+              <span className="font-bold">Request ID:</span> {generatedID}
+            </p>
+          </div>
+        )}
+
+        {generatedID && (
+          <button
+            onClick={navigateShopperMatch}
+            className="bg-green-500 text-white px-4 py-2 rounded-md mt-4 hover:bg-green-600 focus:outline-none focus:ring focus:border-blue-300"
+          >
+            Match Shoppers
+          </button>
+        )}
+      </div>
+
       {/* {
         <>
           <div>{generatedID}</div>

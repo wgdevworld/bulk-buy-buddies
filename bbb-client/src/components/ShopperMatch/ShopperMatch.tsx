@@ -19,7 +19,6 @@ export interface ShoppingForm {
 
 function ShopperMatch() {
   const router = useRouter();
-  const [user, setUser] = useState<string>();
   const [requests, setRequests] = useState<ShoppingForm[]>([]);
 
   const searchParams = useSearchParams();
