@@ -25,13 +25,13 @@ const ProductRec = () => {
   // const [buddyQuantity, setBuddyQuantity] = useState<String>('');
   const [products, setProducts] = useState([]);
   const [name, setName] = useState("");
-  const [dateJoined, setJoined] = useState();
-  const [userID, setUserID] = useState();
-  const [buddyID, setBuddyID] = useState();
-  const [userCategory, setUserCategory] = useState();
-  const [userQuantity, setUserQuantity] = useState();
-  const [buddyQuantity, setBuddyQuantity] = useState();
-  const [location, setLocation] = useState();
+  const [dateJoined, setJoined] = useState(null);
+  const [userID, setUserID] = useState(null);
+  const [buddyID, setBuddyID] = useState(null);
+  const [userCategory, setUserCategory] = useState(null);
+  const [userQuantity, setUserQuantity] = useState(null);
+  const [buddyQuantity, setBuddyQuantity] = useState(null);
+  const [location, setLocation] = useState(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const userRequest = searchParams.get("userReqID");
@@ -43,15 +43,27 @@ const ProductRec = () => {
   // const location = searchParams.get("location")!;
 
   useEffect(() => {
+    console.log(userRequest)
+    console.log(buddyRequest)
     // console.log("buddyid ", buddyID);
     // TODO: create fetch that takes in requestID and returns relevant info: ID, quantity, category, location
     fetchRequestInfo(userRequest, 'user');
     fetchRequestInfo(buddyRequest, 'buddy');
-    // fetch the buddies' information
-    fetchBuddy(buddyID);
-    // fetch recommended products
-    fetchProducts(userCategory, userQuantity, buddyQuantity, location);
   }, []);
+
+  useEffect(() => {
+    if(buddyID != null){
+      // fetch the buddies' information
+      fetchBuddy(buddyID);
+    }    
+  }, [buddyID]);
+
+  useEffect(() => {
+    if(userCategory && userQuantity && buddyQuantity && location){
+      // fetch the buddies' information
+      fetchProducts(userCategory, userQuantity, buddyQuantity, location);
+    }    
+  }, [userCategory, userQuantity, buddyQuantity, location]);
 
   const fetchProducts = async (
     userCategory: any,

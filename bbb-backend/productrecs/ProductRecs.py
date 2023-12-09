@@ -26,7 +26,7 @@ def fetchBestProduct():
 
         print(category_str, location, location_int, user_quantity, buddy_quantity, lower_bound, upper_bound)
         
-        products = list(mongo.db.products.find({'category':category_str, 'locations': location_int, 'quantity':{'$lte':upper_bound,'$gte':lower_bound}}))
+        products = list(mongo.db.products.find({'category':category_str, 'locations': {'$in' : [location_int]}, 'quantity':{'$lte':upper_bound,'$gte':lower_bound}}))
         results = []
         for product in products:
             product['_id'] = str(product['_id'])
@@ -41,6 +41,7 @@ def fetchBuddyInfo():
     mongo = current_app.config['MONGO']
     try:
         buddyID = request.args.get('buddyID')
+        print("Buddy ID is:", buddyID)
         buddyInfo = mongo.db.users.find_one({'uid':buddyID})
         # Mongo's _id is not serializable
         if buddyInfo and "_id" in buddyInfo:
@@ -65,6 +66,7 @@ def fetchRequestInfo():
     mongo = current_app.config['MONGO']
     try:
         data = request.args.get('requestID')
+        print("Object ID value is:", data)
         request_object = ObjectId(data)
         requestsCollection = mongo.db.requests
         request_info = requestsCollection.find_one({'_id': request_object})
