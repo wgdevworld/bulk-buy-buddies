@@ -44,8 +44,8 @@ export default function ShopperCard({
   // };
 
   const query = {
-    userRedID: myReqID,
-    buddyReqId: buddyReqId,
+    userReqID: currentReqID,
+    buddyReqId: reqID,
   };
 
   const createQueryString = (query: object) => {
@@ -59,6 +59,7 @@ export default function ShopperCard({
     <div className="card">
       <h2>Current UserID: {currentUserID}</h2>
       <h2>UserID: {userID}</h2>
+      <h2>ReqID: {reqID}</h2>
       <p>
         Shopping for {category} at {location}
       </p>
@@ -67,14 +68,13 @@ export default function ShopperCard({
       <p>End time: {new Date(timeEnd).toLocaleString()}</p>
       <p>Match Score: {matchScore}%</p>
       <div className="button-container">
-        <button className="button">Select Buddy</button>
         <button
           className="button"
           onClick={() =>
             router.push("/productRec" + "?" + createQueryString(query))
           }
         >
-          Learn More
+          Select Buddy
         </button>
       </div>
     </div>

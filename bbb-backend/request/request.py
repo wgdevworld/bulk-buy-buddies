@@ -55,7 +55,7 @@ def get_match_requests():
 
         for doc in request_collection.find(query):
             requests = {
-                "_id": str(doc["_id"]),
+                "reqID": str(doc["_id"]),
                 "userID": doc["userID"],
                 "category": doc["category"],
                 "quantity": doc["quantity"],
@@ -64,6 +64,7 @@ def get_match_requests():
                 "timeEnd": doc["timeEnd"],
                 "status": doc["status"]
             }
+            print(f"ReqID: {requests.get('reqID')}")
             request_list.append(requests)
 
         return jsonify(request_list)

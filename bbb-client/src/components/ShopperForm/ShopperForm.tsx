@@ -37,6 +37,7 @@ function ShopperForm() {
     null
   );
   const [generatedID, setGeneratedID] = useState<string>("");
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -104,14 +105,20 @@ function ShopperForm() {
         const responseData = await response.json();
         const generatedID = responseData._id;
         setGeneratedID(generatedID);
+        setFormSubmitted(true);
+        // navigateShopperMatch();
         // setResponseContent(parsedResponse);
       } else {
         setResponseContent(null);
+        setFormSubmitted(false);
       }
     } catch (error) {
       console.error("An error occurred:", error);
       setResponseContent(null);
+      setFormSubmitted(false);
     }
+
+    // navigateShopperMatch();
   };
   return (
     <>
@@ -151,11 +158,25 @@ function ShopperForm() {
               onChange={(date) => setEndDate(date)}
             />
           </div>
-          <button type="submit" onClick={navigateShopperMatch}>
-            Submit
-          </button>
+          <button type="submit">Submit</button>
         </div>
       </form>
+
+      {formSubmitted && (
+        <div>
+          <h2>Form Values:</h2>
+          <p>User ID: {userID}</p>
+          <p>Category: {category}</p>
+          <p>Quantity: {quantity}</p>
+          <p>Location: {location}</p>
+          <p>Start Date: {startDate?.toLocaleString()}</p>
+          <p>End Date: {endDate?.toLocaleString()}</p>
+          <p>Request ID: {generatedID}</p>
+        </div>
+      )}
+      {generatedID && (
+        <button onClick={navigateShopperMatch}>Match Shoppers</button>
+      )}
       {/* {
         <>
           <div>{generatedID}</div>
