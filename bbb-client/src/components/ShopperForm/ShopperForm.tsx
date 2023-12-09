@@ -1,19 +1,20 @@
 "use client";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ShopperDropdown from "./ShopperDropdown";
 import DatePicker from "react-datepicker";
 import "./ShopperForm.css";
 import "react-datepicker/dist/react-datepicker.css";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import "../locations/locations.css";
 import Locations from "../locations/locations";
+import constants from "../../../../bbb-shared/constants.json";
 
 // TODO: FIX data type for location once we implement selection from google maps
 
 interface ShoppingForm {
-  //   reqID: string;
+  // reqID: string;
   userID: string;
   category: string;
   quantity: number | undefined;
@@ -23,11 +24,10 @@ interface ShoppingForm {
   status: string | undefined;
 }
 
-const categories = ["beef", "pork", "chicken"];
-const locations = [249, 645, 359];
+const categories = Object.keys(constants.categories);
 
 function ShopperForm() {
-  const [userID, setUserID] = useState<string>("abcd");
+  const [userID, setUserID] = useState<string>("");
   const [category, setCategory] = useState<string>("");
   const [quantity, setQuantity] = useState<number | undefined>(0);
   const [location, setLocation] = useState<string | number | undefined>(0);
@@ -36,15 +36,27 @@ function ShopperForm() {
   const [responseContent, setResponseContent] = useState<ShoppingForm | null>(
     null
   );
+  const [generatedID, setGeneratedID] = useState<string>("");
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentUserID = searchParams.get("uid");
+
+  useEffect(() => {
+    if (currentUserID !== null) {
+      setUserID(currentUserID);
+    }
+  }, [currentUserID]);
 
   const navigateShopperMatch = async () => {
     try {
       const query = {
+        reqID: generatedID,
         userID: userID,
         category: category,
         location: location,
+        quantity: quantity,
         timeStart: startDate,
         timeEnd: endDate,
         status: "Active",
@@ -76,23 +88,7 @@ function ShopperForm() {
       timeEnd: endDate,
       status: "Active",
     };
-    setUserID("aaaa");
-    // UNCOMMENT WHEN LOGIN IMPLEMENTED CORRECTLY
-    // try {
-    //   const responseUserID = await fetch(
-    //     "http://127.0.0.1:5000//get_acc_info"
-    //     // {
-    //     //   method: "GET",
-    //     //   headers: {
-    //     //     "Content-Type": "application/json",
-    //     //   },
-    //     // }
-    //   );
-    //   const userData = await responseUserID.json();
-    //   // setUserID(userData);
-    // } catch (e) {
-    //   console.error(e);
-    // }
+
     try {
       const response = await fetch("http://127.0.0.1:5000/shopping-request", {
         method: "POST",
@@ -103,32 +99,36 @@ function ShopperForm() {
       });
 
       if (response.ok) {
-        const responseData = await response.text();
-        const parsedResponse = JSON.parse(responseData);
-        setResponseContent(parsedResponse);
+        // const responseData = await response.text();
+        // const parsedResponse = JSON.parse(responseData);
+        // const generatedID = parsedResponse._id;
+        const responseData = await response.json();
+        const generatedID = responseData._id;
+        setGeneratedID(generatedID);
+        setFormSubmitted(true);
+        // navigateShopperMatch();
+        // setResponseContent(parsedResponse);
       } else {
         setResponseContent(null);
+        setFormSubmitted(false);
       }
     } catch (error) {
       console.error("An error occurred:", error);
       setResponseContent(null);
+      setFormSubmitted(false);
     }
+
+    // navigateShopperMatch();
   };
   return (
     <>
-      <div>Form Submission</div>
+      <div>Form Submission for {currentUserID}</div>
       <div>
         Let us know your preferences for grocery items you want to split.
       </div>
       <form onSubmit={handleSubmit}>
         <div className="vertical-container">
-          {/* SET LOCATION FROM GOOGLE MAP API */}
-          {/* <ShopperDropdown
-            name="Location"
-            options={locations}
-            value={location}
-            onSelect={(selectedLocation) => setLocation(selectedLocation)}
-          /> */}
+          {/* I need a way to get location from Locations below */}
           <Locations />
           <ShopperDropdown
             name="Category"
@@ -158,14 +158,30 @@ function ShopperForm() {
               onChange={(date) => setEndDate(date)}
             />
           </div>
-          <button type="submit" onClick={navigateShopperMatch}>
-            Submit
-          </button>
+          <button type="submit">Submit</button>
         </div>
       </form>
-      {/* {responseContent !== null && (
-        <pre>{JSON.stringify(responseContent, null, 2)}</pre>
-      )} */}
+
+      {formSubmitted && (
+        <div>
+          <h2>Form Values:</h2>
+          <p>User ID: {userID}</p>
+          <p>Category: {category}</p>
+          <p>Quantity: {quantity}</p>
+          <p>Location: {location}</p>
+          <p>Start Date: {startDate?.toLocaleString()}</p>
+          <p>End Date: {endDate?.toLocaleString()}</p>
+          <p>Request ID: {generatedID}</p>
+        </div>
+      )}
+      {generatedID && (
+        <button onClick={navigateShopperMatch}>Match Shoppers</button>
+      )}
+      {/* {
+        <>
+          <div>{generatedID}</div>
+        </>
+      } */}
     </>
   );
 }
