@@ -14,7 +14,7 @@ import constants from "../../../../bbb-shared/constants.json";
 // TODO: FIX data type for location once we implement selection from google maps
 
 interface ShoppingForm {
-  //   reqID: string;
+  // reqID: string;
   userID: string;
   category: string;
   quantity: number | undefined;
@@ -36,6 +36,7 @@ function ShopperForm() {
   const [responseContent, setResponseContent] = useState<ShoppingForm | null>(
     null
   );
+  const [generatedID, setGeneratedID] = useState<string>("");
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -50,6 +51,7 @@ function ShopperForm() {
   const navigateShopperMatch = async () => {
     try {
       const query = {
+        reqID: generatedID,
         userID: userID,
         category: category,
         location: location,
@@ -96,9 +98,13 @@ function ShopperForm() {
       });
 
       if (response.ok) {
-        const responseData = await response.text();
-        const parsedResponse = JSON.parse(responseData);
-        setResponseContent(parsedResponse);
+        // const responseData = await response.text();
+        // const parsedResponse = JSON.parse(responseData);
+        // const generatedID = parsedResponse._id;
+        const responseData = await response.json();
+        const generatedID = responseData._id;
+        setGeneratedID(generatedID);
+        // setResponseContent(parsedResponse);
       } else {
         setResponseContent(null);
       }
@@ -150,9 +156,11 @@ function ShopperForm() {
           </button>
         </div>
       </form>
-      {/* {responseContent !== null && (
-        <pre>{JSON.stringify(responseContent, null, 2)}</pre>
-      )} */}
+      {/* {
+        <>
+          <div>{generatedID}</div>
+        </>
+      } */}
     </>
   );
 }

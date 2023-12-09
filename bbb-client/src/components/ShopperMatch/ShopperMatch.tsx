@@ -29,6 +29,7 @@ function ShopperMatch() {
   const currentLocation = searchParams.get("location");
   const currentTimeStart = searchParams.get("timeStart");
   const currentTimeEnd = searchParams.get("timeEnd");
+  const currentReqID = searchParams.get("reqID");
 
   useEffect(() => {
     fetchMyRequests(currentUserID);
@@ -70,6 +71,7 @@ function ShopperMatch() {
       <h1>Recommended Bulk Buy Buddies</h1>
       <div>Shoppers we recommend you match with based on your preference.</div>
       <h1>Current UserID: {currentUserID}</h1>
+      <div>Current reqID: {currentReqID}</div>
       <div>Current Category: {currentCategory}</div>
       <div>Current Location: {currentLocation}</div>
       <div>Current Quantity: {currentQuantity}</div>
@@ -94,6 +96,8 @@ function ShopperMatch() {
                 currentTimeEnd,
                 item
               )}
+              reqID={item.reqID}
+              currentReqID={currentReqID}
             />
           ))
         ) : (

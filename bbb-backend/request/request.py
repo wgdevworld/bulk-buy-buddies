@@ -12,8 +12,10 @@ def submit_shopping_request():
     try:
         data = request.json
         request_collection = mongo.db.requests
-        request_collection.insert_one(data)
-        return jsonify({'message': 'Shopping request submitted successfully'}), 200
+        result = request_collection.insert_one(data)
+        generated_id = str(result.inserted_id)
+
+        return jsonify({'message': 'Shopping request submitted successfully', '_id': generated_id}), 200
     except Exception as e:
         return jsonify({'error': 'Failed to process the request'}), 500
 

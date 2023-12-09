@@ -13,6 +13,8 @@ interface ShopperCardProps {
   timeStart: Date;
   timeEnd: Date;
   matchScore: number;
+  reqID: string;
+  currentReqID: string | null;
   //   status: boolean;
 }
 
@@ -24,17 +26,26 @@ export default function ShopperCard({
   timeStart,
   timeEnd,
   matchScore,
+  reqID,
+  currentReqID,
 }: ShopperCardProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentUserID = searchParams.get("userID");
+  const buddyReqId = reqID;
+  const myReqID = currentReqID;
+
+  // const query = {
+  //   userID: userID,
+  //   userCategory: category,
+  //   userQuantity: 1, // add current user's quantity later
+  //   buddyQuantity: quantity,
+  //   location: 249,
+  // };
 
   const query = {
-    userID: userID,
-    userCategory: category,
-    userQuantity: 1, // add current user's quantity later
-    buddyQuantity: quantity,
-    location: 249,
+    userRedID: myReqID,
+    buddyReqId: buddyReqId,
   };
 
   const createQueryString = (query: object) => {
