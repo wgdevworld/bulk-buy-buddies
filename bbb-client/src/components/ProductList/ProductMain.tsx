@@ -10,6 +10,7 @@ export interface Product {
   name: string;
   price: number;
   src: string;
+  link: string;
 }
 function ProductMain() {
   const [searchTerm, setSearchTerm] = useState("");

@@ -70,15 +70,17 @@ def scrape_page(session, url, page=1):
     except HTTPError as e:
         if e.response.status_code == 404:
             print(f"⚠️ Page not found: {url}. Skipping category.")
-            return [], [], []
+            return [], [], [], []
         else:
             raise 
     soup = BeautifulSoup(response.content, 'html.parser')
     
+    product_links = [link['href'] for link in soup.select('a[automation-id^="productDescriptionLink_"]') if link.has_attr('href')]
     product_names = [link.text.strip() for link in soup.select('a[automation-id^="productDescriptionLink_"]')]
     product_prices = [tag.text.strip() for tag in soup.select('div[automation-id^="itemPriceOutput_"]')]
     product_images = [tag['src'] for tag in soup.select('img[automation-id^="productImageLink_"]') if tag.has_attr('src')]
-    return product_names, product_prices, product_images
+    
+    return product_links, product_names, product_prices, product_images
 
 def extract_price(price_str):
     cleaned_price_str = price_str.replace('$', '').replace(',', '')
@@ -134,11 +136,11 @@ def index():
                 BASE_URL = f"https://www.costco.com/{category_path}.html"
                 page = 1
                 while True:
-                    product_names, product_prices, product_images = scrape_page(session, BASE_URL, page)
+                    product_links, product_names, product_prices, product_images = scrape_page(session, BASE_URL, page)
                     if not product_names:
                         break
                     
-                    for name, price_str, src in zip(product_names, product_prices, product_images):
+                    for link, name, price_str, src in zip(product_links, product_names, product_prices, product_images):
                         price = extract_price(price_str)
 
                         unit_pattern = fr'(?i)(\d+\.?\d+|\d+)[-\s]*({regex_pattern})'
@@ -161,6 +163,7 @@ def index():
                                 "src": src, 
                                 "category": category,
                                 "quantity": quantity,
+                                "link": link,
                             }
                             update_products_in_db(products_collection, product_data, Warehouses[warehouse])
                             scraped_products_names.add(name)
