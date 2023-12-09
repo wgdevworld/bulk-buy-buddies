@@ -12,6 +12,9 @@ interface ShopperCardProps {
   location: string;
   timeStart: Date;
   timeEnd: Date;
+  matchScore: number;
+  reqID: string;
+  currentReqID: string | null;
   //   status: boolean;
 }
 
@@ -22,17 +25,27 @@ export default function ShopperCard({
   location,
   timeStart,
   timeEnd,
+  matchScore,
+  reqID,
+  currentReqID,
 }: ShopperCardProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentUserID = searchParams.get("userID");
+  const buddyReqId = reqID;
+  const myReqID = currentReqID;
+
+  // const query = {
+  //   userID: userID,
+  //   userCategory: category,
+  //   userQuantity: 1, // add current user's quantity later
+  //   buddyQuantity: quantity,
+  //   location: 249,
+  // };
 
   const query = {
-    userID: userID,
-    userCategory: category,
-    userQuantity: 1, // add current user's quantity later
-    buddyQuantity: quantity,
-    location: 249,
+    userReqID: currentReqID,
+    buddyReqId: reqID,
   };
 
   const createQueryString = (query: object) => {
@@ -46,21 +59,22 @@ export default function ShopperCard({
     <div className="card">
       <h2>Current UserID: {currentUserID}</h2>
       <h2>UserID: {userID}</h2>
+      <h2>ReqID: {reqID}</h2>
       <p>
         Shopping for {category} at {location}
       </p>
       <p>Quantity: {quantity}</p>
       <p>Start time: {new Date(timeStart).toLocaleString()}</p>
       <p>End time: {new Date(timeEnd).toLocaleString()}</p>
+      <p>Match Score: {matchScore}%</p>
       <div className="button-container">
-        <button className="button">Select Buddy</button>
         <button
           className="button"
           onClick={() =>
             router.push("/productRec" + "?" + createQueryString(query))
           }
         >
-          Learn More
+          Select Buddy
         </button>
       </div>
     </div>
