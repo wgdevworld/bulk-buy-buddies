@@ -2,13 +2,16 @@
 import React from "react";
 import { Location } from "./locations";
 
+// Define the prop types for the LocationCard component
 interface LocationCardProps {
   selectedLocation: Location;
 }
 
+// Define the LocationCard component
 function LocationCard({ selectedLocation }: LocationCardProps) {
   console.log("LocationCard - selectedLocation:", selectedLocation);
 
+  // Render the open hours for the selected location
   const renderOpenHours = () => {
     return selectedLocation.openHours.map((timeSlot, index) => (
       <div key={index}>
@@ -18,13 +21,12 @@ function LocationCard({ selectedLocation }: LocationCardProps) {
   };
 
   return (
-    <div className="location-card">
-      <h1 className="location-title">{selectedLocation.name}</h1>
-      <p className="location-address">{selectedLocation.address}</p>
-      <div className="location-hours">
+    <div className="location-card bg-blue-200 m-8 p-4 rounded-lg shadow-lg">
+      <h1 className="text-2xl font-semibold text-blue-800">{selectedLocation.name}</h1>
+      <p className="text-blue-600">{selectedLocation.address}</p>
+      <div className="mt-4 space-y-2">
         {renderOpenHours()}
       </div>
-      {/* You can add more information here */}
     </div>
   );
 }

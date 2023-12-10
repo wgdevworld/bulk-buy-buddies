@@ -2,7 +2,7 @@
 /* eslint-disable react/react-in-jsx-scope */
 "use client";
 
-import Messenger from "@/components/Messenger";
+import Messenger from "@/components/Messenger/Messenger";
 import ProductRec from "@/components/ProductRec";
 import ProductList from "@/components/ProductList/ProductMain";
 import Register from "@/components/user/register";
