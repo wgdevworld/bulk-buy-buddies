@@ -33,20 +33,6 @@ def get_locations():
         return jsonify(error={"message": str(e)})
 
 
-@locations_blueprint.route('/get_user_address/<user_id>', methods=['GET'])
-def get_user_address(user_id):
-    try:
-        mongo = current_app.config['MONGO']
-        users_collection = mongo.db.users
-        user = users_collection.find_one({"uid": user_id})
-        if user and 'address' in user:
-            user_address = user['address'] 
-            return jsonify(user_address)
-        return jsonify(error={"message": "User address not found."})
-    except Exception as e:
-        return jsonify(error={"message": str(e)})
-
-
 @locations_blueprint.route('/get_user_location/<user_id>', methods=['GET'])
 def get_user_location(user_id):
     try:
@@ -61,6 +47,7 @@ def get_user_location(user_id):
                 data = response.json()
                 if "location" in data['results'][0]['geometry']:
                     location = data['results'][0]['geometry']['location']
+                    print(location)
                     return jsonify(location)
                 else:
                     return jsonify(error={"message": "Could not geocode address."})
@@ -70,9 +57,32 @@ def get_user_location(user_id):
     except Exception as e:
         return jsonify(error={"message": str(e)})
 
+@locations_blueprint.route('/get_location_name/<location_id>', methods=['GET'])
+def get_location_name(location_id):
+    try:
+        mongo = current_app.config['MONGO']
+        locations_collection = mongo.db.locations
+        location = locations_collection.find_one({"lid": location_id})
+        if location:
+            location_name = location['name']
+            print(f"Location Name: {location_name}")
+            return jsonify(location_name)
+        return jsonify(error={"message": "Location not found."})
+    except Exception as e:
+        return jsonify(error={"message": str(e)})
 
-
-
+# @locations_blueprint.route('/get_user_address/<user_id>', methods=['GET'])
+# def get_user_address(user_id):
+#     try:
+#         mongo = current_app.config['MONGO']
+#         users_collection = mongo.db.users
+#         user = users_collection.find_one({"uid": user_id})
+#         if user and 'address' in user:
+#             user_address = user['address'] 
+#             return jsonify(user_address)
+#         return jsonify(error={"message": "User address not found."})
+#     except Exception as e:
+#         return jsonify(error={"message": str(e)})
 
 # @app.route('/get_request_location/<request_id>', methods=['GET'])
 # def get_request_location(request_id):

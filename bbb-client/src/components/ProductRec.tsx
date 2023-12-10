@@ -3,14 +3,15 @@
 import { list } from "postcss";
 import React, { useState, useEffect, Fragment } from "react";
 import ProductCard from "./ProductList/ProductCard";
+import { Product } from "./ProductList/ProductMain";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
-export interface Product {
-  _id: string;
-  name: string;
-  price: number;
-  src: string;
+interface userInteraction {
+  fromRequest: string | null;
+  toRequest: string | null;
+  status: string;
 }
+
 
 const ProductRec = () => {
   // const [userCategory, setUserCategory] = useState<String>('');
@@ -18,29 +19,45 @@ const ProductRec = () => {
   // const [buddyQuantity, setBuddyQuantity] = useState<String>('');
   const [products, setProducts] = useState([]);
   const [name, setName] = useState("");
-  const [dateJoined, setJoined] = useState();
+  const [dateJoined, setJoined] = useState(null);
+  const [userID, setUserID] = useState(null);
+  const [buddyID, setBuddyID] = useState(null);
+  const [userCategory, setUserCategory] = useState(null);
+  const [userQuantity, setUserQuantity] = useState(null);
+  const [buddyQuantity, setBuddyQuantity] = useState(null);
+  const [location, setLocation] = useState(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const buddyID = searchParams.get("userID");
-  const userCategory = searchParams.get("userCategory");
-  const userQuantity = searchParams.get("userQuantity");
-  const buddyQuantity = searchParams.get("buddyQuantity")!;
-  const location = searchParams.get("location")!;
+  const userRequest = searchParams.get("userReqID");
+  const buddyRequest = searchParams.get("buddyReqId");
+
+  // const userCategory = searchParams.get("userCategory");
+  // const userQuantity = searchParams.get("userQuantity");
+  // const buddyQuantity = searchParams.get("buddyQuantity")!;
+  // const location = searchParams.get("location")!;
 
   useEffect(() => {
-    console.log(products);
-  }, [products]);
-
-  useEffect(() => {
-    console.log("buddyid ", buddyID);
-    // retrieve information about the buddy that was clicked
-    // INCLUDES: uid of buddy, preferably also information about the active request clicked
-    // via session storage? or whatever mechanism we find
-    // get user information about buddy
-    // run request information through backend function to fetch product recommenations
-    fetchBuddy(buddyID);
-    fetchProducts(userCategory, userQuantity, buddyQuantity, location);
+    // console.log("buddyid ", buddyID);
+    // TODO: create fetch that takes in requestID and returns relevant info: ID, quantity, category, location
+    fetchRequestInfo(userRequest, 'user');
+    fetchRequestInfo(buddyRequest, 'buddy');
   }, []);
+
+  useEffect(() => {
+    if(buddyID != null){
+      // fetch the buddies' information
+      fetchBuddy(buddyID);
+    }    
+  }, [buddyID]);
+
+  useEffect(() => {
+    console.log('endpoint is hit?')
+    if(userCategory != null && userQuantity != null && buddyQuantity != null && location != null){
+      console.log('endpoint is hit!')
+      // fetch the buddies' information
+      fetchProducts(userCategory, userQuantity, buddyQuantity, location);
+    }    
+  }, [userCategory, userQuantity, buddyQuantity, location]);
 
   const fetchProducts = async (
     userCategory: any,
@@ -50,7 +67,7 @@ const ProductRec = () => {
   ) => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/fetchSimilarProducts?userCategory=${userCategory}&userQuantity=${userQuantity}&buddyQuantity=${buddyQuantity}&location=${location}`
+        `http://127.0.0.1:5000/fetchSimilarProducts?userCategory=${encodeURIComponent(userCategory)}&userQuantity=${encodeURIComponent(userQuantity)}&buddyQuantity=${encodeURIComponent(buddyQuantity)}&location=${encodeURIComponent(location)}`
       );
       if (!response.ok) {
         // Handle success, e.g., show a success message
@@ -73,20 +90,65 @@ const ProductRec = () => {
       }
       const data = await response.json();
       const name = data.results.firstname + " " + data.results.lastname;
-
-      console.log("data: ", data);
       setName(name);
-      const location = data.dateJoined;
-      setJoined(location);
+      const date = data.results.dateJoined;
+      setJoined(date);
     } catch (error) {
-      console.error("An error occurred while submitting the form:", error);
+      console.error("An error occurred while fetching the data:", error);
     }
   };
-
+  const fetchRequestInfo = async (requestID: string | null, forUserType: string | null) => {
+    try{
+      if(requestID == null || forUserType == null) {
+        return;
+      }
+      const response = await fetch(
+        `http://127.0.0.1:5000/fetchRequestInfo?requestID=${requestID}`
+      );
+      if (!response.ok) {
+        console.error("Failed to submit form data");
+      }
+      const data = await response.json();
+      if(forUserType == 'user'){
+        setUserID(data.results.userID);
+        console.log('user category is', data.results.category)  
+        setUserCategory(data.results.category);  
+        console.log('user quantity is', data.results.quantity)  
+        setUserQuantity(data.results.quantity); 
+        console.log('user location is', data.results.location)  
+        setLocation(data.results.location);  
+      } 
+      else if(forUserType == 'buddy'){
+        console.log('buddy ID is', data.results.userID)
+        setBuddyID(data.results.userID);  
+        console.log('buddy quantity is', data.results.quantity)
+        setBuddyQuantity(data.results.quantity);
+      } 
+    } catch (error) {
+      console.error("An error occurred while fetching the data:", error);
+    }
+  }
   const sendBuddyRequest = async () => {
     try {
+      const requestData: userInteraction = {
+        fromRequest: userRequest,
+        toRequest: buddyRequest,
+        status: "requested",
+      };  
+      const response = await fetch(`http://127.0.0.1:5000/buddy-request`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        }
+      );
+      if (!response.ok) {
+        // Handle success, e.g., show a success message
+        console.error("Failed to submit buddy request");
+      }                                 
       const query = {
-        currentUserID: "abcd",
+        currentUserID: userID,
         buddyUserID: buddyID,
       };
       console.log("To Messenger");
@@ -126,64 +188,27 @@ const ProductRec = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        flexDirection: "column"
       }}
     >
-      {/* <div>
-                <p>Choose users' product category</p>
-                {radioOptions.map(({view: title, value: option}: any) => {
-                    return (
-                        <>
-                            <input
-                                type="radio"
-                                value={option}
-                                name={option}
-                                checked = {option === userCategory}
-                                onChange={(e) => onRadioChange(e)}
-                            />
-                            {title}<br/>
-                        </>
-                    );
-                })}
-            </div><br/> */}
-      {/* <div>
-                <label>
-                User Quantity:
-                <input
-                    type="text"
-                    name="quantity"
-                    onChange={(e) => onUserqChange(e)}
-                />
-                </label>
-            </div>
-            <div>
-                <label>
-                Buddy Quantity:
-                <input
-                    type="text"
-                    name="quantity"
-                    onChange={(e) => onBuddyqChange(e)}
-                />
-                </label>
-            </div><br/> */}
-      {/* <button type="submit" onClick={handleClick}>Submit</button> */}
       {name !== "" ? (
         <>
-          <h3>Buddy Name: ${name}</h3>
-          <h6>Date Joined: ${dateJoined}</h6>
+          <h3>Buddy Name: {name}</h3>
+          <h6>Date Joined: {dateJoined}</h6>
         </>
       ) : (
         <></>
       )}
       <button type="submit" onClick={sendBuddyRequest}>
-        Send Buddy Request
+        Request Match
       </button>
       {products && products.length !== 0 ? (
         <>
-          <br />
-          <p>Here are products you recommend you purchase with ${name}!</p>
+          <br/>
+          <p>Here are products you recommend you purchase with {name}!</p>
           <ul className="product-list">
             {products.map((product: Product) => (
-              <ProductCard product={product} key={product._id} />
+              <ProductCard product={product} setModalVisible={()=> {}} setSelectedProductId={()=> {}}/>
             ))}
           </ul>
         </>

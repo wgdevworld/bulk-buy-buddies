@@ -1,4 +1,7 @@
 // locations.tsx
+
+"use client";
+
 import React, { useState, useEffect } from "react";
 import "./locations.css";
 import MapComponent from "./map";
@@ -14,6 +17,18 @@ export interface Location {
     openTime: string;
     endTime: string;
   }[];
+}
+
+const placeholderLocation = {
+  lid: 0,
+  name: "Loading your nearest Location...",
+  address: "",
+  coordinates: [0, 0],
+  openHours: [],
+};
+
+interface LocationsProps {
+  onSelectLocation: (location: Location) => void;
 }
 
 
@@ -36,58 +51,67 @@ function calculateDistance(coord1: number[], coord2: number[]): number {
   distance = Math.acos(distance);
   distance = distance * 180/Math.PI;
   distance = distance * 60 * 1.1515;
-
   distance = distance * 1.609344;
 
   return distance;
 }
 
-
-
-function Locations() {
+function Locations({ onSelectLocation }: LocationsProps) {
+  console.log("Locations component is rendering");
   const [locations, setLocations] = useState<Location[]>([]);
-  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>({ lat: 36.028848, lng: -78.915528 }); 
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<Location>(placeholderLocation);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>({ lat: 36.028848, lng: -78.915528 });
 
   useEffect(() => {
-    fetchLocations();
-    fetchUserLocation();
+    const fetchData = async () => {
+      await fetchLocations();
+    };
+    fetchData();
   }, []);
 
+  useEffect(() => {
+    if (locations.length > 0) {
+      fetchUserLocation();
+    }
+  }, [locations]);
+
   const fetchLocations = async () => {
+    console.log("fetchLocations is being called");
     try {
       const response = await fetch("http://127.0.0.1:5000/get_locations");
       const locationsData = await response.json();
       setLocations(locationsData);
+      console.log("Locations fetched:", locationsData);
     } catch (error) {
       console.error("An error occurred while fetching locations:", error);
-      setLocations([]); 
+      setLocations([]);
     }
   };
-  
+
   const fetchUserLocation = async () => {
+    console.log("fetchUserLocation is being called");
     try {
-      const acctResponse = await fetch('http://127.0.0.1:5000/users/get_acct_info');
+      const acctResponse = await fetch('http://127.0.0.1:5000/get_acct_info');
       const acctData = await acctResponse.json();
-      const userId = acctData.uid; 
+      const userId = acctData.uid;
   
-      const locationResponse = await fetch(`http://127.0.0.1:5000/locations/get_user_location/${userId}`);
+      const locationResponse = await fetch(`http://127.0.0.1:5000/get_user_location/${userId}`);
       const userLocation = await locationResponse.json();
+      console.log("User location fetched:", userLocation);
+  
       if (locations.length > 0) {
-        const nearestLocation = findNearestLocation(userLocation, locations);
+        const nearestLocation = findNearestLocation([userLocation.lng, userLocation.lat], locations);
+        console.log("Nearest location:", nearestLocation);
         setMapCenter({ lat: nearestLocation.coordinates[1], lng: nearestLocation.coordinates[0] });
         setSelectedLocation(nearestLocation);
+        onSelectLocation(nearestLocation);
       }
     } catch (error) {
       console.error("Error fetching user information:", error);
-      setMapCenter({ lat: 36.028848, lng: -78.915528 }); 
     }
   };
   
   
-  
-
-
   function findNearestLocation(userLocation: number[], locations: Location[]): Location {
     let nearestLocation = locations[0];
     let shortestDistance = calculateDistance(userLocation, nearestLocation.coordinates);
@@ -99,28 +123,28 @@ function Locations() {
         nearestLocation = location;
       }
     }
-
     return nearestLocation;
   }
 
-
   const handleLocationSelect = (location: Location) => {
-    setSelectedLocation(location);
+    setSelectedLocation(location); // Update the selected location
     setMapCenter({ lat: location.coordinates[1], lng: location.coordinates[0] });
+    onSelectLocation(location);
   };
 
   return (
     <div className="locations">
       <h1 className="location-title">Choose your Costco warehouse</h1>
-      <div className="locations-container">
-        <LocationsDropdown locations={locations} onSelectLocation={handleLocationSelect} />
-      </div>
+      <LocationsDropdown
+        locations={locations}
+        onSelectLocation={handleLocationSelect}
+        selectedLocation={selectedLocation}
+      />
       <div className="map-container">
         <MapComponent center={mapCenter} setCenter={setMapCenter} selectedLocation={selectedLocation} />
       </div>
     </div>
   );
 }
-
 
 export default Locations;

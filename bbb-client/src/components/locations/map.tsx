@@ -1,4 +1,6 @@
 // map.tsx
+"use client";
+
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 import { Location } from "./locations";
 import LocationCard from "./locationcard";
@@ -11,12 +13,12 @@ const containerStyle = {
 interface MapComponentProps {
   center: { lat: number; lng: number };
   setCenter: React.Dispatch<React.SetStateAction<{ lat: number; lng: number }>>;
-  selectedLocation: Location | null;
+  selectedLocation: Location;
 }
 
 function MapComponent({
   center,
-  setCenter,
+  // setCenter,
   selectedLocation,
 }: MapComponentProps) {
   console.log("MapComponent - selectedLocation:", selectedLocation);

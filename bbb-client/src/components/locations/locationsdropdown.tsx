@@ -1,25 +1,44 @@
 // locationsdropdown.tsx
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { Location } from "./locations";
 
 interface LocationsDropdownProps {
   locations: Location[];
   onSelectLocation: (location: Location) => void;
+  selectedLocation: Location;
 }
 
-const LocationsDropdown: React.FC<LocationsDropdownProps> = ({ locations, onSelectLocation }) => {
+export default function LocationsDropdown({
+  locations,
+  onSelectLocation,
+  selectedLocation,
+}: LocationsDropdownProps) {
+  const [localSelectedLocation, setLocalSelectedLocation] = useState<Location | null>(selectedLocation);
+
+  const handleLocationSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedName = e.target.value;
+    const selectedLocation = locations.find(location => location.name === selectedName);
+
+    if (selectedLocation) {
+      // Update the localSelectedLocation state
+      setLocalSelectedLocation(selectedLocation);
+
+      onSelectLocation(selectedLocation);
+    }
+  };
+
   return (
     <div className="locations-dropdown">
-      <select onChange={(e) => onSelectLocation(locations[Number(e.target.value)])}>
+      <select onChange={handleLocationSelect} value={localSelectedLocation?.name || ""}>
         <option value="">Select a location</option>
-        {locations.map((location, index) => (
-          <option key={location.lid} value={index}>
+        {locations.map((location) => (
+          <option key={location.lid} value={location.name}>
             {location.name}
           </option>
         ))}
       </select>
     </div>
   );
-};
-
-export default LocationsDropdown;
+}

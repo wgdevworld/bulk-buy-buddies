@@ -13,21 +13,23 @@ import ShopperForm from "@/components//ShopperForm/ShopperForm";
 import ResetPassword from "@/components/user/resetPassword";
 import Account from "@/components/user/account";
 import ShopperMatch from "@/components/ShopperMatch/ShopperMatch";
+import ActiveRequestScroll from "@/components/user/userRequestComponent/activeRequestScroll";
 
 export default function Home() {
   return (
     <div>
-      <Messenger /> 
-      <ProductRec />
+      {/* <Messenger /> */}
+      {/* <ProductRec /> */}
       {/* <ProductList /> */}
-      <Register />
-      <Logout/> 
+      {/* <Register /> */}
+      {/* <Logout/> */}
+      {/* <ActiveRequestScroll/> */}
       <Login />
-      <Locations />
-      <ShopperForm />
-      <ShopperMatch />
-      <ResetPassword />
-      <Account />
+      {/* <Locations /> */}
+      {/* <ShopperForm /> */}
+      {/* <ShopperMatch /> */}
+      {/* <ResetPassword /> */}
+      {/* <Account /> */}
     </div>
   );
 }
