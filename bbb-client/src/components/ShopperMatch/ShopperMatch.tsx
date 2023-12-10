@@ -74,13 +74,6 @@ function ShopperMatch() {
           Shoppers we recommend you match with based on your preference.
         </div>
       </div>
-      {/* <h1>Current UserID: {currentUserID}</h1>
-      <div>Current reqID: {currentReqID}</div>
-      <div>Current Category: {currentCategory}</div>
-      <div>Current Location: {currentLocation}</div>
-      <div>Current Quantity: {currentQuantity}</div>
-      <div>Current TimeStart: {currentTimeStart}</div>
-      <div>Current TimeEnd: {currentTimeEnd}</div> */}
 
       <div>
         {requests && requests.length > 0 ? (
