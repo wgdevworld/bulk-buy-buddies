@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 
+// Define the interface for an unmatched request
 export interface UnmatchedRequest {
   userName: string;
   category: string;
@@ -9,15 +10,19 @@ export interface UnmatchedRequest {
   locationName: string;
 }
 
+// Define the prop types for the UnmatchedRequests component
 interface UnmatchedRequestsProps {
   locationId: number;
 }
 
+// Define the UnmatchedRequests component
 function UnmatchedRequests({ locationId }: UnmatchedRequestsProps) {
+  // Define state variables
   const [unmatchedRequests, setUnmatchedRequests] = useState<UnmatchedRequest[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
 
+  // useEffect hook to fetch data when the component mounts or dependencies change
   useEffect(() => {
     const fetchUnmatchedData = async () => {
       try {
@@ -61,11 +66,13 @@ function UnmatchedRequests({ locationId }: UnmatchedRequestsProps) {
         });
         const userResults = await Promise.all(userPromises);
 
+        // Extract unique categories and set available categories
         const uniqueCategories = Array.from(
           new Set(unmatchedRequestsData.map((request: { category: any }) => request.category))
         );
-        setAvailableCategories(uniqueCategories as string[]); 
+        setAvailableCategories(uniqueCategories as string[]);
 
+        // Update unmatched requests data with user names and location name
         const updatedRequestsData = unmatchedRequestsData.map(
           (request: { userID: unknown }) => {
             const userResult = userResults.find(
@@ -79,6 +86,7 @@ function UnmatchedRequests({ locationId }: UnmatchedRequestsProps) {
           }
         );
 
+        // Filter requests based on selected category
         const filteredRequests =
           selectedCategory === null
             ? updatedRequestsData
@@ -96,10 +104,10 @@ function UnmatchedRequests({ locationId }: UnmatchedRequestsProps) {
     fetchUnmatchedData();
   }, [locationId, selectedCategory]);
 
+  // Handle category change
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCategory(e.target.value === "all" ? null : e.target.value);
   };
-
 
   return (
     <div className="w-screen unmatched-requests p-4 flex justify-center items-center">
@@ -145,48 +153,6 @@ function UnmatchedRequests({ locationId }: UnmatchedRequestsProps) {
       </div>
     </div>
   );
-  
-  
-  
-  
-  
-  
-//   return (
-//     <div className="unmatched-requests p-4">
-//       <h2 className="text-xl font-semibold mb-2 text-blue-900">
-//         Unmatched Requests in {unmatchedRequests.length > 0 ? unmatchedRequests[0].locationName : ""}
-//       </h2>
-//       <label className="block">Select Category:</label>
-//       <select
-//         className="border border-blue-600 rounded-md px-3 py-2 mb-2 text-blue-900"
-//         onChange={handleCategoryChange}
-//       >
-//         <option value="all">All</option>
-//         {availableCategories.map((category) => (
-//           <option key={category} value={category}>
-//             {category}
-//           </option>
-//         ))}
-//       </select>
-//       <ul className="list-inside list-none" style={{ listStyleType: 'none' }}>
-//         {unmatchedRequests.map((request, index) => (
-//           <li key={index} className="mb-4">
-//             <div className="flex items-center space-x-2">
-//               <span className="text-blue-900">
-//                 User: {request.userName}, Category: {request.category}, Quantity: {request.quantity}
-//               </span>
-//             </div>
-//             {index < unmatchedRequests.length - 1 && (
-//               <div className="border-t border-gray-300 mt-4"></div>
-//             )}
-//           </li>
-//         ))}
-//       </ul>
-//     </div>
-//   );
-  
-  
-  
 }
 
 export default UnmatchedRequests;
