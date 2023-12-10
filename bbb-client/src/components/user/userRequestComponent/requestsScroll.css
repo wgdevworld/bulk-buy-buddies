@@ -1,0 +1,10 @@
+.horiz-scroll-container {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    overflow-x: scroll;
+  }
+  .inf-container {
+    width:6400px;
+    flex-direction: row;
+  }
