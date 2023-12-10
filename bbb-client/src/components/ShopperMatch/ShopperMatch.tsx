@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import ShopperCard from "./ShopperCard";
 import { useRouter, useSearchParams } from "next/navigation";
 import { calculateMatchScore } from "./MatchScore";
+import Layout from "../CommonLayout";
 
 export interface ShoppingForm {
   reqID: string;
@@ -67,7 +68,7 @@ function ShopperMatch() {
   };
 
   return (
-    <>
+    <Layout>
       <div className="text-center mt-4">
         <h1 className="font-bold text-3xl">Recommended Bulk Buy Buddies</h1>
         <div className="text-lg">
@@ -101,7 +102,7 @@ function ShopperMatch() {
           <p>No requests found.</p>
         )}
       </div>
-    </>
+    </Layout>
   );
 }
 

@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import "../locations/locations.css";
 import Locations, { Location } from "../locations/locations";
 import constants from "../../../../bbb-shared/constants.json";
+import Layout from "../CommonLayout";
 
 // Basic interface of information we will need from users
 interface ShoppingForm {
@@ -250,7 +251,7 @@ function ShopperForm() {
     }
   };
   return (
-    <>
+    <Layout>
       <form onSubmit={handleSubmit} className="mt-4">
         <div className="mt-4 flex flex-col items-center">
           {/* User selects location here */}
@@ -337,7 +338,7 @@ function ShopperForm() {
           </button>
         )}
       </div>
-    </>
+    </Layout>
   );
 }
 

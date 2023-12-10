@@ -1,9 +1,11 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import "./products.css";
 import constants from "../../../../bbb-shared/constants.json";
 import ReactPaginate from "react-paginate";
 import Modal from "./IndicatePresenceModal";
+import Layout from "../CommonLayout";
 
 export interface Product {
   _id: string;
@@ -114,7 +116,7 @@ function ProductMain() {
   };
 
   return (
-    <>
+    <Layout>
       <Modal
         show={isSetPresenceModalVisible}
         close={() => {
@@ -244,7 +246,7 @@ function ProductMain() {
           />
         </div>
       </div>
-    </>
+    </Layout>
   );
 }
 

@@ -22,6 +22,7 @@ import {
 } from "./MessengerHelper";
 import io from "socket.io-client";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import Layout from "../CommonLayout";
 
 const Messenger = () => {
   const [newUid, setNewUid] = useState("");
@@ -211,145 +212,147 @@ const Messenger = () => {
     chats.find((chat) => chat.withUser.uid === selectedChat)?.messages || [];
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <div className="w-1/4 p-5 bg-white border-r">
-        {userdata == null ? (
-          <h1 className="text-xl font-semibold text-gray-600">Loading</h1>
-        ) : (
-          <h1 className="text-xl font-semibold text-gray-700">
-            Hello, {userdata.firstname}
-          </h1>
-        )}
-
-        <form onSubmit={handleUidSubmit} className="my-4">
-          <input
-            type="text"
-            value={newUid}
-            onChange={handleUidChange}
-            placeholder="Enter your user ID"
-            className="w-full p-2 mb-2 border rounded shadow-sm"
-          />
-          <button
-            type="submit"
-            className="w-full px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
-          >
-            Set UID
-          </button>
-        </form>
-
-        <form onSubmit={handleNewChatSubmit} className="mb-4">
-          <input
-            type="text"
-            value={newChatUid}
-            onChange={handleNewChatUidChange}
-            className="w-full p-2 mb-2 border rounded shadow-sm"
-            placeholder="Enter new user's UID"
-          />
-          <button
-            type="submit"
-            className="w-full px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
-          >
-            +
-          </button>
-        </form>
-
-        <h2 className="text-lg font-semibold text-gray-700">Chats</h2>
-        <ul className="mt-3">
-          {chats.map((chat) => (
-            <li
-              key={chat.withUser.uid}
-              className={`p-2 my-1 rounded cursor-pointer ${
-                selectedChat === chat.withUser.uid
-                  ? "bg-blue-200"
-                  : "hover:bg-gray-200"
-              }`}
-              onClick={() => handleChatSelect(chat.withUser.uid)}
-            >
-              {chat.withUser.firstname}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="w-3/4 flex flex-col">
-        <div className="p-5 overflow-y-auto flex-grow">
-          {selectedChatMessages.map((message) =>
-            message.isBuddyRequest ? (
-              <div
-                key={message.id}
-                className={`my-2 p-3 rounded shadow max-w-xs ${
-                  message.fromUid === uid
-                    ? "bg-yellow-100 ml-auto"
-                    : "bg-yello-100 mr-auto"
-                }`}
-              >
-                <span className="font-bold text-yellow-600">
-                  <InformationCircleIcon className="h-6 w-6 text-yellow-600" />
-                  Buddy Request
-                </span>
-                <p>I would like to be your buddy.</p>
-              </div>
-            ) : (
-              <div
-                key={message.id}
-                className={`my-2 p-3 rounded shadow max-w-xs ${
-                  message.fromUid === uid
-                    ? "bg-blue-100 ml-auto"
-                    : "bg-white mr-auto"
-                }`}
-              >
-                <p className="text-gray-800">{message.text}</p>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-xs text-gray-500">
-                    {message.timestamp}
-                    <button
-                      className="text-xs text-red-500 ml-2"
-                      onClick={() => handleDeleteMessage(message.id)}
-                    >
-                      Delete
-                    </button>
-                  </span>
-                  <button
-                    onClick={() =>
-                      handleLikeUnlike(
-                        message.id,
-                        message.liked ? "unlike" : "like"
-                      )
-                    }
-                    className="text-red-500 hover:text-red-600"
-                  >
-                    {message.liked ? (
-                      <HeartIcon className="h-6 w-6" />
-                    ) : (
-                      <OutlineHeartIcon className="h-6 w-6" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            )
+    <Layout>
+      <div className="flex h-screen bg-gray-100">
+        <div className="w-1/4 p-5 bg-white border-r">
+          {userdata == null ? (
+            <h1 className="text-xl font-semibold text-gray-600">Loading</h1>
+          ) : (
+            <h1 className="text-xl font-semibold text-gray-700">
+              Hello, {userdata.firstname}
+            </h1>
           )}
+
+          <form onSubmit={handleUidSubmit} className="my-4">
+            <input
+              type="text"
+              value={newUid}
+              onChange={handleUidChange}
+              placeholder="Enter your user ID"
+              className="w-full p-2 mb-2 border rounded shadow-sm"
+            />
+            <button
+              type="submit"
+              className="w-full px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+            >
+              Set UID
+            </button>
+          </form>
+
+          <form onSubmit={handleNewChatSubmit} className="mb-4">
+            <input
+              type="text"
+              value={newChatUid}
+              onChange={handleNewChatUidChange}
+              className="w-full p-2 mb-2 border rounded shadow-sm"
+              placeholder="Enter new user's UID"
+            />
+            <button
+              type="submit"
+              className="w-full px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
+            >
+              +
+            </button>
+          </form>
+
+          <h2 className="text-lg font-semibold text-gray-700">Chats</h2>
+          <ul className="mt-3">
+            {chats.map((chat) => (
+              <li
+                key={chat.withUser.uid}
+                className={`p-2 my-1 rounded cursor-pointer ${
+                  selectedChat === chat.withUser.uid
+                    ? "bg-blue-200"
+                    : "hover:bg-gray-200"
+                }`}
+                onClick={() => handleChatSelect(chat.withUser.uid)}
+              >
+                {chat.withUser.firstname}
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <form
-          onSubmit={sendCurrentBuffer}
-          className="flex p-5 bg-white border-t"
-        >
-          <input
-            type="text"
-            value={messageBuffer}
-            onChange={onInputChange}
-            placeholder="Type your message here"
-            className="flex-grow p-3 mr-2 border rounded-l shadow-sm"
-          />
-          <button
-            type="submit"
-            className="px-4 text-white bg-blue-500 rounded-r hover:bg-blue-600"
+        <div className="w-3/4 flex flex-col">
+          <div className="p-5 overflow-y-auto flex-grow">
+            {selectedChatMessages.map((message) =>
+              message.isBuddyRequest ? (
+                <div
+                  key={message.id}
+                  className={`my-2 p-3 rounded shadow max-w-xs ${
+                    message.fromUid === uid
+                      ? "bg-yellow-100 ml-auto"
+                      : "bg-yello-100 mr-auto"
+                  }`}
+                >
+                  <span className="font-bold text-yellow-600">
+                    <InformationCircleIcon className="h-6 w-6 text-yellow-600" />
+                    Buddy Request
+                  </span>
+                  <p>I would like to be your buddy.</p>
+                </div>
+              ) : (
+                <div
+                  key={message.id}
+                  className={`my-2 p-3 rounded shadow max-w-xs ${
+                    message.fromUid === uid
+                      ? "bg-blue-100 ml-auto"
+                      : "bg-white mr-auto"
+                  }`}
+                >
+                  <p className="text-gray-800">{message.text}</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-xs text-gray-500">
+                      {message.timestamp}
+                      <button
+                        className="text-xs text-red-500 ml-2"
+                        onClick={() => handleDeleteMessage(message.id)}
+                      >
+                        Delete
+                      </button>
+                    </span>
+                    <button
+                      onClick={() =>
+                        handleLikeUnlike(
+                          message.id,
+                          message.liked ? "unlike" : "like"
+                        )
+                      }
+                      className="text-red-500 hover:text-red-600"
+                    >
+                      {message.liked ? (
+                        <HeartIcon className="h-6 w-6" />
+                      ) : (
+                        <OutlineHeartIcon className="h-6 w-6" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )
+            )}
+          </div>
+
+          <form
+            onSubmit={sendCurrentBuffer}
+            className="flex p-5 bg-white border-t"
           >
-            Send
-          </button>
-        </form>
+            <input
+              type="text"
+              value={messageBuffer}
+              onChange={onInputChange}
+              placeholder="Type your message here"
+              className="flex-grow p-3 mr-2 border rounded-l shadow-sm"
+            />
+            <button
+              type="submit"
+              className="px-4 text-white bg-blue-500 rounded-r hover:bg-blue-600"
+            >
+              Send
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
