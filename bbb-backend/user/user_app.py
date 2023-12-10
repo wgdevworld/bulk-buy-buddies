@@ -41,6 +41,24 @@ def findLocation(code):
     
     return "Location not Found"
 
+def getSortOrder(sortBy, all_requests):
+    print("FUNCTION SORTING BY: ", sortBy)
+    if  "Products A-Z" in sortBy:
+        print("A")
+        return sorted(all_requests, key=lambda x: len(x['category']))
+    elif "Products Z-A" in sortBy:
+        print("B")
+        return sorted(all_requests, key=lambda x: len(x['category']))
+    elif "Date: Most Recent First" in sortBy:
+        print("C")
+        return sorted(all_requests, key=lambda x: -len(x['timeStart']))
+    elif "Date: Least Recent First" in sortBy:
+        print("D")
+        return sorted(all_requests, key=lambda x: len(x['timeStart']))
+    else:
+        print("E")
+        return sorted(all_requests, key=lambda x: -len(x['timeStart']))
+
 
 '''
 API Routes
@@ -238,6 +256,31 @@ def get_acct_info():
         return jsonify(error=str(e)), 500
     
 
+@user_blueprint.route("/get_filter_categories", methods=['GET'])
+def get_filter_categories():
+    print("\nCATEGORIES")
+    try:
+        categories = list(current_app.config['CONSTANTS']["categories"].keys())
+        print(categories)
+        return jsonify({"categories": categories}), 200
+    
+    except Exception as e:
+        print(f'Exception: {e}')
+        return jsonify(error=str(e)), 500
+    
+
+@user_blueprint.route("/get_filter_locations", methods=['GET'])
+def get_filter_locations():
+    print("\nLOCATIONS")
+    try:
+        locations = list(current_app.config['CONSTANTS']["warehouses"].keys())
+        return jsonify({"locations": locations}), 200
+    
+    except Exception as e:
+        print(f'Exception: {e}')
+        return jsonify(error=str(e)), 500
+    
+
 @user_blueprint.route("/get_transactions", methods=['GET'])
 def get_transactions():
     print("\nTRANSACTIONS")
@@ -278,34 +321,79 @@ def search_reqs():
     mongo = current_app.config['MONGO']
 
     try:
+        
+        users = mongo.db.users
         requests_collection = mongo.db.requests
-        active_requests = []
-
-        status = request.args.get('status', '').strip()
+        userInteractions_collection = mongo.db.userInteractions
+        all_requests = []
+        print(request.args.get('status'))
+        status = request.args.get('status')
         category = request.args.get('category')
         minDate = request.args.get('minDate')
         maxDate = request.args.get('maxDate')
         location = request.args.get('location')
-
+        sortBy = request.args.get('sortBy')
+        print("SORTING BY: ", sortBy)
+        
         query = {
             "$and": [
                 {"userID": curr_user['uid']}
             ]
         }
-
-        if (status):
+        print(f"query: {query}")
+        if (status) and status != "All":
             query["$and"].append({"status": status})
-        if (category):
+        if (category) and category != "All":
             query["$and"].append({"category": category})
-        if (location):
+        if (location) and status != "All":
             query["$and"].append({"location": location})
-        if (minDate and maxDate):
+        if (minDate and maxDate) and (minDate!="Nope" and maxDate!="Nope"):
             query["and"].append({"timeStart": {"$gte": maxDate, "$lte": minDate}})
         
-        for req in requests_collection.find(query):
+        print("hiiii pls")
+        print(query)
+        reqs = requests_collection.find(query)
+        print("hello")
+        print(reqs)
+        for req in reqs:
             req["_id"] = str(req["_id"])
             req["location"] = findLocation(req["location"])
-            active_requests.append(req)
+
+            if req["status"] == "Active":
+                req["matches"] = []
+                req["buddy"] = None
+                req["buddyID"]=None
+                query = {
+                    "$and": [
+                        {"to_requestID": req["_id"]},
+                        {"status": "requested"}
+                    ]
+                }
+                for u in userInteractions_collection.find(query):
+                    req["matches"].append(u["from_requestID"])
+            
+            else:
+                query = {
+                    "$and": [
+                        {"to_requestID": req["_id"]},
+                        {"status": "matched"}
+                    ]
+                }
+                match = userInteractions_collection.find_one(query)
+                if (match):
+                    matching_req = requests_collection.find_one({"_id": ObjectId(match["from_requestID"])})
+                    buddy = users.find_one({"uid": matching_req["userID"]})
+                    req["buddy"]=f"{buddy['firstname']} {buddy['lastname']}"
+                    req["buddyID"]=buddy["uid"]
+                    req["matches"]=None
+
+            all_requests.append(req)
+
+        all_requests = getSortOrder(sortBy, all_requests)
+        print("result")
+        print(all_requests)
+        print(len(all_requests))
+        return jsonify(all_requests)
 
     except Exception as e:
         print(str(e))
