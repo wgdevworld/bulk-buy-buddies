@@ -7,8 +7,8 @@ import { Product } from "./ProductList/ProductMain";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 interface userInteraction {
-  fromRequest: string | null;
-  toRequest: string | null;
+  from_requestID: string | null;
+  to_requestID: string | null;
   status: string;
 }
 
@@ -28,6 +28,7 @@ const ProductRec = () => {
   const [location, setLocation] = useState(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const prevPage = searchParams.get("function");
   const userRequest = searchParams.get("userReqID");
   const buddyRequest = searchParams.get("buddyReqId");
 
@@ -131,8 +132,8 @@ const ProductRec = () => {
   const sendBuddyRequest = async () => {
     try {
       const requestData: userInteraction = {
-        fromRequest: userRequest,
-        toRequest: buddyRequest,
+        from_requestID: userRequest,
+        to_requestID: buddyRequest,
         status: "requested",
       };  
       const response = await fetch(`http://127.0.0.1:5000/buddy-request`, {
@@ -157,7 +158,25 @@ const ProductRec = () => {
       console.error("Error going to Messenger page", error);
     }
   };
-
+  const acceptMatch = async () => {
+    try {
+      const acceptData = {
+        from_requestID: userRequest,
+        to_requestID: buddyRequest,
+      }
+      const response = await fetch(`http://127.0.0.1:5000/update-database`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(acceptData),
+      }
+    );
+    router.push("/landingPage");
+    } catch (error) {
+      console.error("Error accepting match", error);
+    }
+  }
   const createQueryString = (query: object) => {
     const params = new URLSearchParams();
     for (const [name, value] of Object.entries(query)) {
@@ -199,9 +218,15 @@ const ProductRec = () => {
       ) : (
         <></>
       )}
-      <button type="submit" onClick={sendBuddyRequest}>
-        Request Match
-      </button>
+      {prevPage == "requesting_match" ? (
+        <button type="submit" onClick={sendBuddyRequest}>
+          Request Match
+        </button>
+      ) : (
+        <button type="submit" onClick={acceptMatch}>
+          Accept Match
+        </button>
+      )}
       {products && products.length !== 0 ? (
         <>
           <br/>

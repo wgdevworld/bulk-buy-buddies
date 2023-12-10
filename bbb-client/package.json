@@ -9,7 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+<<<<<<< HEAD
+=======
     "@headlessui/react": "^1.7.17",
+>>>>>>> main
     "@heroicons/react": "^2.0.18",
     "@react-google-maps/api": "^2.19.2",
     "@tailwindcss/aspect-ratio": "^0.4.2",
