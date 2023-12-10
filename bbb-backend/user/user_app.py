@@ -255,7 +255,21 @@ def get_transactions():
     except Exception as e:
         print(str(e))
         return jsonify(error={"message": str(e)})
-    
+
+@user_blueprint.route("/get_user_name/<user_id>", methods=['GET'])
+def get_user_name(user_id):
+    try:
+        mongo = current_app.config['MONGO']
+        users_collection = mongo.db.users
+        user = users_collection.find_one({"uid": user_id})
+        if user:
+            user_name = user['firstname']
+            return jsonify(user_name)
+        return jsonify(error={"message": "User not found."})
+    except Exception as e:
+        return jsonify(error={"message": str(e)})
+
+
 
 @user_blueprint.route("/search_reqs", methods=['GET'])
 def search_reqs():
