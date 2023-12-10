@@ -222,7 +222,7 @@ const Messenger = () => {
               Hello, {userdata.firstname}
             </h1>
           )}
-
+          {/* 
           <form onSubmit={handleUidSubmit} className="my-4">
             <input
               type="text"
@@ -237,7 +237,7 @@ const Messenger = () => {
             >
               Set UID
             </button>
-          </form>
+          </form> */}
 
           <form onSubmit={handleNewChatSubmit} className="mb-4">
             <input
