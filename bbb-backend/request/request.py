@@ -2,17 +2,19 @@ from flask import Blueprint, Flask, request, jsonify, current_app
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from dotenv import dotenv_values
+from bson import ObjectId
+from datetime import datetime, timedelta
 
 # Create a Blueprint for request-related routes
 request_blueprint = Blueprint('request_blueprint', __name__)
 
-
-# Route to submit a shopping request
 @request_blueprint.route('/shopping-request', methods=['POST'])
 def submit_shopping_request():
     mongo = current_app.config['MONGO']
     try:
         data = request.json
+        data['createdAt'] = datetime.utcnow()
+
         request_collection = mongo.db.requests
         result = request_collection.insert_one(data)
         generated_id = str(result.inserted_id)
@@ -21,7 +23,8 @@ def submit_shopping_request():
     except Exception as e:
         return jsonify({'error': 'Failed to process the request'}), 500
 
-# Route to get requests in a specific location
+
+
 @request_blueprint.route('/get_requests_in_location/<location_id>', methods=['GET'])
 def get_requests_on_this_location(location_id):
     try:
@@ -40,8 +43,8 @@ def get_requests_on_this_location(location_id):
         return jsonify(requests_list)
     except Exception as e:
         return jsonify(error={"message": str(e)})
-
-# Route to get all requests
+    
+    
 @request_blueprint.route('/get-requests', methods=['GET'])
 def get_my_requests():
     mongo = current_app.config['MONGO']
@@ -63,8 +66,7 @@ def get_my_requests():
         return jsonify(request_list)
     except Exception as e:
         return jsonify(error={"message": str(e)})
-
-# Route to get matching requests
+    
 @request_blueprint.route('/get-match-requests', methods=['GET'])
 def get_match_requests():
     mongo = current_app.config['MONGO']
@@ -73,7 +75,13 @@ def get_match_requests():
         current_user_id = request.args.get('userID')
         request_list = []
 
-        query = {'userID': {'$ne': current_user_id}, 'status': 'Active'}
+        current_time = datetime.utcnow()
+
+        query = {
+            'userID': {'$ne': current_user_id},
+            'status': 'Active',
+            'timeStart': {'$gt': current_time.isoformat()}
+        }
 
         for doc in request_collection.find(query):
             requests = {
@@ -92,7 +100,6 @@ def get_match_requests():
     except Exception as e:
         return jsonify(error={"message": str(e)})
 
-# Route to log transaction history
 @request_blueprint.route('/log-transaction-history', methods=['POST'])
 def log_transaction_history():
     mongo = current_app.config['MONGO']
@@ -123,5 +130,3 @@ def log_transaction_history():
         # Detailed error logging
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
-
-
