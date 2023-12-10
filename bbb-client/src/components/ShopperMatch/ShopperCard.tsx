@@ -76,25 +76,34 @@ export default function ShopperCard({
   };
 
   return (
-    <div className="card">
-      <h2>Current UserID: {currentUserID}</h2>
-      <h2>UserID: {userID}</h2>
-      <h2>ReqID: {reqID}</h2>
-      <p>Shopping for {category}</p>
-      <p>at {locationName}</p>
-      <p>Quantity: {quantity}</p>
-      <p>Start time: {new Date(timeStart).toLocaleString()}</p>
-      <p>End time: {new Date(timeEnd).toLocaleString()}</p>
-      <p>Match Score: {matchScore}%</p>
-      <div className="button-container">
-        <button
-          className="button"
-          onClick={() =>
-            router.push("/productRec" + "?" + createQueryString(query))
-          }
-        >
-          Select Buddy
-        </button>
+    <div className="card p-4 border rounded-md shadow-md mb-4 bg-white relative">
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-col justify-between">
+          <p className="text-lg mb-2">
+            Shopping for <span className="font-bold">{category}</span> at{" "}
+            <span className="font-bold">{locationName}</span>
+          </p>
+          <p className="text-lg mb-2">Quantity: {quantity}</p>
+          <p className="text-lg mb-2">
+            Start time: {new Date(timeStart).toLocaleString()}
+          </p>
+          <p className="text-lg mb-2">
+            End time: {new Date(timeEnd).toLocaleString()}
+          </p>
+        </div>
+        <div className="flex flex-col justify-between items-end mt-auto">
+          <span className="bg-blue-500 text-white px-4 py-3 text-xl mt-2 font-bold rounded-full">
+            {matchScore}% Match!
+          </span>
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 mb-4 hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300 relative overflow-hidden"
+            onClick={() =>
+              router.push("/productRec" + "?" + createQueryString(query))
+            }
+          >
+            Select Buddy
+          </button>
+        </div>
       </div>
     </div>
   );
