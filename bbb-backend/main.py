@@ -10,6 +10,7 @@ import sys
 import secrets
 from dotenv import load_dotenv, find_dotenv
 import json
+from datetime import datetime, timedelta
 
 # Blueprint Imports
 from user.user_app import user_blueprint
@@ -46,6 +47,10 @@ curr_user = None
 # Initialize PyMongo
 app.config["MONGO"]=PyMongo(app, tlsCAFile=certifi.where())
 
+# # Create TTL index on createdAt field
+# with app.app_context():
+#     app.config["MONGO"].db.requests.create_index("createdAt", expireAfterSeconds=2592000)  # 30 days in seconds
+
 # API Functionality
 socketio = SocketIO(app, cors_allowed_origins="*")
 app.register_blueprint(messaging_blueprint)
@@ -62,6 +67,14 @@ def index():
 # Make sure to call the function to register your socket events
 from messaging.MessageSocket import register_socket_events
 register_socket_events(socketio)
+
+
+def update_documents():
+    with app.app_context():
+        app.config["MONGO"].db.requests.create_index("createdAt", expireAfterSeconds=2592000)  # 30 days in seconds
+
+# Call the function to update documents within the Flask context
+update_documents()
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5000)

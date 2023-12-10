@@ -28,37 +28,41 @@ export interface Transaction2 {
 
 
 function ActiveRequestCard({
-    _id,
-    userID,
-    category,
-    quantity,
-    location,
-    timeStart,
-    timeEnd,
-    matches,
-}: RequestWithMatches) {
-
+    request,
+    setModalVisible,
+    setSelectedRequestID,
+    setCurrentRequestID,  
+}: {
+    request: RequestWithMatches;
+    setModalVisible: (visible: boolean) => void;
+    setSelectedRequestID: (matches: string[]) => void;
+    setCurrentRequestID: (id: string) => void;
+}) {
     return (
-        <div className="-mt-2 p-2 sm:mt-0 sm:w-full sm:max-w-sm sm:flex-shrink-0">
+        <div className="-mt-2 p-2 sm:mt-0 sm:w-full sm:max-w-sm sm:flex-shrink-0" onClick={() => {
+            setSelectedRequestID(request.matches);
+            setCurrentRequestID(request._id);
+            setModalVisible(true);
+          }}>
             <div className="rounded-2xl bg-gray-50 py-10 text-left ring-1 ring-inset ring-gray-900/5 sm:flex sm:flex-col sm:py-8 sm:justify-start">
                 <div className=" max-w-none px-8">
-                    <p className="text-2xl font-bold tracking-tight text-gray-900 truncate"> {category} </p>
+                    <p className="text-2xl font-bold tracking-tight text-gray-900 truncate"> {request.category} </p>
                     <p>
                         <span className="break-normal text-base font-bold text-lime-600"> • </span>
-                        <span className="text-base font-medium text-gray-600">{matches.length} requests pending </span>
+                        <span className="text-base font-medium text-gray-600">{request.matches.length} inbound requests </span>
                     </p>
                     <p className="mt-3">
                         <p>
                             <span className="break-normal text-base font-medium text-gray-600"> Quantity: </span>
-                            <span className="text-base font-normal text-gray-600">{quantity} </span>
+                            <span className="text-base font-normal text-gray-600">{request.quantity} </span>
                         </p>
                         <p>
                             <span className="break-normal text-base font-medium text-gray-600"> Location: </span>
-                            <span className="text-base font-normal text-gray-600">{location} </span>
+                            <span className="text-base font-normal text-gray-600">{request.location} </span>
                         </p>
                         <p>
                             <span className="break-normal text-base font-medium text-gray-600"> Date Range: </span>
-                            <span className="text-base font-normal text-gray-600">{new Date(timeStart).toLocaleString()} to {new Date(timeEnd).toLocaleString()} </span>
+                            <span className="text-base font-normal text-gray-600">{new Date(request.timeStart).toLocaleString()} to {new Date(request.timeEnd).toLocaleString()} </span>
                         </p>
                     </p>
                 </div>

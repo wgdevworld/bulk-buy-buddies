@@ -1,10 +1,10 @@
 /* eslint-disable react/react-in-jsx-scope */
-import Messenger from "@/components/Messenger/Messenger";
+import ProductMain from "@/components/ProductList/ProductMain";
 
 export default function AccountApp() {
   return (
     <div>
-      <Messenger />
+      <ProductMain />
     </div>
   );
 }

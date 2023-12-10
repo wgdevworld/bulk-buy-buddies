@@ -5,13 +5,14 @@ import React, { useEffect, useState } from "react";
 import ShopperCard from "./ShopperCard";
 import { useRouter, useSearchParams } from "next/navigation";
 import { calculateMatchScore } from "./MatchScore";
+import Layout from "../CommonLayout";
 
 export interface ShoppingForm {
   reqID: string;
   userID: string;
   category: string;
   quantity: number;
-  location: string;
+  location: number;
   timeStart: Date;
   timeEnd: Date;
   status: string;
@@ -19,7 +20,6 @@ export interface ShoppingForm {
 
 function ShopperMatch() {
   const router = useRouter();
-  const [user, setUser] = useState<string>();
   const [requests, setRequests] = useState<ShoppingForm[]>([]);
 
   const searchParams = useSearchParams();
@@ -30,6 +30,7 @@ function ShopperMatch() {
   const currentTimeStart = searchParams.get("timeStart");
   const currentTimeEnd = searchParams.get("timeEnd");
   const currentReqID = searchParams.get("reqID");
+  const parseLocation = Number(currentLocation);
 
   useEffect(() => {
     fetchMyRequests(currentUserID);
@@ -46,14 +47,14 @@ function ShopperMatch() {
         (a: ShoppingForm, b: ShoppingForm) =>
           calculateMatchScore(
             currentCategory,
-            currentLocation,
+            parseLocation,
             currentTimeStart,
             currentTimeEnd,
             b
           ) -
           calculateMatchScore(
             currentCategory,
-            currentLocation,
+            parseLocation,
             currentTimeStart,
             currentTimeEnd,
             a
@@ -67,16 +68,13 @@ function ShopperMatch() {
   };
 
   return (
-    <>
-      <h1>Recommended Bulk Buy Buddies</h1>
-      <div>Shoppers we recommend you match with based on your preference.</div>
-      <h1>Current UserID: {currentUserID}</h1>
-      <div>Current reqID: {currentReqID}</div>
-      <div>Current Category: {currentCategory}</div>
-      <div>Current Location: {currentLocation}</div>
-      <div>Current Quantity: {currentQuantity}</div>
-      <div>Current TimeStart: {currentTimeStart}</div>
-      <div>Current TimeEnd: {currentTimeEnd}</div>
+    <Layout>
+      <div className="text-center mt-4">
+        <h1 className="font-bold text-3xl">Recommended Bulk Buy Buddies</h1>
+        <div className="text-lg">
+          Shoppers we recommend you match with based on your preference.
+        </div>
+      </div>
 
       <div>
         {requests && requests.length > 0 ? (
@@ -91,7 +89,7 @@ function ShopperMatch() {
               timeEnd={item.timeEnd}
               matchScore={calculateMatchScore(
                 currentCategory,
-                currentLocation,
+                parseLocation,
                 currentTimeStart,
                 currentTimeEnd,
                 item
@@ -104,7 +102,7 @@ function ShopperMatch() {
           <p>No requests found.</p>
         )}
       </div>
-    </>
+    </Layout>
   );
 }
 
