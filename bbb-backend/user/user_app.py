@@ -8,6 +8,7 @@ from dotenv import dotenv_values, load_dotenv, find_dotenv
 from datetime import datetime
 import json
 import os
+from bson.objectid import ObjectId
 
 user_blueprint = Blueprint('user_blueprint', __name__)
 
@@ -23,12 +24,23 @@ def get_user():
 
 def refreshToken():
     global curr_user
+    auth = current_app.config["FIREBASE_AUTH"]
     # curr_user = session.get('user')
     refresh_user = auth.refresh(curr_user['refreshToken'])
     curr_user['idToken'] = refresh_user['idToken']
     curr_user['refreshToken'] = refresh_user['refreshToken']
 
     session['user'] = curr_user
+
+def findLocation(code):
+    code_num = int(code)
+    constants = current_app.config['CONSTANTS']
+    warehouses = constants["warehouses"]
+    for warehouse in warehouses:
+        if warehouses[warehouse] == code_num: return warehouse
+    
+    return "Location not Found"
+
 
 '''
 API Routes
@@ -258,6 +270,138 @@ def get_user_name(user_id):
         return jsonify(error={"message": str(e)})
 
 
+
+@user_blueprint.route("/search_reqs", methods=['GET'])
+def search_reqs():
+    print("\nSEARCH REQUESTS")
+    global curr_user
+    mongo = current_app.config['MONGO']
+
+    try:
+        requests_collection = mongo.db.requests
+        active_requests = []
+
+        status = request.args.get('status', '').strip()
+        category = request.args.get('category')
+        minDate = request.args.get('minDate')
+        maxDate = request.args.get('maxDate')
+        location = request.args.get('location')
+
+        query = {
+            "$and": [
+                {"userID": curr_user['uid']}
+            ]
+        }
+
+        if (status):
+            query["$and"].append({"status": status})
+        if (category):
+            query["$and"].append({"category": category})
+        if (location):
+            query["$and"].append({"location": location})
+        if (minDate and maxDate):
+            query["and"].append({"timeStart": {"$gte": maxDate, "$lte": minDate}})
+        
+        for req in requests_collection.find(query):
+            req["_id"] = str(req["_id"])
+            req["location"] = findLocation(req["location"])
+            active_requests.append(req)
+
+    except Exception as e:
+        print(str(e))
+        return jsonify(error={"message": str(e)})
+    
+
+@user_blueprint.route("/get_matched_reqs", methods=['GET'])
+def get_matched_reqs():
+    print("\nMATCHED REQUESTS")
+    global curr_user
+    mongo = current_app.config['MONGO']
+
+    try: 
+        users = mongo.db.users
+        requests_collection = mongo.db.requests
+        userInteractions_collection = mongo.db.userInteractions
+        matched_requests = []
+        query = {
+            "$and": [
+                {"userID": curr_user['uid']},
+                {"status": "Matched"}
+            ]
+        }
+        for req in requests_collection.find(query):
+            req["_id"] = str(req["_id"])
+            req["location"] = findLocation(req["location"])
+
+            query = {
+                "$and": [
+                    {"to_requestID": req["_id"]},
+                    {"status": "matched"}
+                ]
+            }
+            match = userInteractions_collection.find_one(query)
+            # query = {
+            #     "$and": [
+            #         {"_id": match["from_requestID"]},
+            #         {"status": "Matched"}
+            #     ]
+            # }
+            if (match):
+                matching_req = requests_collection.find_one({"_id": ObjectId(match["from_requestID"])})
+                buddy = users.find_one({"uid": matching_req["userID"]})
+                req["buddy"]=f"{buddy['firstname']} {buddy['lastname']}"
+                req["buddyID"]=buddy["uid"]
+                matched_requests.append(req)
+
+        matched_requests = sorted(matched_requests, key=lambda x: -len(x['timeStart']))
+        if len(matched_requests) > 10:
+            return jsonify(matched_requests[:10])
+        
+        return jsonify(matched_requests)
+    except Exception as e:
+        print(str(e))
+        return jsonify(error={"message": str(e)})
+    
+
+@user_blueprint.route("/get_active_reqs", methods=['GET'])
+def get_active_reqs():
+    print("\nACTIVE REQUESTS")
+    global curr_user
+    mongo = current_app.config['MONGO']
+
+    try: 
+        requests_collection = mongo.db.requests
+        userInteractions_collection = mongo.db.userInteractions
+        active_requests = []
+        query = {
+            "$and": [
+                {"userID": curr_user['uid']},
+                {"status": "Active"}
+            ]
+        }
+        for req in requests_collection.find(query):
+            req["_id"] = str(req["_id"])
+            req["location"] = findLocation(req["location"])
+            req["matches"] = []
+            query = {
+                "$and": [
+                    {"to_requestID": req["_id"]},
+                    {"status": "requested"}
+                ]
+            }
+            for u in userInteractions_collection.find(query):
+                req["matches"].append(u["from_requestID"])
+
+            active_requests.append(req)
+
+        active_requests = sorted(active_requests, key=lambda x: -len(x['matches']))
+        if len(active_requests) > 10:
+            return jsonify(active_requests[:10])
+        return jsonify(active_requests)
+    except Exception as e:
+        print(str(e))
+        return jsonify(error={"message": str(e)})
+    
 
 @user_blueprint.route("/updateAccount", methods=['POST'])
 def updateAccount():

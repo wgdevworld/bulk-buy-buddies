@@ -65,12 +65,11 @@ def get_location_name(location_id):
         location = locations_collection.find_one({"lid": location_id})
         if location:
             location_name = location['name']
+            print(f"Location Name: {location_name}")
             return jsonify(location_name)
         return jsonify(error={"message": "Location not found."})
     except Exception as e:
         return jsonify(error={"message": str(e)})
-    
-
 
 # @locations_blueprint.route('/get_user_address/<user_id>', methods=['GET'])
 # def get_user_address(user_id):
