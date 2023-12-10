@@ -1,6 +1,7 @@
 import { ShoppingForm } from "./ShopperMatch";
 import { isWithinInterval } from "date-fns";
 
+// Calculates the percentage match of two different requests
 export const calculateMatchScore = (
   referenceCategory: string | null,
   referenceLocation: number | null,
@@ -30,6 +31,7 @@ export const calculateMatchScore = (
   return totalScore;
 };
 
+// Parses date string in to Date() object
 function parseDate(dateString: string | null): Date | null {
   if (dateString !== null) {
     return new Date(dateString);

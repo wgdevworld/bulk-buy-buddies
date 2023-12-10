@@ -2,8 +2,10 @@ from flask import Blueprint, Flask, request, jsonify, current_app
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from dotenv import dotenv_values
+from bson import ObjectId
+from datetime import datetime, timedelta
 
-# Flask Blueprint configuration
+# Create a Blueprint for request-related routes
 request_blueprint = Blueprint('request_blueprint', __name__)
 
 @request_blueprint.route('/shopping-request', methods=['POST'])
@@ -11,6 +13,8 @@ def submit_shopping_request():
     mongo = current_app.config['MONGO']
     try:
         data = request.json
+        data['createdAt'] = datetime.utcnow()
+
         request_collection = mongo.db.requests
         result = request_collection.insert_one(data)
         generated_id = str(result.inserted_id)
@@ -20,10 +24,31 @@ def submit_shopping_request():
         return jsonify({'error': 'Failed to process the request'}), 500
 
 
+
+@request_blueprint.route('/get_requests_in_location/<location_id>', methods=['GET'])
+def get_requests_on_this_location(location_id):
+    try:
+        mongo = current_app.config['MONGO']
+        requests_collection = mongo.db.requests
+        requests_list = []
+        for doc in requests_collection.find({"location": int(location_id)}):
+            request = {
+                "userID": doc["userID"],
+                "category": doc["category"],
+                "quantity": doc["quantity"],
+                "timeStart": doc["timeStart"],
+                "timeEnd": doc["timeEnd"],
+            }
+            requests_list.append(request)
+        return jsonify(requests_list)
+    except Exception as e:
+        return jsonify(error={"message": str(e)})
+    
+    
 @request_blueprint.route('/get-requests', methods=['GET'])
 def get_my_requests():
     mongo = current_app.config['MONGO']
-    try: 
+    try:
         request_collection = mongo.db.requests
         request_list = []
         for doc in request_collection.find():
@@ -48,10 +73,15 @@ def get_match_requests():
     try:
         request_collection = mongo.db.requests
         current_user_id = request.args.get('userID')
-        print(f"Current User ID: {current_user_id}")
         request_list = []
 
-        query = {'userID': {'$ne': current_user_id}, 'status': 'Active'}
+        current_time = datetime.utcnow()
+
+        query = {
+            'userID': {'$ne': current_user_id},
+            'status': 'Active',
+            'timeStart': {'$gt': current_time.isoformat()}
+        }
 
         for doc in request_collection.find(query):
             requests = {
@@ -64,7 +94,6 @@ def get_match_requests():
                 "timeEnd": doc["timeEnd"],
                 "status": doc["status"]
             }
-            print(f"ReqID: {requests.get('reqID')}")
             request_list.append(requests)
 
         return jsonify(request_list)

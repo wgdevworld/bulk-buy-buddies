@@ -69,15 +69,12 @@ function ShopperMatch() {
 
   return (
     <Layout>
-      <h1>Recommended Bulk Buy Buddies</h1>
-      <div>Shoppers we recommend you match with based on your preference.</div>
-      <h1>Current UserID: {currentUserID}</h1>
-      <div>Current reqID: {currentReqID}</div>
-      <div>Current Category: {currentCategory}</div>
-      <div>Current Location: {currentLocation}</div>
-      <div>Current Quantity: {currentQuantity}</div>
-      <div>Current TimeStart: {currentTimeStart}</div>
-      <div>Current TimeEnd: {currentTimeEnd}</div>
+      <div className="text-center mt-4">
+        <h1 className="font-bold text-3xl">Recommended Bulk Buy Buddies</h1>
+        <div className="text-lg">
+          Shoppers we recommend you match with based on your preference.
+        </div>
+      </div>
 
       <div>
         {requests && requests.length > 0 ? (

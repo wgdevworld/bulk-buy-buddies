@@ -16,12 +16,12 @@
 .card h2 {
   font-size: 18px;
   margin: 0;
-  color: #333;
+  color: black;
 }
 
 .card p {
   font-size: 16px;
-  color: #666;
+  color: black;
 }
 
 .button-container {

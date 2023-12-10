@@ -12,6 +12,8 @@ def save_message_to_db(message_data):
             "fromUid": message_data['fromUid'],
             "toUid": message_data['toUid'],
             "timestamp": message_data['timestamp'],
+            "liked": message_data['liked'],
+            "isBuddyRequest": message_data['isBuddyRequest'],
         }
         messages_collection.insert_one(message_dict)
         return True

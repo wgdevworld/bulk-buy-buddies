@@ -5,6 +5,7 @@ export interface IMessage {
   toUid: string;
   timestamp: string;
   liked: boolean;
+  isBuddyRequest: boolean;
 }
 
 export interface Chat {
@@ -55,6 +56,7 @@ export async function fetchChats(uid: string): Promise<Chat[] | undefined> {
           toUid: message.toUid,
           timestamp: message.timestamp,
           liked: message.liked,
+          isBuddyRequest: message.isBuddyRequest,
         })
       );
       let withUser = await getUserAcctInfo(withUid);
