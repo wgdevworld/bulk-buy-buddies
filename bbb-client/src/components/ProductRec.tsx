@@ -52,9 +52,7 @@ const ProductRec = () => {
   }, [buddyID]);
 
   useEffect(() => {
-    console.log('endpoint is hit?')
     if(userCategory != null && userQuantity != null && buddyQuantity != null && location != null){
-      console.log('endpoint is hit!')
       // fetch the buddies' information
       fetchProducts(userCategory, userQuantity, buddyQuantity, location);
     }    
@@ -170,9 +168,12 @@ const ProductRec = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(acceptData),
-      }
-    );
-    router.push("/landingPage");
+      });
+      if (!response.ok) {
+        // Handle success, e.g., show a success message
+        console.error("Failed to update!");
+      }                                 
+    router.push("/user/landingPage");
     } catch (error) {
       console.error("Error accepting match", error);
     }

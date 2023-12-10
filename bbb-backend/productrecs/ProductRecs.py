@@ -4,89 +4,117 @@ from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from dotenv import dotenv_values
 
-# Create a Blueprint for product recommendation-related routes
 productRec_blueprint = Blueprint('productRec', __name__)
 
-# Route to fetch similar products based on user input
 @productRec_blueprint.route("/fetchSimilarProducts", methods=['GET'])
 def fetchBestProduct():
     mongo = current_app.config['MONGO']
     try:
-        # Retrieve query parameters from request
         category_str = request.args.get('userCategory')
         user_quantity_str = request.args.get('userQuantity')
         buddy_quantity_str = request.args.get('buddyQuantity')
+
         location = request.args.get('location')
-        
-        # Convert parameters to appropriate data types
         location_int = int(location)
         user_quantity = int(user_quantity_str)
         buddy_quantity = int(buddy_quantity_str)
+
         desired_quantity = user_quantity + buddy_quantity
-        lower_bound = int(desired_quantity * 0.8)
-        upper_bound = int(desired_quantity * 1.2)
+        lower_bound = int(desired_quantity*0.8)
+        upper_bound = int(desired_quantity*1.2)       
 
-        # Query MongoDB for matching products
-        products = list(mongo.db.products.find({'category': category_str, 'quantity': {'$lte': upper_bound, '$gte': lower_bound}}))
+        print(category_str, location, location_int, user_quantity, buddy_quantity, lower_bound, upper_bound)
+        
+        # products = list(mongo.db.products.find({'category':category_str, 'locations': {'$in' : [location_int]}, 'quantity':{'$lte':upper_bound,'$gte':lower_bound}}))
+        products = list(mongo.db.products.find({'category':category_str, 'quantity':{'$lte':upper_bound,'$gte':lower_bound}}))
 
-        # Prepare results for response
         results = []
         for product in products:
             product['_id'] = str(product['_id'])
             results.append(product)
-
+        print("length is", len(results))
         return jsonify(results=results)
     except Exception as e:
         return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
 
-# Route to fetch buddy information
 @productRec_blueprint.route("/fetchBuddyInfo", methods=['GET'])
 def fetchBuddyInfo():
     mongo = current_app.config['MONGO']
     try:
-        # Retrieve buddy ID from request
         buddyID = request.args.get('buddyID')
-
-        # Query MongoDB for buddy information
-        buddyInfo = mongo.db.users.find_one({'uid': buddyID})
-
-        # Make _id field serializable
+        print("Buddy ID is:", buddyID)
+        buddyInfo = mongo.db.users.find_one({'uid':buddyID})
+        # Mongo's _id is not serializable
         if buddyInfo and "_id" in buddyInfo:
             buddyInfo["_id"] = str(buddyInfo["_id"])
-
         return jsonify(results=buddyInfo)
     except Exception as e:
         return jsonify(error=f"An unexpected error occurred: {str(e)}"), 500
 
-# Route to submit a buddy request
 @productRec_blueprint.route("/buddy-request", methods=['POST'])
 def submit_buddy_request():
     mongo = current_app.config['MONGO']
     try:
         data = request.json
+        print(data)
         userInteractions = mongo.db.userInteractions
         userInteractions.insert_one(data)
         return jsonify({'message': 'Buddy request submitted successfully'}), 200
     except Exception as e:
         return jsonify({'error': 'Failed to process the request'}), 500
 
-# Route to fetch request information
 @productRec_blueprint.route("/fetchRequestInfo", methods=['GET'])
 def fetchRequestInfo():
     mongo = current_app.config['MONGO']
     try:
-        # Retrieve request ID from request
         data = request.args.get('requestID')
+        print("Object ID value is:", data)
         request_object = ObjectId(data)
-
-        # Query MongoDB for request information
+        print(request_object)
         requestsCollection = mongo.db.requests
         request_info = requestsCollection.find_one({'_id': request_object})
-
-        # Make _id field serializable
+        print(request_info)
+        # Mongo's _id is not serializable
         if request_info and "_id" in request_info:
             request_info["_id"] = str(request_info["_id"])
-
         return jsonify(results=request_info)
     except Exception as e:
         return jsonify({'error': 'Failed to process the request'}), 500
+
+@productRec_blueprint.route("/update_transactions", methods=['POST'])
+def update_transactions():
+    mongo = current_app.config['MONGO']
+    try:
+        data = request.json
+        request_object = ObjectId(data.requestID)
+        requestsCollection = mongo.db.requests
+        to_update = requestsCollection.find_one({'_id':request_object})
+        requestsCollection.update({'_id':request_object}, {'$set': {"status":"Fulfilled"}})
+        transactionHistory = mongo.db.transactionHistory
+        transactionHistory.insert_one({'requestId':data.requestID, "userId":to_update['userID'], "products":data.product_name, "quantity":data.product_quantity})
+        # Mongo's _id is not serializable
+        if request_info and "_id" in request_info:
+            request_info["_id"] = str(request_info["_id"])
+        return jsonify(results=request_info)
+    except Exception as e:
+        return jsonify({'error': 'Failed to process the request'}), 500
+
+@productRec_blueprint.route("/update-database", methods=['POST'])
+def update_database():
+    mongo = current_app.config['MONGO']
+    try:
+        data = request.json
+        user_reqid = data.from_requestID
+        print(user_reqid)
+        buddy_reqid = data.to_requestID
+        print(buddy_reqid)
+        requestsCollection = mongo.db.requests
+        userInteractions = mongo.db.userInteractions
+        to_match = userInteractions.find_one({'from_requestID': user_reqid, 'to_requestID': buddy_reqid})
+        userInteractions.update_one({'_id': ObjectId(to_match['_id'])}, {"$set": {"status":"matched"}})
+        requestCollection.update_one({'_id': ObjectId(user_reqid)}, {'$set': {"status":"Matched"}})
+        requestCollection.update_one({'_id': ObjectId(buddy_reqid)}, {'$set': {"status":"Matched"}})
+        return jsonify({'message': 'Database Updated Successfully!'}), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to process the request'}), 400
+
