@@ -2,11 +2,12 @@
 
 import React, { FormEvent, useState, useEffect } from "react";
 import Logout from "@/components/user/logout";
-import { useRouter } from 'next/navigation';
-import Link from 'next/link'
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Layout from "../CommonLayout";
 // =======
 // import StandardButton from "./button";
-// import { useRouter } from "next/navigation"; 
+// import { useRouter } from "next/navigation";
 // >>>>>>> main
 
 function Login() {
@@ -15,64 +16,65 @@ function Login() {
   const [success, setSuccess] = useState(false);
   const router = useRouter();
 
-    useEffect(() => {
-        getCurrUser();
-    }, []);
+  useEffect(() => {
+    getCurrUser();
+  }, []);
 
-    const getCurrUser = async () => {
-        try {
-            const response = await fetch("http://127.0.0.1:5000/get_acct_info", {
-            credentials: "include",
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-          })
-          const user_acct = await response.json();
-          
-          if (user_acct != null) {
-            setUsername(user_acct['firstname'])
-            setSuccess(true)
-            router.push('/user/landingPage')
-          }
-          console.log(user_acct)
-          } catch (error) {
-            console.error(error);
-          }
+  const getCurrUser = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/get_acct_info", {
+        credentials: "include",
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const user_acct = await response.json();
+
+      if (user_acct != null) {
+        setUsername(user_acct["firstname"]);
+        setSuccess(true);
+        router.push("/user/landingPage");
+      }
+      console.log(user_acct);
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    const loginUser = async (e: FormEvent) => {
-        e.preventDefault()
+  const loginUser = async (e: FormEvent) => {
+    e.preventDefault();
 
-        try {
-            const user_info = {
-                'email': username,
-                'password': password 
-            };
-            console.log(user_info)
-            const response = await fetch("http://127.0.0.1:5000/login", {
-                credentials: "include",
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(user_info),
-            })
-            console.log(response)
-            if (!response.ok) {
-                throw new Error("Failed to login");
-            }
-            console.log(response.json())
-            setSuccess(true)
-            console.log("Successfully logged in")
-            router.push('/user/landingPage')
-        } catch (error) {
-            console.error("Error logging in:", error);
-        }
+    try {
+      const user_info = {
+        email: username,
+        password: password,
+      };
+      console.log(user_info);
+      const response = await fetch("http://127.0.0.1:5000/login", {
+        credentials: "include",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user_info),
+      });
+      console.log(response);
+      if (!response.ok) {
+        throw new Error("Failed to login");
+      } 
+      console.log(response.json());
+      setSuccess(true);
+      console.log("Successfully logged in");
+      router.push("/user/landingPage");
+    } catch (error) {
+      console.error("Error logging in:", error);
     }
+  };
 
-    return (
-        <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+  return (
+    <Layout>
+      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           {/* <img
             className="mx-auto h-10 w-auto"
@@ -83,7 +85,8 @@ function Login() {
             Welcome to Bulk Buy Buddies!
           </h1>
           <p className="mt-2 text-center leading-9 tracking-tight text-gray-900">
-            Save money and be eco-friendly with your Costco groceries by splitting your items with other shoppers
+            Save money and be eco-friendly with your Costco groceries by
+            splitting your items with other shoppers
           </p>
           <h2 className="mt-10 text-center text-xl font-bold leading-9 tracking-tight text-gray-900">
             Sign in to find your buddy
@@ -91,17 +94,25 @@ function Login() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" action="#" method="POST" onSubmit={loginUser}>
+          <form
+            className="space-y-6"
+            action="#"
+            method="POST"
+            onSubmit={loginUser}
+          >
             <div>
-              <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
                 Email address
               </label>
               <div className="mt-2">
                 <input
                   id="email"
-                  type="email" 
-                  name="email" 
-                  value={username || ""} 
+                  type="email"
+                  name="email"
+                  value={username || ""}
                   onChange={(e) => setUsername(e.target.value)}
                   autoComplete="email"
                   required
@@ -112,21 +123,27 @@ function Login() {
 
             <div>
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
                   Password
                 </label>
                 <div className="text-sm">
-                  <Link href="/user/resetPassword" className="font-semibold text-blue-600 hover:text-blue-500"> 
-                    Forgot password? 
+                  <Link
+                    href="/user/resetPassword"
+                    className="font-semibold text-blue-600 hover:text-blue-500"
+                  >
+                    Forgot password?
                   </Link>
                 </div>
               </div>
               <div className="mt-2">
                 <input
                   id="password"
-                  type="password" 
-                  name="password" 
-                  value={password || ""} 
+                  type="password"
+                  name="password"
+                  value={password || ""}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
                   required
@@ -146,14 +163,18 @@ function Login() {
           </form>
 
           <p className="mt-10 text-center text-sm text-gray-500">
-            Not a buddy?{' '}
-            <Link href="/user/register" className="font-semibold leading-6 text-blue-600 hover:text-blue-500">
-                Create an Account
+            Not a buddy?{" "}
+            <Link
+              href="/user/register"
+              className="font-semibold leading-6 text-blue-600 hover:text-blue-500"
+            >
+              Create an Account
             </Link>
           </p>
         </div>
       </div>
-    )
+    </Layout>
+  );
 }
 
 export default Login;

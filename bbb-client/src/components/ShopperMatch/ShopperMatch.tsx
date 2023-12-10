@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import ShopperCard from "./ShopperCard";
 import { useRouter, useSearchParams } from "next/navigation";
 import { calculateMatchScore } from "./MatchScore";
+import Layout from "../CommonLayout";
 
 export interface ShoppingForm {
   reqID: string;
@@ -67,7 +68,7 @@ function ShopperMatch() {
   };
 
   return (
-    <>
+    <Layout>
       <h1>Recommended Bulk Buy Buddies</h1>
       <div>Shoppers we recommend you match with based on your preference.</div>
       <h1>Current UserID: {currentUserID}</h1>
@@ -104,7 +105,7 @@ function ShopperMatch() {
           <p>No requests found.</p>
         )}
       </div>
-    </>
+    </Layout>
   );
 }
 

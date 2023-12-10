@@ -5,6 +5,7 @@ import "./Messenger.css";
 import { Chat, IMessage, fetchChats, sendMessage } from "./MessengerHelper";
 import io from "socket.io-client";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import Layout from "./CommonLayout";
 
 const Messenger = () => {
   const [newUid, setNewUid] = useState("");
@@ -111,65 +112,67 @@ const Messenger = () => {
     chats.find((chat) => chat.withUid === selectedChat)?.messages || [];
 
   return (
-    <div className="messenger">
-      <div className="sidebar">
-        <form onSubmit={handleUidSubmit}>
-          <input
-            type="text"
-            value={newUid}
-            onChange={handleUidChange}
-            placeholder="Enter your user ID"
-          />
-          <button type="submit">Set UID</button>
-        </form>
-        <form onSubmit={handleNewChatSubmit} className="new-chat-form">
-          <input
-            type="text"
-            value={newChatUid}
-            onChange={handleNewChatUidChange}
-            className="new-chat-input"
-            placeholder="Enter new user's UID"
-          />
-          <button type="submit" className="new-chat-button">
-            +
-          </button>
-        </form>
-        <h2>Chats</h2>
-        <ul>
-          {chats.map((chat) => (
-            <li
-              key={chat.withUid}
-              className={selectedChat === chat.withUid ? "selected" : ""}
-              onClick={() => handleChatSelect(chat.withUid)}
+    <Layout>
+      <div className="messenger">
+        <div className="sidebar">
+          <form onSubmit={handleUidSubmit}>
+            <input
+              type="text"
+              value={newUid}
+              onChange={handleUidChange}
+              placeholder="Enter your user ID"
+            />
+            <button type="submit">Set UID</button>
+          </form>
+          <form onSubmit={handleNewChatSubmit} className="new-chat-form">
+            <input
+              type="text"
+              value={newChatUid}
+              onChange={handleNewChatUidChange}
+              className="new-chat-input"
+              placeholder="Enter new user's UID"
+            />
+            <button type="submit" className="new-chat-button">
+              +
+            </button>
+          </form>
+          <h2>Chats</h2>
+          <ul>
+            {chats.map((chat) => (
+              <li
+                key={chat.withUid}
+                className={selectedChat === chat.withUid ? "selected" : ""}
+                onClick={() => handleChatSelect(chat.withUid)}
+              >
+                {chat.withUid}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="main">
+          {selectedChatMessages.map((message) => (
+            <div
+              key={message.id}
+              className={`message ${
+                message.fromUid === uid ? "sent" : "received"
+              }`}
             >
-              {chat.withUid}
-            </li>
+              <p>{message.text}</p>
+              <span>{message.timestamp}</span>
+            </div>
           ))}
-        </ul>
+        </div>
+        <form onSubmit={sendCurrentBuffer}>
+          <input
+            type="text"
+            value={messageBuffer}
+            onChange={onInputChange}
+            placeholder="Type your message here"
+          />
+          <button type="submit">Send</button>
+        </form>
       </div>
-      <div className="main">
-        {selectedChatMessages.map((message) => (
-          <div
-            key={message.id}
-            className={`message ${
-              message.fromUid === uid ? "sent" : "received"
-            }`}
-          >
-            <p>{message.text}</p>
-            <span>{message.timestamp}</span>
-          </div>
-        ))}
-      </div>
-      <form onSubmit={sendCurrentBuffer}>
-        <input
-          type="text"
-          value={messageBuffer}
-          onChange={onInputChange}
-          placeholder="Type your message here"
-        />
-        <button type="submit">Send</button>
-      </form>
-    </div>
+    </Layout>
   );
 };
 

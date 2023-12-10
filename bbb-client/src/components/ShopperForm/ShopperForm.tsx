@@ -10,6 +10,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import "../locations/locations.css";
 import Locations, { Location } from "../locations/locations";
 import constants from "../../../../bbb-shared/constants.json";
+import Layout from "../CommonLayout";
 
 // TODO: FIX data type for location once we implement selection from google maps
 
@@ -223,7 +224,7 @@ function ShopperForm() {
     }
   };
   return (
-    <>
+    <Layout>
       <div className="text-xl font-bold">
         Form Submission for {currentUserID}
       </div>
@@ -321,7 +322,7 @@ function ShopperForm() {
           <div>{generatedID}</div>
         </>
       } */}
-    </>
+    </Layout>
   );
 }
 
