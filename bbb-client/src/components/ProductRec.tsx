@@ -170,8 +170,11 @@ const ProductRec = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(acceptData),
-      }
-    );
+      });
+      if (!response.ok) {
+        // Handle success, e.g., show a success message
+        console.error("Failed to update!");
+      }                                 
     router.push("/landingPage");
     } catch (error) {
       console.error("Error accepting match", error);
