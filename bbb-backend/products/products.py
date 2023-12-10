@@ -203,6 +203,8 @@ def search():
             query["category"] = category
         if location is not None:
             query["locations"] = {"$in": [location]}
+        else:
+            query["locations"] = {"$exists": True, "$not": {"$size": 0}}
 
         products = list(mongo.db.products.find(query))
 

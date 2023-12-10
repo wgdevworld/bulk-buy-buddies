@@ -202,7 +202,7 @@ const ProductRec = () => {
       <button type="submit" onClick={sendBuddyRequest}>
         Request Match
       </button>
-      {products.length !== 0 ? (
+      {products && products.length !== 0 ? (
         <>
           <br/>
           <p>Here are products you recommend you purchase with {name}!</p>
