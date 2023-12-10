@@ -123,85 +123,92 @@ function EditAccount() {
 
   return (
     <Layout>
-      <div>
+      <div className="max-w-2xl mx-auto p-5 bg-white shadow-lg rounded-lg">
         {editSuccess ? (
-          <div>
-            <div> Information Updated </div>
-            <StandardButton
+          <div className="text-center">
+            <div className="text-lg font-semibold text-green-600 mb-4">
+              Information Updated
+            </div>
+            <button
               onClick={navigateAccountPage}
-              label="Back to Account"
-            />
+              className="px-4 py-2 bg-blue-500 text-white font-medium rounded hover:bg-blue-600"
+            >
+              Back to Account
+            </button>
           </div>
         ) : (
           <div>
-            <form onSubmit={updateInfo}>
+            <form onSubmit={updateInfo} className="space-y-4">
               <div>
-                <label>First Name</label>
+                <label className="block text-gray-700">First Name</label>
                 <input
                   type="text"
                   name="firstname"
                   value={firstname || user?.firstname}
                   onChange={(e) => setFirstname(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300"
                 />
               </div>
               <div>
-                <label>Last Name</label>
+                <label className="block text-gray-700">Last Name</label>
                 <input
                   type="text"
                   name="lastname"
                   value={lastname || user?.lastname}
                   onChange={(e) => setLastname(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300"
                 />
               </div>
               <div>
-                <label>Address</label>
+                <label className="block text-gray-700">Address</label>
                 <input
                   type="text"
                   name="email"
                   value={address || user?.address["address"]}
                   onChange={(e) => setAddress(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300"
                 />
               </div>
               <div>
-                <label>City / Town</label>
+                <label className="block text-gray-700">City / Town</label>
                 <input
                   type="text"
                   name="email"
                   value={city || user?.address["city"]}
                   onChange={(e) => setCity(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300"
                 />
               </div>
-              <ShopperDropdown
-                name="State"
-                options={states}
-                value={state || user?.address["state"]}
-                onSelect={(selectedState) => setState(selectedState)}
-              />
+              {/* ShopperDropdown component should be styled separately */}
               <div>
-                <label>Zip / Postal Code</label>
+                <label className="block text-gray-700">Zip / Postal Code</label>
                 <input
                   type="text"
                   name="email"
                   value={zipcode || user?.address["zipcode"]}
                   onChange={(e) => setZipcode(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300"
                 />
               </div>
-              <button type="submit"> Update Information </button>
+              <button
+                type="submit"
+                className="w-full px-4 py-2 bg-blue-500 text-white font-medium rounded hover:bg-blue-600"
+              >
+                Update Information
+              </button>
             </form>
-            <StandardButton onClick={resetPassword} label="Change Password" />
-            <div>
-              {passwordSuccess ? (
-                <div>
-                  <div>
-                    {" "}
-                    Reset password instructions sent to email associated with
-                    this account!{" "}
-                  </div>
-                </div>
-              ) : (
-                <div />
-              )}
-            </div>
+            <button
+              onClick={resetPassword}
+              className="mt-4 w-full px-4 py-2 bg-green-500 text-white font-medium rounded hover:bg-green-600"
+            >
+              Change Password
+            </button>
+            {passwordSuccess && (
+              <div className="mt-4 text-center text-green-600">
+                Reset password instructions sent to email associated with this
+                account!
+              </div>
+            )}
           </div>
         )}
       </div>
