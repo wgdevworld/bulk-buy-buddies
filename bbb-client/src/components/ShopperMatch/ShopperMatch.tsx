@@ -11,7 +11,7 @@ export interface ShoppingForm {
   userID: string;
   category: string;
   quantity: number;
-  location: string;
+  location: number;
   timeStart: Date;
   timeEnd: Date;
   status: string;
@@ -29,6 +29,7 @@ function ShopperMatch() {
   const currentTimeStart = searchParams.get("timeStart");
   const currentTimeEnd = searchParams.get("timeEnd");
   const currentReqID = searchParams.get("reqID");
+  const parseLocation = Number(currentLocation);
 
   useEffect(() => {
     fetchMyRequests(currentUserID);
@@ -45,14 +46,14 @@ function ShopperMatch() {
         (a: ShoppingForm, b: ShoppingForm) =>
           calculateMatchScore(
             currentCategory,
-            currentLocation,
+            parseLocation,
             currentTimeStart,
             currentTimeEnd,
             b
           ) -
           calculateMatchScore(
             currentCategory,
-            currentLocation,
+            parseLocation,
             currentTimeStart,
             currentTimeEnd,
             a
@@ -90,7 +91,7 @@ function ShopperMatch() {
               timeEnd={item.timeEnd}
               matchScore={calculateMatchScore(
                 currentCategory,
-                currentLocation,
+                parseLocation,
                 currentTimeStart,
                 currentTimeEnd,
                 item

@@ -8,7 +8,7 @@ import "./ShopperForm.css";
 import "react-datepicker/dist/react-datepicker.css";
 import { useRouter, useSearchParams } from "next/navigation";
 import "../locations/locations.css";
-import Locations from "../locations/locations";
+import Locations, { Location } from "../locations/locations";
 import constants from "../../../../bbb-shared/constants.json";
 
 // TODO: FIX data type for location once we implement selection from google maps
@@ -18,7 +18,7 @@ interface ShoppingForm {
   userID: string;
   category: string;
   quantity: number | undefined;
-  location: string | number | undefined;
+  location: number | undefined;
   timeStart: Date | null;
   timeEnd: Date | null;
   status: string | undefined;
@@ -30,7 +30,12 @@ function ShopperForm() {
   const [userID, setUserID] = useState<string>("");
   const [category, setCategory] = useState<string>("");
   const [quantity, setQuantity] = useState<number | undefined>(0);
-  const [location, setLocation] = useState<string | number | undefined>(0);
+  const [location, setLocation] = useState<number | undefined>(0);
+
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
+    null
+  );
+
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
   const [responseContent, setResponseContent] = useState<ShoppingForm | null>(
@@ -48,6 +53,12 @@ function ShopperForm() {
       setUserID(currentUserID);
     }
   }, [currentUserID]);
+
+  useEffect(() => {
+    if (selectedLocation !== null) {
+      setLocation(selectedLocation.lid);
+    }
+  }, [selectedLocation]);
 
   const navigateShopperMatch = async () => {
     try {
@@ -83,7 +94,7 @@ function ShopperForm() {
       userID,
       category,
       quantity,
-      location,
+      location: selectedLocation?.lid || 0,
       timeStart: startDate,
       timeEnd: endDate,
       status: "Active",
@@ -123,8 +134,7 @@ function ShopperForm() {
       </div>
       <form onSubmit={handleSubmit} className="mt-4">
         <div className="mt-4 flex flex-col items-center">
-          {/* I need a way to get location from Locations below */}
-          {/* <Locations /> */}
+          <Locations onSelectLocation={setSelectedLocation} />
           <ShopperDropdown
             name="Category"
             options={categories}

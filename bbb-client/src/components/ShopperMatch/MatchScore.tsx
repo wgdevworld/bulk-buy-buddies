@@ -3,7 +3,7 @@ import { isWithinInterval } from "date-fns";
 
 export const calculateMatchScore = (
   referenceCategory: string | null,
-  referenceLocation: string | null,
+  referenceLocation: number | null,
   referenceTimeStart: string | null,
   referenceTimeEnd: string | null,
   row: ShoppingForm
