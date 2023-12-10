@@ -14,8 +14,6 @@ function MatchedRequestScroll() {
     const [productQuantity, setProductQuantity] = useState(0);
 
 
-
-
     useEffect(() => {
         getUserMatchedReqs();
     }, []);
@@ -81,18 +79,10 @@ function MatchedRequestScroll() {
                 :
                 <ul className="flex flex-row overflow-x-auto flex-nowrap">
                     {matchedReqs.map((item) => (
-                        <MatchedRequestCard 
-                            key={item._id}
-                            _id={item._id}
-                            userID={item.userID}
-                            category={item.category}
-                            buddy={item.buddy}
-                            buddyID={item.buddyID}
-                            quantity={item.quantity}
-                            location={item.location}
-                            timeStart={item.timeStart}
-                            timeEnd={item.timeEnd}
-                            status={item.status}
+                        <MatchedRequestCard
+                            request={item} 
+                            setModalVisible={setIsSetPresenceModalVisible}
+                            setRequestID={setRequestID}
                         />
                     ))}
                 </ul>
