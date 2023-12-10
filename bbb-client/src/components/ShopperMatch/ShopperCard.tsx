@@ -35,6 +35,7 @@ export default function ShopperCard({
   const [locationName, setLocationName] = useState<string | undefined>("");
 
   const query = {
+    function: "requesting_match",
     userReqID: currentReqID,
     buddyReqId: reqID,
   };

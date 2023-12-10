@@ -75,7 +75,13 @@ def get_match_requests():
         print(f"Current User ID: {current_user_id}")
         request_list = []
 
-        query = {'userID': {'$ne': current_user_id}, 'status': 'Active'}
+        current_time = datetime.utcnow()
+
+        query = {
+            'userID': {'$ne': current_user_id},
+            'status': 'Active',
+            'timeStart': {'$gt': current_time.isoformat()}
+        }
 
         for doc in request_collection.find(query):
             requests = {

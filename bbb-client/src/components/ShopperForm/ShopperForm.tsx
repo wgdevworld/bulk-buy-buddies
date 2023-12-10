@@ -1,6 +1,5 @@
 "use client";
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
 import ShopperDropdown from "./ShopperDropdown";
 import DatePicker from "react-datepicker";
@@ -11,10 +10,7 @@ import "../locations/locations.css";
 import Locations, { Location } from "../locations/locations";
 import constants from "../../../../bbb-shared/constants.json";
 
-// TODO: FIX data type for location once we implement selection from google maps
-
 interface ShoppingForm {
-  // reqID: string;
   userID: string;
   category: string;
   quantity: number | undefined;
@@ -35,12 +31,12 @@ function ShopperForm() {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(
     null
   );
-
+  const [locationName, setLocationName] = useState<string | undefined>("");
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
-  const [responseContent, setResponseContent] = useState<ShoppingForm | null>(
-    null
-  );
+  // const [responseContent, setResponseContent] = useState<ShoppingForm | null>(
+  //   null
+  // );
   const [generatedID, setGeneratedID] = useState<string>("");
   const [formSubmitted, setFormSubmitted] = useState(false);
 
@@ -148,6 +144,13 @@ function ShopperForm() {
     }
   }, [selectedLocation]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchLocationName(location);
+    };
+    fetchData();
+  }, []);
+
   const navigateShopperMatch = async () => {
     try {
       const query = {
@@ -173,6 +176,27 @@ function ShopperForm() {
       params.set(name, value);
     }
     return params.toString();
+  };
+
+  const fetchLocationName = async (location: number | undefined) => {
+    console.log("fetchLocations is being called");
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:5000//get_location_name/${location}`
+      );
+      const locationsData = await response.json();
+
+      if (locationsData.error) {
+        console.error("Error fetching location name:", locationsData.error);
+        setLocationName("Error fetching location");
+      } else {
+        setLocationName(locationsData);
+        console.log("Locations fetched:", locationsData);
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching locations:", error);
+      setLocationName("Error fetching location");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -218,23 +242,17 @@ function ShopperForm() {
           quantity
         );
       } else {
-        setResponseContent(null);
+        // setResponseContent(null);
         setFormSubmitted(false);
       }
     } catch (error) {
       console.error("An error occurred:", error);
-      setResponseContent(null);
+      // setResponseContent(null);
       setFormSubmitted(false);
     }
   };
   return (
     <>
-      <div className="text-xl font-bold">
-        Form Submission for {currentUserID}
-      </div>
-      <div className="mt-4">
-        Let us know your preferences for grocery items you want to split.
-      </div>
       <form onSubmit={handleSubmit} className="mt-4">
         <div className="mt-4 flex flex-col items-center">
           <Locations onSelectLocation={setSelectedLocation} />
@@ -284,10 +302,7 @@ function ShopperForm() {
       <div className="flex flex-col items-center mt-8">
         {formSubmitted && (
           <div className="p-4 border rounded-md shadow-md text-center max-w-md">
-            <h2 className="text-xl font-bold mb-4">Form Values:</h2>
-            <p>
-              <span className="font-bold">User ID:</span> {userID}
-            </p>
+            <h2 className="text-xl font-bold mb-4">Confirm Your Request!</h2>
             <p>
               <span className="font-bold">Category:</span> {category}
             </p>
@@ -295,7 +310,7 @@ function ShopperForm() {
               <span className="font-bold">Quantity:</span> {quantity}
             </p>
             <p>
-              <span className="font-bold">Location:</span> {location}
+              <span className="font-bold">Location:</span> {locationName}
             </p>
             <p>
               <span className="font-bold">Start Date:</span>{" "}
@@ -304,9 +319,6 @@ function ShopperForm() {
             <p>
               <span className="font-bold">End Date:</span>{" "}
               {endDate?.toLocaleString()}
-            </p>
-            <p>
-              <span className="font-bold">Request ID:</span> {generatedID}
             </p>
           </div>
         )}
