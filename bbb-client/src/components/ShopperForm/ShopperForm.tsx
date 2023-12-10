@@ -90,6 +90,11 @@ function ShopperForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (startDate && endDate && startDate >= endDate) {
+      alert("End date must be after start date");
+      return;
+    }
+
     const requestData: ShoppingForm = {
       userID,
       category,
