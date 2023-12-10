@@ -66,15 +66,6 @@ function Register() {
         }
     }
 
-    // const navigateAccount = async () => {
-    //     try {
-    //         console.log("go to account page")
-    //         router.push('/user/account')
-    //     } catch (error) {
-    //         console.error("Error going to account page:", error);
-    //     }
-    // }
-
     const navigateSignIn = async () => {
         try {
             console.log("go to login page");
@@ -163,90 +154,6 @@ function Register() {
             </form>
         </div>
     )
-            // <div>
-            //     {success ?
-            //         <div> 
-            //             <div> Successfully logged in! </div>
-            //             <div> 
-            //                 <h1> Welcome, {username}</h1>
-            //                 <StandardButton onClick={navigateAccount} label="View Account" />
-            //             </div>
-            //             <Logout />
-            //         </div>
-            //         :
-            //         <form onSubmit={registerUser}>
-            //             <div>
-            //                 <label>First Name</label>
-            //                 <input 
-            //                     type="text" 
-            //                     name="firstname" 
-            //                     value={firstname || ""} 
-            //                     onChange={(e) => setFirstname(e.target.value)}
-            //                 />
-            //             </div>
-            //             <div>
-            //                 <label>Last Name</label>
-            //                 <input 
-            //                     type="text" 
-            //                     name="lastname" 
-            //                     value={lastname || ""} 
-            //                     onChange={(e) => setLastname(e.target.value)}
-            //                 />
-            //             </div>
-            //             <div>
-            //                 <label>Email</label>
-            //                 <input 
-            //                     type="text" 
-            //                     name="email" 
-            //                     value={username || ""} 
-            //                     onChange={(e) => setUsername(e.target.value)}
-            //                 />
-            //             </div>
-            //             <div>
-            //             <label>Password</label>
-            //                 <input 
-            //                     type="password" 
-            //                     name="password" 
-            //                     value={password || ""} 
-            //                     onChange={(e) => setPassword(e.target.value)}
-            //                 />
-            //             </div>
-            //             <div>
-            //                 <label>Address</label>
-            //                 <input 
-            //                     type="text" 
-            //                     name="email" 
-            //                     value={address || ""} onChange={(e) => setAddress(e.target.value)}
-            //                 />
-            //             </div>
-            //             <div>
-            //                 <label>City / Town</label>
-            //                 <input 
-            //                     type="text" 
-            //                     name="email" 
-            //                     value={city || ""} 
-            //                     onChange={(e) => setCity(e.target.value)}
-            //                 />
-            //             </div>
-            //             <ShopperDropdown
-            //                 name="State"
-            //                 options={states}
-            //                 value={state}
-            //                 onSelect={(selectedLocation) => setState(selectedLocation)}
-            //             />
-            //             <div>
-            //                 <label>Zip / Postal Code</label>
-            //                 <input 
-            //                     type="text" 
-            //                     name="email" 
-            //                     value={zipcode || ""} 
-            //                     onChange={(e) => setZipcode(e.target.value)}
-            //                 />
-            //             </div>
-            //             <button type="submit"> Register </button>
-            //         </form>
-            //     }
-            // </div> 
 }
 
 export default Register;
