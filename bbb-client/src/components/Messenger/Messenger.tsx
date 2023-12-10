@@ -1,6 +1,12 @@
 "use client";
-import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
-import { HeartIcon } from "@heroicons/react/24/solid"; // for filled heart
+import React, {
+  useState,
+  useEffect,
+  FormEvent,
+  ChangeEvent,
+  useCallback,
+} from "react";
+import { HeartIcon, InformationCircleIcon } from "@heroicons/react/24/solid"; // for filled heart
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline"; // for outlined heart
 import { v4 as uuidv4 } from "uuid";
 import "./Messenger.css";
@@ -25,10 +31,12 @@ const Messenger = () => {
   const [newChatUid, setNewChatUid] = useState<string>("");
   const [socket, setSocket] = useState<any>(null);
   const [userdata, setUserdata] = useState<UserInfo>();
+  const [buddyRequestSent, setBuddyRequestSend] = useState<boolean>(false);
 
   // Data from previous screen
   const searchParams = useSearchParams();
   const [uid, setUid] = useState(searchParams.get("currentUserID")!);
+  const toRequestUid = searchParams.get("buddyUserID")!;
   const [selectedChat, setSelectedChat] = useState<string>(
     searchParams.get("buddyUserID")!
   );
@@ -36,18 +44,6 @@ const Messenger = () => {
   useEffect(() => {
     // Only initialize the socket if the uid is set
     if (uid) {
-      // Get the user data
-      (async () => {
-        let userInfo = await getUserAcctInfo(uid);
-        setUserdata(userInfo);
-      })();
-
-      // Get all the chats
-      (async () => {
-        let fetchedChats = await fetchChats(uid);
-        setChats(fetchedChats!);
-      })();
-
       // on socket connect, provide server with uid
       const newSocket = io("http://localhost:5000", {
         query: { uid },
@@ -57,9 +53,57 @@ const Messenger = () => {
       setSocket(newSocket);
 
       // when server emits new messages, add them to the state
-      newSocket.on("got_message", (messageData: IMessage) => {
+      newSocket.on("got_message", (messageData) => {
         setMessages((prevMessages) => [...prevMessages, messageData]);
       });
+
+      // Define an async function inside the useEffect
+      const fetchData = async () => {
+        // Get the user data
+        let userInfo = await getUserAcctInfo(uid);
+        setUserdata(userInfo);
+
+        // Get all the chats
+        let fetchedChats = await fetchChats(uid);
+        setChats(fetchedChats!);
+
+        if (toRequestUid !== null && buddyRequestSent === false) {
+          console.log("Sending request message");
+          // Open a chat to the directed user
+
+          // Check if chat with this UID already exists
+          const chatExists = chats.some(
+            (chat) => chat.withUser.uid === toRequestUid
+          );
+          if (!chatExists) {
+            // If not, create a new chat object and add it to the state
+            let opponent = await getUserAcctInfo(toRequestUid);
+            const newChat: Chat = {
+              withUser: opponent!,
+              messages: [],
+            };
+            setChats([...chats, newChat]);
+          }
+
+          const messageData: IMessage = {
+            id: uuidv4(),
+            text: JSON.stringify({
+              textData: "Request Message",
+              toRequestUid: toRequestUid,
+            }),
+            fromUid: uid,
+            toUid: selectedChat,
+            timestamp: new Date().toISOString(),
+            liked: false,
+            isBuddyRequest: true,
+          };
+          newSocket.emit("new_message", messageData);
+          setBuddyRequestSend(true);
+        }
+      };
+
+      // Call the async function
+      fetchData();
 
       return () => {
         // Disconnect the socket when the component unmounts or the uid changes
@@ -67,6 +111,8 @@ const Messenger = () => {
       };
     }
   }, [uid, messages]);
+
+  const sendBuddyRequest = () => {};
 
   // Send the currently typed message
   const sendCurrentBuffer = async (e: FormEvent) => {
@@ -81,6 +127,7 @@ const Messenger = () => {
       toUid: selectedChat,
       timestamp: new Date().toISOString(),
       liked: false,
+      isBuddyRequest: false,
     };
     socket.emit("new_message", messageData);
     setBuffer("");
@@ -226,44 +273,61 @@ const Messenger = () => {
 
       <div className="w-3/4 flex flex-col">
         <div className="p-5 overflow-y-auto flex-grow">
-          {selectedChatMessages.map((message) => (
-            <div
-              key={message.id}
-              className={`my-2 p-3 rounded shadow max-w-xs ${
-                message.fromUid === uid
-                  ? "bg-blue-100 ml-auto"
-                  : "bg-white mr-auto"
-              }`}
-            >
-              <p className="text-gray-800">{message.text}</p>
-              <div className="flex justify-between items-center mt-2">
-                <span className="text-xs text-gray-500">
-                  {message.timestamp}
-                  <button
-                    className="text-xs text-red-500 ml-2"
-                    onClick={() => handleDeleteMessage(message.id)}
-                  >
-                    Delete
-                  </button>
+          {selectedChatMessages.map((message) =>
+            message.isBuddyRequest ? (
+              <div
+                key={message.id}
+                className={`my-2 p-3 rounded shadow max-w-xs ${
+                  message.fromUid === uid
+                    ? "bg-yellow-100 ml-auto"
+                    : "bg-yello-100 mr-auto"
+                }`}
+              >
+                <span className="font-bold text-yellow-600">
+                  <InformationCircleIcon className="h-6 w-6 text-yellow-600" />
+                  Buddy Request
                 </span>
-                <button
-                  onClick={() =>
-                    handleLikeUnlike(
-                      message.id,
-                      message.liked ? "unlike" : "like"
-                    )
-                  }
-                  className="text-red-500 hover:text-red-600"
-                >
-                  {message.liked ? (
-                    <HeartIcon className="h-6 w-6" />
-                  ) : (
-                    <OutlineHeartIcon className="h-6 w-6" />
-                  )}
-                </button>
+                <p>I would like to be your buddy.</p>
               </div>
-            </div>
-          ))}
+            ) : (
+              <div
+                key={message.id}
+                className={`my-2 p-3 rounded shadow max-w-xs ${
+                  message.fromUid === uid
+                    ? "bg-blue-100 ml-auto"
+                    : "bg-white mr-auto"
+                }`}
+              >
+                <p className="text-gray-800">{message.text}</p>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-xs text-gray-500">
+                    {message.timestamp}
+                    <button
+                      className="text-xs text-red-500 ml-2"
+                      onClick={() => handleDeleteMessage(message.id)}
+                    >
+                      Delete
+                    </button>
+                  </span>
+                  <button
+                    onClick={() =>
+                      handleLikeUnlike(
+                        message.id,
+                        message.liked ? "unlike" : "like"
+                      )
+                    }
+                    className="text-red-500 hover:text-red-600"
+                  >
+                    {message.liked ? (
+                      <HeartIcon className="h-6 w-6" />
+                    ) : (
+                      <OutlineHeartIcon className="h-6 w-6" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            )
+          )}
         </div>
 
         <form
