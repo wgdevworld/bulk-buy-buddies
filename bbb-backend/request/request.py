@@ -2,6 +2,8 @@ from flask import Blueprint, Flask, request, jsonify, current_app
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from dotenv import dotenv_values
+from bson import ObjectId
+from datetime import datetime, timedelta
 
 # Flask Blueprint configuration
 request_blueprint = Blueprint('request_blueprint', __name__)
@@ -11,6 +13,8 @@ def submit_shopping_request():
     mongo = current_app.config['MONGO']
     try:
         data = request.json
+        data['createdAt'] = datetime.utcnow()
+
         request_collection = mongo.db.requests
         result = request_collection.insert_one(data)
         generated_id = str(result.inserted_id)
@@ -70,3 +74,11 @@ def get_match_requests():
         return jsonify(request_list)
     except Exception as e:
         return jsonify(error={"message": str(e)})
+    
+# with current_app.app_context():
+#     current_app.config["MONGO"].db.requests.create_index("createdAt", expireAfterSeconds=2592000)  # 30 days in seconds
+
+# current_app.config["MONGO"].db.requests.update_many(
+#     {"createdAt": {"$exists": False}},
+#     {"$set": {"createdAt": datetime.utcnow()}}
+# )
