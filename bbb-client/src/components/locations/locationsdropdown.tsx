@@ -1,4 +1,3 @@
-// locationsdropdown.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -29,9 +28,25 @@ export default function LocationsDropdown({
     }
   };
 
+  // return (
+  //   <div className="locations-dropdown">
+  //     <select onChange={handleLocationSelect} value={localSelectedLocation?.name || ""}>
+  //       <option value="">Select a location</option>
+  //       {locations.map((location) => (
+  //         <option key={location.lid} value={location.name}>
+  //           {location.name}
+  //         </option>
+  //       ))}
+  //     </select>
+  //   </div>
+  // );
   return (
     <div className="locations-dropdown">
-      <select onChange={handleLocationSelect} value={localSelectedLocation?.name || ""}>
+      <select
+        onChange={handleLocationSelect}
+        value={localSelectedLocation?.name || ""}
+        className="bg-white border border-blue-600 rounded px-4 py-2 text-blue-900"
+      >
         <option value="">Select a location</option>
         {locations.map((location) => (
           <option key={location.lid} value={location.name}>
@@ -41,4 +56,5 @@ export default function LocationsDropdown({
       </select>
     </div>
   );
+  
 }
