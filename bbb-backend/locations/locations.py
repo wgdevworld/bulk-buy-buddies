@@ -57,6 +57,19 @@ def get_user_location(user_id):
     except Exception as e:
         return jsonify(error={"message": str(e)})
 
+@locations_blueprint.route('/get_location_name/<location_id>', methods=['GET'])
+def get_location_name(location_id):
+    try:
+        mongo = current_app.config['MONGO']
+        locations_collection = mongo.db.locations
+        location = locations_collection.find_one({"lid": location_id})
+        if location:
+            location_name = location['name']
+            return jsonify(location_name)
+        return jsonify(error={"message": "Location not found."})
+    except Exception as e:
+        return jsonify(error={"message": str(e)})
+    
 
 
 # @locations_blueprint.route('/get_user_address/<user_id>', methods=['GET'])

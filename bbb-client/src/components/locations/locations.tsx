@@ -1,4 +1,3 @@
-// locations.tsx
 
 "use client";
 
@@ -6,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import "./locations.css";
 import MapComponent from "./map";
 import LocationsDropdown from "./locationsdropdown";
+import UnmatchedRequests from "./unmatchedrequests";
 
 export interface Location {
   lid: number;
@@ -127,24 +127,47 @@ function Locations({ onSelectLocation }: LocationsProps) {
   }
 
   const handleLocationSelect = (location: Location) => {
-    setSelectedLocation(location); // Update the selected location
+    setSelectedLocation(location); 
     setMapCenter({ lat: location.coordinates[1], lng: location.coordinates[0] });
     onSelectLocation(location);
   };
 
+  // return (
+  //   <div className="locations">
+  //     <h1 className="location-title">Choose your Costco warehouse</h1>
+  //     <LocationsDropdown
+  //       locations={locations}
+  //       onSelectLocation={handleLocationSelect}
+  //       selectedLocation={selectedLocation}
+  //     />
+  //     <div className="map-container">
+  //       <MapComponent center={mapCenter} setCenter={setMapCenter} selectedLocation={selectedLocation} />
+  //     </div>
+
+  //     {selectedLocation.lid !== 0 && (
+  //       <UnmatchedRequests locationId={selectedLocation.lid} />
+  //     )}
+  //   </div>
+  // );
   return (
-    <div className="locations">
-      <h1 className="location-title">Choose your Costco warehouse</h1>
-      <LocationsDropdown
-        locations={locations}
-        onSelectLocation={handleLocationSelect}
-        selectedLocation={selectedLocation}
-      />
-      <div className="map-container">
-        <MapComponent center={mapCenter} setCenter={setMapCenter} selectedLocation={selectedLocation} />
+    <div className="min-h-screen">
+      <div className="flex flex-col justify-center items-center py-20">
+        <h1 className="text-3xl font-bold text-blue-900 mb-8">Choose your Costco warehouse</h1>
+        <LocationsDropdown
+          locations={locations}
+          onSelectLocation={handleLocationSelect}
+          selectedLocation={selectedLocation}
+        />
+        <div className="map-container">
+          <MapComponent center={mapCenter} setCenter={setMapCenter} selectedLocation={selectedLocation} />
+        </div>
+        {selectedLocation.lid !== 0 && (
+          <UnmatchedRequests locationId={selectedLocation.lid} />
+        )}
       </div>
     </div>
   );
+  
 }
 
 export default Locations;

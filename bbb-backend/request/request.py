@@ -3,7 +3,6 @@ from flask_cors import CORS
 from flask_pymongo import PyMongo
 from dotenv import dotenv_values
 
-# Flask Blueprint configuration
 request_blueprint = Blueprint('request_blueprint', __name__)
 
 @request_blueprint.route('/shopping-request', methods=['POST'])
@@ -20,6 +19,27 @@ def submit_shopping_request():
         return jsonify({'error': 'Failed to process the request'}), 500
 
 
+
+@request_blueprint.route('/get_requests_in_location/<location_id>', methods=['GET'])
+def get_requests_on_this_location(location_id):
+    try:
+        mongo = current_app.config['MONGO']
+        requests_collection = mongo.db.requests
+        requests_list = []
+        for doc in requests_collection.find({"location": int(location_id)}):
+            request = {
+                "userID": doc["userID"],
+                "category": doc["category"],
+                "quantity": doc["quantity"],
+                "timeStart": doc["timeStart"],
+                "timeEnd": doc["timeEnd"],
+            }
+            requests_list.append(request)
+        return jsonify(requests_list)
+    except Exception as e:
+        return jsonify(error={"message": str(e)})
+    
+    
 @request_blueprint.route('/get-requests', methods=['GET'])
 def get_my_requests():
     mongo = current_app.config['MONGO']
