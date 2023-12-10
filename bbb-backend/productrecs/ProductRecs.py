@@ -86,17 +86,18 @@ def update_transactions():
     mongo = current_app.config['MONGO']
     try:
         data = request.json
-        request_object = ObjectId(data.requestID)
+        request_object = ObjectId(data['requestID'])
         requestsCollection = mongo.db.requests
+        productsCollection = mongo.db.products
+        product = productsCollection.find_one({'_id':ObjectId(data['productId'])})
         to_update = requestsCollection.find_one({'_id':request_object})
-        requestsCollection.update({'_id':request_object}, {'$set': {"status":"Fulfilled"}})
+        requestsCollection.update_one({'_id':request_object}, {'$set': {"status":"Fulfilled", "category":product['name'], "quantity":int(data['product_quantity'])}})
         transactionHistory = mongo.db.transactionHistory
-        transactionHistory.insert_one({'requestId':data.requestID, "userId":to_update['userID'], "products":data.product_name, "quantity":data.product_quantity})
+        transactionHistory.insert_one({'requestId':data['requestID'], "userId":to_update['userID'], "products":product['name'], "quantity":int(data['product_quantity'])})
         # Mongo's _id is not serializable
-        if request_info and "_id" in request_info:
-            request_info["_id"] = str(request_info["_id"])
-        return jsonify(results=request_info)
+        return jsonify({'message': 'Successful!'}), 200 
     except Exception as e:
+        print(e)
         return jsonify({'error': 'Failed to process the request'}), 500
 
 @productRec_blueprint.route("/update-database", methods=['POST'])
@@ -104,17 +105,19 @@ def update_database():
     mongo = current_app.config['MONGO']
     try:
         data = request.json
-        user_reqid = data.from_requestID
-        print(user_reqid)
-        buddy_reqid = data.to_requestID
-        print(buddy_reqid)
+        print(data)
+        user_reqid = data['from_requestID']
+        buddy_reqid = data['to_requestID']
         requestsCollection = mongo.db.requests
         userInteractions = mongo.db.userInteractions
-        to_match = userInteractions.find_one({'from_requestID': user_reqid, 'to_requestID': buddy_reqid})
+        to_match = userInteractions.find_one({'from_requestID': buddy_reqid, 'to_requestID': user_reqid})
+        print(to_match)
         userInteractions.update_one({'_id': ObjectId(to_match['_id'])}, {"$set": {"status":"matched"}})
-        requestCollection.update_one({'_id': ObjectId(user_reqid)}, {'$set': {"status":"Matched"}})
-        requestCollection.update_one({'_id': ObjectId(buddy_reqid)}, {'$set': {"status":"Matched"}})
+        requestsCollection.update_one({'_id': ObjectId(user_reqid)}, {'$set': {"status":"Matched"}})
+        requestsCollection.update_one({'_id': ObjectId(buddy_reqid)}, {'$set': {"status":"Matched"}})
         return jsonify({'message': 'Database Updated Successfully!'}), 200
     except Exception as e:
+        print("aslkfjsldkfj")
+        print(f"error: {e}")
         return jsonify({'error': 'Failed to process the request'}), 400
 
