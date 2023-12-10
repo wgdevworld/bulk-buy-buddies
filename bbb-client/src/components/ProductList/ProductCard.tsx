@@ -2,15 +2,19 @@ import React from "react";
 import Image from "next/image";
 import { Product } from "./ProductMain";
 
+// Define the prop types for the ProductCard component
+interface ProductCardProps {
+  product: Product;
+  setModalVisible: (visible: boolean) => void;
+  setSelectedProductId: (id: string) => void;
+}
+
+// Define the ProductCard component
 function ProductCard({
   product,
   setModalVisible,
   setSelectedProductId,
-}: {
-  product: Product;
-  setModalVisible: (visible: boolean) => void;
-  setSelectedProductId: (id: string) => void;
-}) {
+}: ProductCardProps) {
   return (
     <div className="bg-white border rounded-lg overflow-hidden shadow-md transition-transform transform hover:scale-105">
       <div className="relative aspect-w-1 aspect-h-1">

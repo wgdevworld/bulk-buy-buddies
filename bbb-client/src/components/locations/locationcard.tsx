@@ -2,13 +2,16 @@
 import React from "react";
 import { Location } from "./locations";
 
+// Define the prop types for the LocationCard component
 interface LocationCardProps {
   selectedLocation: Location;
 }
 
+// Define the LocationCard component
 function LocationCard({ selectedLocation }: LocationCardProps) {
   console.log("LocationCard - selectedLocation:", selectedLocation);
 
+  // Render the open hours for the selected location
   const renderOpenHours = () => {
     return selectedLocation.openHours.map((timeSlot, index) => (
       <div key={index}>
@@ -26,8 +29,6 @@ function LocationCard({ selectedLocation }: LocationCardProps) {
       </div>
     </div>
   );
-  
-  
 }
 
 export default LocationCard;
