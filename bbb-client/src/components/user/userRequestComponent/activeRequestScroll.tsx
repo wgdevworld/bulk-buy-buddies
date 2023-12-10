@@ -47,18 +47,8 @@ function ActiveRequestScroll({ userID }: { userID: string | undefined }) {
     }
 
 
-    //status, category, date min, date max, location
-    /*
-            const url = `http://127.0.0.1:5000/get_active_reqs?status=${encodeURIComponent(
-                searchTerm
-              )}&category=${encodeURIComponent(
-                minPrice
-              )}&minDate=${encodeURIComponent(
-                maxPrice
-              )}&maxDate=${encodeURIComponent(
-                category)}&location=${encodeURIComponent(category)}`
-    */
-    const getUserActiveReqs = async () => {
+    const getUserActiveReqs= async () => {
+
         try {
             const response = await fetch("http://127.0.0.1:5000/get_active_reqs", {
                 credentials: "include",
