@@ -43,6 +43,94 @@ function ShopperForm() {
   const searchParams = useSearchParams();
   const currentUserID = searchParams.get("uid");
 
+  const scheduleNotification = (
+    targetTime: Date | null,
+    userID: string,
+    shopDate: Date | null,
+    requestId: string,
+    category: string,
+    quantity: number | undefined
+  ) => {
+    const now = new Date();
+    if (targetTime === null) {
+      return;
+    }
+
+    const delay = targetTime.getTime() - now.getTime();
+
+    if (delay < 0) {
+      console.log("The scheduled time is in the past.");
+      return;
+    }
+
+    if (delay !== undefined) {
+      setTimeout(() => {
+        if (Notification.permission === "granted" && shopDate) {
+          const year = shopDate.getFullYear();
+          const month = shopDate.getMonth() + 1;
+          const day = shopDate.getDate();
+          const formattedDate = `${year}-${month
+            .toString()
+            .padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
+          const notification = new Notification(
+            "Did you request get fulfilled?",
+            {
+              body: `Click to confirm you shopped on ${formattedDate}`,
+              data: {
+                requestId: requestId,
+                userId: userID,
+                category: category,
+                quantity: quantity,
+              },
+            }
+          );
+
+          notification.onclick = async (event) => {
+            event.preventDefault();
+            const data = notification.data;
+            if (data) {
+              await postToTransactionHistory({
+                requestId: data.requestId,
+                userId: data.userId,
+                category: data.category,
+                quantity: data.quantity,
+              });
+            }
+          };
+        }
+      }, delay);
+    }
+  };
+
+  const postToTransactionHistory = async (requestData: {
+    requestId: string;
+    userId: string;
+    category: string;
+    quantity: number;
+  }) => {
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:5000/log-transaction-history",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      console.log("Transaction logged:", responseData);
+    } catch (error) {
+      console.error("Error logging transaction:", error);
+    }
+  };
+
   useEffect(() => {
     if (currentUserID !== null) {
       setUserID(currentUserID);
@@ -108,6 +196,14 @@ function ShopperForm() {
         setFormSubmitted(true);
         // navigateShopperMatch();
         // setResponseContent(parsedResponse);
+        scheduleNotification(
+          endDate,
+          userID,
+          startDate,
+          generatedID,
+          category,
+          quantity
+        );
       } else {
         setResponseContent(null);
         setFormSubmitted(false);

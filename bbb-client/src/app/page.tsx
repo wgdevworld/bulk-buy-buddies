@@ -17,17 +17,17 @@ import ShopperMatch from "@/components/ShopperMatch/ShopperMatch";
 export default function Home() {
   return (
     <div>
-      {/* <Messenger /> */}
-      {/* <ProductRec /> */}
-      <ProductList />
-      {/* <Register /> */}
-      {/* <Logout/> */}
-      {/* <Login /> */}
-      {/* <Locations /> */}
-      {/* <ShopperForm /> */}
-      {/* <ShopperMatch /> */}
-      {/* <ResetPassword /> */}
-      {/* <Account /> */}
+      <Messenger /> 
+      <ProductRec />
+      {/* <ProductList /> */}
+      <Register />
+      <Logout/> 
+      <Login />
+      <Locations />
+      <ShopperForm />
+      <ShopperMatch />
+      <ResetPassword />
+      <Account />
     </div>
   );
 }
