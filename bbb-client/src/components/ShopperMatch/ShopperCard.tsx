@@ -61,7 +61,7 @@ export default function ShopperCard({
       <h2>UserID: {userID}</h2>
       <h2>ReqID: {reqID}</h2>
       <p>
-        Shopping for {category} at {location}
+        Shopping for {category}
       </p>
       <p>Quantity: {quantity}</p>
       <p>Start time: {new Date(timeStart).toLocaleString()}</p>
