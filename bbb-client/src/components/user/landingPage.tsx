@@ -12,8 +12,18 @@ function LandingPage() {
     const [doneLoading, setDoneLoading] = useState(false);
     const router = useRouter()
 
+    const requestNotificationPermission = async () => {
+        if (!("Notification" in window)) {
+          alert("This browser does not support desktop notification");
+        } else if (Notification.permission !== "denied") {
+          const permission = await Notification.requestPermission();
+          return permission;
+        }
+      };
+
     useEffect(() => {
         getUserAcctInfo();
+        requestNotificationPermission();
     }, []);
 
     const getUserAcctInfo = async () => {

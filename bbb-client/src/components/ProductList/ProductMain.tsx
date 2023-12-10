@@ -86,7 +86,6 @@ function ProductMain() {
     }
     event.preventDefault();
     await updateProductLocation(selectedProductId, selectedWarehouse);
-    console.log("Selected Warehouse:", selectedWarehouse);
     setIsSetPresenceModalVisible(false);
     setSelectedWarehouse("");
   };

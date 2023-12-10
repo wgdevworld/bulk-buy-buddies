@@ -70,3 +70,34 @@ def get_match_requests():
         return jsonify(request_list)
     except Exception as e:
         return jsonify(error={"message": str(e)})
+
+@request_blueprint.route('/log-transaction-history', methods=['POST'])
+def log_transaction_history():
+    mongo = current_app.config['MONGO']
+    try:
+        transaction_history_collection = mongo.db.transactionHistory
+        request_data = request.json
+        
+        requestId = request_data.get('requestId')
+        userId = request_data.get('userId')
+        category = request_data.get('category')
+        quantity = request_data.get('quantity')
+
+        if not all([requestId, userId, category, quantity is not None]):
+            return jsonify({"error": "Missing required fields"}), 400
+
+        transaction_record = {
+            "requestId": requestId,
+            "userId": userId,
+            "category": category,
+            "quantity": quantity,
+        }
+
+        transaction_history_collection.insert_one(transaction_record)
+
+        return jsonify({"message": "Transaction logged successfully"}), 201
+
+    except Exception as e:
+        # Detailed error logging
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
